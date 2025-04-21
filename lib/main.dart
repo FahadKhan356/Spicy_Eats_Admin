@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/Authentication/LoginScreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/RegisterScreen.dart';
 import 'package:spicy_eats_admin/Dashboard/Dashboard.dart';
 
 void main() {
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      home: const RegisterScreen(),
+      //const LoginScreen(),
       // Dashboard()
     );
   }
