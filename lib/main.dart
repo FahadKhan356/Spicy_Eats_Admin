@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/Authentication/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/RegisterScreen.dart';
 import 'package:spicy_eats_admin/Dashboard/Dashboard.dart';
+import 'package:spicy_eats_admin/Routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const RegisterScreen(),
+      onGenerateRoute: generateRoute,
       //const LoginScreen(),
       // Dashboard()
     );

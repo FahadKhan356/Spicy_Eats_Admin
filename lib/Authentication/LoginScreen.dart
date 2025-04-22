@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:spicy_eats_admin/Authentication/Register/RegisterScreen.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 
 class LoginScreen extends StatelessWidget {
+  static const String routename = '/Login';
   const LoginScreen({super.key});
 
   @override
@@ -212,21 +214,26 @@ class DekstopLayout extends StatelessWidget {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Don\'t Have An Account?',
-                                        style: TextStyle(
-                                            color: MyAppColor.iconGray),
-                                      ),
-                                      Text(
-                                        'Register Now',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black),
-                                      ),
-                                    ],
+                                  InkWell(
+                                    onTap: () => Navigator.pushNamed(
+                                        context, RegisterScreen.routename),
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Don\'t Have An Account?',
+                                          style: TextStyle(
+                                              color: MyAppColor.iconGray),
+                                        ),
+                                        Text(
+                                          'Register Now',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
