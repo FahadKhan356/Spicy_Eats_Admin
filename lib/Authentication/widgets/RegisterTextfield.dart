@@ -4,18 +4,16 @@ import 'package:spicy_eats_admin/utils/colors.dart';
 class RegisterTextfield extends StatelessWidget {
   final String labeltext;
   final String? Function(String?) onvalidation;
-  final TextEditingController controller;
 
-  RegisterTextfield(
-      {super.key,
-      required this.labeltext,
-      required this.onvalidation,
-      required this.controller});
+  RegisterTextfield({
+    super.key,
+    required this.labeltext,
+    required this.onvalidation,
+  });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: controller,
       validator: onvalidation,
       cursorColor: MyAppColor.iconGray,
       decoration: InputDecoration(

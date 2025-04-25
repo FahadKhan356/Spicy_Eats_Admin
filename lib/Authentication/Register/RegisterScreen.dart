@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:spicy_eats_admin/Authentication/LoginScreen.dart';
+import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
+import 'package:spicy_eats_admin/Authentication/widgets/map.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RegisterScreen extends StatelessWidget {
   static const String routename = '/Register';
@@ -37,6 +41,10 @@ class RegisterScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () =>
                       Navigator.pushNamed(context, LoginScreen.routename),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10))),
                   child: Text(
                     'Sign in',
                     style: TextStyle(
@@ -49,10 +57,6 @@ class RegisterScreen extends StatelessWidget {
                                     ? 10
                                     : 8),
                   ),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10))),
                 )),
           )
         ],
@@ -86,13 +90,16 @@ class RegisterScreen extends StatelessWidget {
   }
 }
 
-class Dekstoplayout extends StatelessWidget {
+class Dekstoplayout extends ConsumerWidget {
   final BoxConstraints constraint;
   Dekstoplayout({super.key, required this.constraint});
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
-  final TextEditingController businessController = TextEditingController();
+  // final TextEditingController businessController = TextEditingController();
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final address = ref.watch(restaurantLocationSelectedProvider);
+
     return Form(
       key: _form,
       child: Row(
@@ -168,90 +175,77 @@ class Dekstoplayout extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   RegisterTextfield(
-                                      labeltext: 'Your Business Name',
-                                      onvalidation: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'please provide busines name';
-                                        }
-                                        return null;
-                                      },
-                                      controller: businessController),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  TextFormField(
-                                    cursorColor: MyAppColor.iconGray,
-                                    decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Colors.grey[100],
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 5, horizontal: 10),
-                                        label: const Text(
-                                            'First & Middle Name per CNIC'),
-                                        labelStyle: const TextStyle(
-                                            color: Colors.black),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: BorderSide.none,
-                                        )),
+                                    labeltext: 'Your Business Name',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      ref
+                                          .read(businessNameProvider.notifier)
+                                          .state = value;
+                                      return null;
+                                    },
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  TextFormField(
-                                    cursorColor: MyAppColor.iconGray,
-                                    decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Colors.grey[100],
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 5, horizontal: 10),
-                                        label: const Text('Last Name Per CNIC'),
-                                        labelStyle: const TextStyle(
-                                            color: Colors.black),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: BorderSide.none,
-                                        )),
+                                  RegisterTextfield(
+                                    labeltext: 'First & Middle Name per CNIC',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      ref
+                                          .read(firstAndMiddleNameProvider
+                                              .notifier)
+                                          .state = value;
+                                      return null;
+                                    },
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  TextFormField(
-                                    cursorColor: MyAppColor.iconGray,
-                                    decoration: InputDecoration(
-                                        fillColor: Colors.grey[100],
-                                        filled: true,
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 5, horizontal: 10),
-                                        label: const Text(
-                                            'Enter Your Business Email'),
-                                        labelStyle: const TextStyle(
-                                            color: Colors.black),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: BorderSide.none,
-                                        )),
+                                  RegisterTextfield(
+                                    labeltext: 'Last Name Per CNIC',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      ref
+                                          .read(lastNameProvider.notifier)
+                                          .state = value;
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    labeltext: 'Last Name Per CNIC',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      ref
+                                          .read(lastNameProvider.notifier)
+                                          .state = value;
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    labeltext: 'Enter Your Business Email',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      ref
+                                          .read(lastNameProvider.notifier)
+                                          .state = value;
+                                      return null;
+                                    },
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -281,38 +275,75 @@ class Dekstoplayout extends StatelessWidget {
                                           ),
                                         ),
                                         Expanded(
-                                          child: TextFormField(
-                                            cursorColor: Colors.grey[100],
-                                            decoration: InputDecoration(
-                                                filled: true,
-                                                fillColor: Colors.grey[100],
-                                                contentPadding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5,
-                                                        horizontal: 10),
-                                                label:
-                                                    const Text('Mobile Number'),
-                                                labelStyle: const TextStyle(
-                                                    color: Colors.black),
-                                                enabledBorder:
-                                                    OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  borderSide: BorderSide.none,
-                                                ),
-                                                focusedBorder:
-                                                    OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  borderSide: BorderSide.none,
-                                                )),
-                                          ),
-                                        ),
+                                            child: RegisterTextfield(
+                                                labeltext: 'Mobile Number',
+                                                onvalidation: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Mandatory field Can\'t be empty ';
+                                                  }
+                                                  return null;
+                                                })),
                                       ],
                                     ),
                                   ),
                                   const SizedBox(
-                                    height: 10,
+                                    height: 20,
+                                  ),
+                                  Stack(
+                                    children: [
+                                      Center(
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.asset(
+                                            'lib/assets/map2.jpg',
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      Center(
+                                        child: SizedBox(
+                                          height: Responsive.isDesktop(context)
+                                              ? 40
+                                              : 30,
+                                          width: double.maxFinite,
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              surfaceTintColor: Colors.blue,
+                                              backgroundColor:
+                                                  Colors.black.withOpacity(0.5),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                  context, MyMap.routename);
+                                            },
+                                            child: const Text(
+                                              'Select restaurant location',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  address != null && address == true
+                                      ? const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Text(
+                                            'Location is not selected',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        )
+                                      : const SizedBox(),
+                                  const SizedBox(
+                                    height: 20,
                                   ),
                                   SizedBox(
                                     height:
@@ -320,11 +351,19 @@ class Dekstoplayout extends StatelessWidget {
                                     width: double.maxFinite,
                                     child: ElevatedButton(
                                       onPressed: () {
+                                        if (address == null) {
+                                          ref
+                                              .read(
+                                                  restaurantLocationSelectedProvider
+                                                      .notifier)
+                                              .state = true;
+                                        }
                                         if (_form.currentState!.validate()) {
                                           return;
                                         }
                                       },
                                       style: ElevatedButton.styleFrom(
+                                        surfaceTintColor: Colors.blue,
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10)),
@@ -399,7 +438,7 @@ class MobileLayout extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Center(
                       child: Text(
                         'From Local Favorite to Delivery Star!',
@@ -455,14 +494,16 @@ class MobileLayout extends StatelessWidget {
                                       color: Colors.white, fontSize: 12),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.white),
+                                    borderSide:
+                                        const BorderSide(color: Colors.white),
                                     //  const BorderSide(
                                     //     color: MyAppColor.iconGray,
                                     //     width: 1),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.white),
+                                    borderSide:
+                                        const BorderSide(color: Colors.white),
                                     //  const BorderSide(
                                     //     color: MyAppColor.iconGray,
                                     //     width: 1),
@@ -472,7 +513,7 @@ class MobileLayout extends StatelessWidget {
                               height: 20,
                             ),
                             TextFormField(
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                               cursorColor: MyAppColor.iconGray,
                               decoration: InputDecoration(
                                   filled: false,
@@ -486,18 +527,20 @@ class MobileLayout extends StatelessWidget {
                                       color: Colors.white, fontSize: 12),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.white),
+                                    borderSide:
+                                        const BorderSide(color: Colors.white),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.white),
+                                    borderSide:
+                                        const BorderSide(color: Colors.white),
                                   )),
                             ),
                             const SizedBox(
                               height: 20,
                             ),
                             TextFormField(
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                               cursorColor: MyAppColor.iconGray,
                               decoration: InputDecoration(
                                   filled: false,
@@ -522,7 +565,7 @@ class MobileLayout extends StatelessWidget {
                               height: 20,
                             ),
                             TextFormField(
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                               cursorColor: MyAppColor.iconGray,
                               decoration: InputDecoration(
                                   fillColor: Colors.grey[100],
@@ -554,7 +597,7 @@ class MobileLayout extends StatelessWidget {
                                         child: Container(
                                           color: Colors.grey[100],
                                           height: 40,
-                                          width: 80,
+                                          width: 70,
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceAround,
@@ -564,10 +607,10 @@ class MobileLayout extends StatelessWidget {
                                                 fit: BoxFit.cover,
                                                 height:
                                                     constraint.maxWidth > 200
-                                                        ? 30
+                                                        ? 20
                                                         : size.height * 0.02,
                                                 width: constraint.maxWidth > 200
-                                                    ? 40
+                                                    ? 30
                                                     : size.width * 0.02,
                                               ),
                                               Text(
