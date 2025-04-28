@@ -1,11 +1,17 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker_web/image_picker_web.dart';
 import 'package:spicy_eats_admin/Authentication/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
+import 'package:spicy_eats_admin/Authentication/utils/commonImagePicker.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/map.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
@@ -275,15 +281,16 @@ class Dekstoplayout extends ConsumerWidget {
                                           ),
                                         ),
                                         Expanded(
-                                            child: RegisterTextfield(
-                                                labeltext: 'Mobile Number',
-                                                onvalidation: (value) {
-                                                  if (value == null ||
-                                                      value.isEmpty) {
-                                                    return 'Mandatory field Can\'t be empty ';
-                                                  }
-                                                  return null;
-                                                })),
+                                          child: RegisterTextfield(
+                                              labeltext: 'Mobile Number',
+                                              onvalidation: (value) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
+                                                  return 'Mandatory field Can\'t be empty ';
+                                                }
+                                                return null;
+                                              }),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -345,6 +352,24 @@ class Dekstoplayout extends ConsumerWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: Center(
+                                      child: Text(
+                                        'Add your bank details to recieve payments',
+                                        style: GoogleFonts.mina(
+                                            fontSize: constraint.maxWidth < 400
+                                                ? constraint.maxWidth * 0.06
+                                                : 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
                                   SizedBox(
                                     height:
                                         Responsive.isDesktop(context) ? 40 : 30,
@@ -393,33 +418,53 @@ class Dekstoplayout extends ConsumerWidget {
   }
 }
 
-class MobileLayout extends StatelessWidget {
+class MobileLayout extends ConsumerStatefulWidget {
   BoxConstraints constraint;
   MobileLayout({super.key, required this.constraint});
 
   @override
+  ConsumerState<MobileLayout> createState() => _MobileLayoutState();
+}
+
+class _MobileLayoutState extends ConsumerState<MobileLayout> {
+  final GlobalKey<FormState> _form = GlobalKey<FormState>();
+
+  Uint8List? idImage;
+
+  Future<void> pickImage() async {
+    final pickedFile = await ImagePickerWeb.getImageAsBytes();
+    if (pickedFile != null) {
+      setState(() {
+        idImage = pickedFile;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isImageSelected = ref.watch(isimage);
+    final address = ref.watch(restaurantLocationSelectedProvider);
     final size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Stack(
         children: [
-          Positioned(
-            bottom: 0,
-            top: 0,
-            right: 0,
-            left: 0,
-            child: Container(
-              // decoration:
-              //     BoxDecoration(borderRadius: BorderRadius.circular(10)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  'lib/assets/registerbg2.jpg',
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
+          // Positioned(
+          //   bottom: 0,
+          //   top: 0,
+          //   right: 0,
+          //   left: 0,
+          //   child: Container(
+          //     // decoration:
+          //     //     BoxDecoration(borderRadius: BorderRadius.circular(10)),
+          //     child: ClipRRect(
+          //       borderRadius: BorderRadius.circular(10),
+          //       child: Image.asset(
+          //         'lib/assets/registerbg2.jpg',
+          //         fit: BoxFit.cover,
+          //       ),
+          //     ),
+          //   ),
+          // ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
             child: Container(
@@ -443,249 +488,502 @@ class MobileLayout extends StatelessWidget {
                       child: Text(
                         'From Local Favorite to Delivery Star!',
                         style: GoogleFonts.mina(
-                            fontSize: constraint.maxWidth < 400
-                                ? constraint.maxWidth * 0.07
-                                : 25,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                          fontSize: widget.constraint.maxWidth < 400
+                              ? widget.constraint.maxWidth * 0.07
+                              : 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(
-                            textDirection: TextDirection.ltr,
-                            'Let spicyeats handle the delivery while you focus on what you do best - creating amazing food! ',
-                            style: TextStyle(
-                                fontSize: constraint.maxWidth < 400
-                                    ? constraint.maxWidth * 0.07
-                                    : 20,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black),
+                  Form(
+                    key: _form,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Text(
+                              textDirection: TextDirection.ltr,
+                              'Let spicyeats handle the delivery while you focus on what you do best - creating amazing food! ',
+                              style: TextStyle(
+                                  fontSize: widget.constraint.maxWidth < 400
+                                      ? widget.constraint.maxWidth * 0.07
+                                      : 20,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextFormField(
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 13),
-                              cursorColor: Colors.white,
-                              decoration: InputDecoration(
-                                  filled: false,
-                                  fillColor: Colors.grey[100],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 10),
-                                  label: const Text('Your Business Name'),
-                                  labelStyle: const TextStyle(
-                                      color: Colors.white, fontSize: 12),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
-                                    //  const BorderSide(
-                                    //     color: MyAppColor.iconGray,
-                                    //     width: 1),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RegisterTextfield(
+                                labeltext: 'Your Business Name',
+                                onvalidation: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Mandatory field Can\'t be empty ';
+                                  }
+                                  ref
+                                      .read(businessNameProvider.notifier)
+                                      .state = value;
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              RegisterTextfield(
+                                labeltext: 'First & Middle Name per CNIC',
+                                onvalidation: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Mandatory field Can\'t be empty ';
+                                  }
+                                  ref
+                                      .read(firstAndMiddleNameProvider.notifier)
+                                      .state = value;
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              RegisterTextfield(
+                                labeltext: 'Last Name Per CNIC',
+                                onvalidation: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Mandatory field Can\'t be empty ';
+                                  }
+                                  ref.read(lastNameProvider.notifier).state =
+                                      value;
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              RegisterTextfield(
+                                labeltext: 'Last Name Per CNIC',
+                                onvalidation: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Mandatory field Can\'t be empty ';
+                                  }
+                                  ref.read(lastNameProvider.notifier).state =
+                                      value;
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              RegisterTextfield(
+                                labeltext: 'Enter Your Business Email',
+                                onvalidation: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Mandatory field Can\'t be empty ';
+                                  }
+                                  ref.read(lastNameProvider.notifier).state =
+                                      value;
+                                  return null;
+                                },
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  widget.constraint.maxWidth > 200
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Container(
+                                            color: Colors.grey[100],
+                                            height: 40,
+                                            width: 70,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                Image.asset(
+                                                  'lib/assets/pak1.png',
+                                                  fit: BoxFit.cover,
+                                                  height: widget.constraint
+                                                              .maxWidth >
+                                                          200
+                                                      ? 20
+                                                      : size.height * 0.02,
+                                                  width: widget.constraint
+                                                              .maxWidth >
+                                                          200
+                                                      ? 30
+                                                      : size.width * 0.02,
+                                                ),
+                                                Text(
+                                                  '+92',
+                                                  style: TextStyle(
+                                                    fontSize: widget.constraint
+                                                                .maxWidth >
+                                                            200
+                                                        ? 14
+                                                        : 6,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      : const SizedBox(),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 20),
+                                      child: RegisterTextfield(
+                                          labeltext: 'Mobile Number',
+                                          onvalidation: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Mandatory field Can\'t be empty ';
+                                            }
+                                            return null;
+                                          }), //textfield
+                                    ),
                                   ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
-                                    //  const BorderSide(
-                                    //     color: MyAppColor.iconGray,
-                                    //     width: 1),
-                                  )),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            TextFormField(
-                              style: const TextStyle(color: Colors.white),
-                              cursorColor: MyAppColor.iconGray,
-                              decoration: InputDecoration(
-                                  filled: false,
-                                  fillColor: Colors.grey[100],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 10),
-                                  label: const Text(
-                                    'First & Middle Name per CNIC',
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Stack(
+                                children: [
+                                  Center(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.asset(
+                                        'lib/assets/map2.jpg',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
-                                  labelStyle: const TextStyle(
-                                      color: Colors.white, fontSize: 12),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
+                                  Center(
+                                    child: SizedBox(
+                                      height: Responsive.isDesktop(context)
+                                          ? 40
+                                          : 30,
+                                      width: double.maxFinite,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          surfaceTintColor: Colors.blue,
+                                          backgroundColor:
+                                              Colors.black.withOpacity(0.5),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pushNamed(
+                                              context, MyMap.routename);
+                                        },
+                                        child: const Text(
+                                          'Select restaurant location',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
-                                  )),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            TextFormField(
-                              style: const TextStyle(color: Colors.white),
-                              cursorColor: MyAppColor.iconGray,
-                              decoration: InputDecoration(
-                                  filled: false,
-                                  fillColor: Colors.grey[100],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 10),
-                                  label: const Text('Last Name Per CNIC'),
-                                  labelStyle: const TextStyle(
-                                      color: Colors.white, fontSize: 12),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
+                                ],
+                              ),
+                              address != null && address == true
+                                  ? const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      child: Text(
+                                        'Location is not selected',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Add your bank details to recieve payments',
+                                    style: GoogleFonts.mina(
+                                        fontSize: widget.constraint.maxWidth <
+                                                400
+                                            ? widget.constraint.maxWidth * 0.06
+                                            : 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
                                   ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
-                                  )),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            TextFormField(
-                              style: const TextStyle(color: Colors.white),
-                              cursorColor: MyAppColor.iconGray,
-                              decoration: InputDecoration(
-                                  fillColor: Colors.grey[100],
-                                  filled: false,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 10),
-                                  label:
-                                      const Text('Enter Your Business Email'),
-                                  labelStyle: const TextStyle(
-                                      color: Colors.white, fontSize: 12),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
+                                  const SizedBox(
+                                    height: 10,
                                   ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
-                                  )),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                constraint.maxWidth > 200
-                                    ? Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Container(
-                                          color: Colors.grey[100],
-                                          height: 40,
-                                          width: 70,
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Icon(
+                                        Icons.lock,
+                                        color: Colors.green,
+                                        shadows: const [
+                                          BoxShadow(
+                                              color: Colors.black,
+                                              offset: Offset(0.2, 0.1))
+                                        ],
+                                        size: widget.constraint.maxWidth < 400
+                                            ? widget.constraint.maxWidth * 0.05
+                                            : 15,
+                                      ),
+                                      // const SizedBox(
+                                      //   width: 10,
+                                      // ),
+                                      Expanded(
+                                        child: Text(
+                                          'Your details are secure and encrypted with us.',
+                                          style: GoogleFonts.mina(
+                                              fontSize: widget
+                                                          .constraint.maxWidth <
+                                                      400
+                                                  ? widget.constraint.maxWidth *
+                                                      0.04
+                                                  : 12,
+                                              fontWeight: FontWeight.w900,
+                                              color: Colors.black),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              RegisterTextfield(
+                                labeltext: 'Bank Name',
+                                onvalidation: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Mandatory field Can\'t be empty ';
+                                  }
+                                  ref
+                                      .read(firstAndMiddleNameProvider.notifier)
+                                      .state = value;
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              RegisterTextfield(
+                                labeltext: 'Bank Account Owner/Title',
+                                onvalidation: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Mandatory field Can\'t be empty ';
+                                  }
+                                  ref
+                                      .read(firstAndMiddleNameProvider.notifier)
+                                      .state = value;
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              RegisterTextfield(
+                                labeltext: 'IBAN',
+                                onvalidation: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Mandatory field Can\'t be empty ';
+                                  }
+                                  ref
+                                      .read(firstAndMiddleNameProvider.notifier)
+                                      .state = value;
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Text(
+                                'Legal Documents',
+                                style: GoogleFonts.mina(
+                                    fontSize: widget.constraint.maxWidth < 400
+                                        ? widget.constraint.maxWidth * 0.06
+                                        : 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                height: 210,
+                                width: double.infinity,
+                                child: DottedBorder(
+                                  color: Colors.grey,
+                                  strokeWidth: 3,
+                                  dashPattern: const [12, 8],
+                                  child: idImage != null
+                                      ? Padding(
+                                          padding: const EdgeInsets.all(8.0),
                                           child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceAround,
                                             children: [
-                                              Image.asset(
-                                                'lib/assets/pak1.png',
-                                                fit: BoxFit.cover,
-                                                height:
-                                                    constraint.maxWidth > 200
-                                                        ? 20
-                                                        : size.height * 0.02,
-                                                width: constraint.maxWidth > 200
-                                                    ? 30
-                                                    : size.width * 0.02,
-                                              ),
-                                              Text(
-                                                '+92',
-                                                style: TextStyle(
-                                                  fontSize:
-                                                      constraint.maxWidth > 200
-                                                          ? 14
-                                                          : 6,
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: Container(
+                                                  padding: EdgeInsets.all(10),
+                                                  height: 100,
+                                                  color: Colors.blueGrey,
+                                                  child: Column(
+                                                    children: [
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            pickImage();
+                                                            idImage != null
+                                                                ? ref
+                                                                        .read(isimage
+                                                                            .notifier)
+                                                                        .state =
+                                                                    true
+                                                                : ref
+                                                                    .read(isimage
+                                                                        .notifier)
+                                                                    .state = false;
+                                                          },
+                                                          icon: const Icon(
+                                                            Icons.upload,
+                                                            size: 40,
+                                                            color: Colors.white,
+                                                          )),
+                                                      const Text(
+                                                        'upload again',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              )
+                                              ),
+                                              Center(
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      boxShadow: const [
+                                                        BoxShadow(
+                                                          color: Colors.black26,
+                                                          offset: Offset(1, 3),
+                                                          spreadRadius: 2,
+                                                          blurRadius: 2,
+                                                        )
+                                                      ]),
+                                                  child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      child: Image.memory(
+                                                        idImage!,
+                                                        height: 200,
+                                                        width: 200,
+                                                        fit: BoxFit.cover,
+                                                      )),
+                                                ),
+                                              ),
                                             ],
                                           ),
+                                        )
+                                      : Column(
+                                          children: [
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            Center(
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  pickImage();
+                                                  // pickimagefromgallery();
+                                                  idImage != null
+                                                      ? ref
+                                                          .read(
+                                                              isimage.notifier)
+                                                          .state = true
+                                                      : ref
+                                                          .read(
+                                                              isimage.notifier)
+                                                          .state = false;
+                                                },
+                                                icon: const Icon(
+                                                  Icons.camera_front_rounded,
+                                                  size: 100,
+                                                ),
+                                              ),
+                                            ),
+                                            const Text(
+                                                'Upload Identity Card Photo')
+                                          ],
                                         ),
-                                      )
-                                    : const SizedBox(),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 20),
-                                    child: TextFormField(
-                                      style: TextStyle(color: Colors.white),
-                                      cursorColor: Colors.grey[100],
-                                      decoration: InputDecoration(
-                                          filled: false,
-                                          fillColor: Colors.grey[100],
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 5, horizontal: 10),
-                                          label: const Text('Mobile Number'),
-                                          labelStyle: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            borderSide: const BorderSide(
-                                                color: Colors.white),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            borderSide: const BorderSide(
-                                                color: Colors.white),
-                                          )),
-                                    ),
+                                ),
+                              ),
+                              isImageSelected == false
+                                  ? const Text(
+                                      'upload image please',
+                                      style: TextStyle(color: Colors.red),
+                                    )
+                                  : const SizedBox(),
+                              SizedBox(
+                                height: Responsive.isDesktop(context) ? 40 : 30,
+                                width: double.maxFinite,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (address == null) {
+                                      ref
+                                          .read(
+                                              restaurantLocationSelectedProvider
+                                                  .notifier)
+                                          .state = true;
+                                    }
+                                    if (_form.currentState!.validate()) {
+                                      return;
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    surfaceTintColor: Colors.blue,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    backgroundColor: Colors.black,
+                                  ),
+                                  child: const Text(
+                                    ' Get Started ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
                                   ),
                                 ),
-                              ],
-                            ),
-                            // const SizedBox(
-                            //   height: 10,
-                            // ),
-                            // SizedBox(
-                            //   height: Responsive.isDesktop(context) ? 40 : 30,
-                            //   width: double.maxFinite,
-                            //   child: ElevatedButton(
-                            //     onPressed: () {},
-                            //     style: ElevatedButton.styleFrom(
-                            //       shape: RoundedRectangleBorder(
-                            //           borderRadius: BorderRadius.circular(10)),
-                            //       backgroundColor: Colors.black,
-                            //     ),
-                            //     child: const Text(
-                            //       ' Get Started ',
-                            //       style: TextStyle(
-                            //           fontWeight: FontWeight.bold,
-                            //           color: Colors.white),
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),

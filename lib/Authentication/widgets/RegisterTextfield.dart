@@ -18,7 +18,8 @@ class RegisterTextfield extends StatelessWidget {
       cursorColor: MyAppColor.iconGray,
       decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.grey[100],
+          fillColor: Colors.black12,
+          focusColor: Colors.transparent,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           label: Text(labeltext),

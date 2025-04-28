@@ -42,6 +42,8 @@ dependencies:
   flutter_map_location_picker: ^0.0.4
   geolocator: ^12.0.0
   http: ^1.2.2
+  image_picker_web: ^4.0.0
+  dotted_border: ^2.1.0
 
 dev_dependencies:
   flutter_test:
