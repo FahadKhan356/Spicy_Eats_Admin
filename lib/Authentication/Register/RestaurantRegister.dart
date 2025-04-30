@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:spicy_eats_admin/Authentication/LoginScreen.dart';
@@ -18,9 +19,9 @@ import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RestaurantRegister extends StatelessWidget {
   static const String routename = '/Register';
-  const RegisterScreen({super.key});
+  const RestaurantRegister({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -96,16 +97,68 @@ class RegisterScreen extends StatelessWidget {
   }
 }
 
-class Dekstoplayout extends ConsumerWidget {
+class Dekstoplayout extends ConsumerStatefulWidget {
   final BoxConstraints constraint;
   Dekstoplayout({super.key, required this.constraint});
-  final GlobalKey<FormState> _form = GlobalKey<FormState>();
-  // final TextEditingController businessController = TextEditingController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final address = ref.watch(restaurantLocationSelectedProvider);
+  ConsumerState<Dekstoplayout> createState() => _DekstoplayoutState();
+}
 
+class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
+  final GlobalKey<FormState> _form = GlobalKey<FormState>();
+  Uint8List? idImage;
+  Future<void> pickImage() async {
+    try {
+      final pickedimage = await ImagePickerWeb.getImageAsBytes();
+      if (pickedimage != null) {
+        setState(() {
+          idImage = pickedimage;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    businessemail.dispose();
+    businessname.dispose();
+    bankname.dispose();
+    contactno.dispose();
+    accountownername.dispose();
+    iban.dispose();
+    cnicno.dispose();
+    lastname.dispose();
+    firstandmiddlename.dispose();
+    mobileno.dispose();
+    password.dispose();
+  }
+
+  final businessname = TextEditingController();
+  final firstandmiddlename = TextEditingController();
+  final lastname = TextEditingController();
+  final cnicno = TextEditingController();
+  final businessemail = TextEditingController();
+  final contactno = TextEditingController();
+  final bankname = TextEditingController();
+  final accountownername = TextEditingController();
+  final iban = TextEditingController();
+  final mobileno = TextEditingController();
+  final password = TextEditingController();
+
+  double? latitude;
+  double? longitude;
+  String? address;
+  // final TextEditingController businessController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    final address = ref.watch(restaurantLocationSelectedProvider);
+    final size = MediaQuery.of(context).size;
+    final isImageSelected = ref.watch(isimage);
     return Form(
       key: _form,
       child: Row(
@@ -138,12 +191,12 @@ class Dekstoplayout extends ConsumerWidget {
                       children: [
                         Padding(
                           padding: EdgeInsets.symmetric(
-                              horizontal: constraint.maxWidth / 100),
+                              horizontal: widget.constraint.maxWidth / 100),
                           child: Text(
                             'From Local Favorite to Delivery Star!',
                             style: GoogleFonts.mina(
-                                fontSize: constraint.maxWidth < 1024
-                                    ? constraint.maxWidth * 0.02
+                                fontSize: widget.constraint.maxWidth < 1024
+                                    ? widget.constraint.maxWidth * 0.02
                                     : 22,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black),
@@ -163,8 +216,9 @@ class Dekstoplayout extends ConsumerWidget {
                                   textDirection: TextDirection.ltr,
                                   'Let spicyeats handle the delivery while you focus on what you do best - creating amazing food! ',
                                   style: TextStyle(
-                                      fontSize: constraint.maxWidth < 1024
-                                          ? constraint.maxWidth * 0.02
+                                      fontSize: widget.constraint.maxWidth <
+                                              1024
+                                          ? widget.constraint.maxWidth * 0.02
                                           : 22,
                                       fontWeight: FontWeight.w400,
                                       color: Colors.black),
@@ -181,6 +235,42 @@ class Dekstoplayout extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   RegisterTextfield(
+                                    controller: businessemail,
+                                    labeltext: 'Enter Your Business Email',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      ref
+                                          .read(lastNameProvider.notifier)
+                                          .state = value;
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    controller: password,
+                                    labeltext: 'Enter Password',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      if (value.length < 9) {
+                                        return 'Password length should be atleast 9 ';
+                                      }
+                                      ref
+                                          .read(lastNameProvider.notifier)
+                                          .state = value;
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    controller: businessname,
                                     labeltext: 'Your Business Name',
                                     onvalidation: (value) {
                                       if (value == null || value.isEmpty) {
@@ -196,6 +286,7 @@ class Dekstoplayout extends ConsumerWidget {
                                     height: 20,
                                   ),
                                   RegisterTextfield(
+                                    controller: firstandmiddlename,
                                     labeltext: 'First & Middle Name per CNIC',
                                     onvalidation: (value) {
                                       if (value == null || value.isEmpty) {
@@ -212,6 +303,7 @@ class Dekstoplayout extends ConsumerWidget {
                                     height: 20,
                                   ),
                                   RegisterTextfield(
+                                    controller: lastname,
                                     labeltext: 'Last Name Per CNIC',
                                     onvalidation: (value) {
                                       if (value == null || value.isEmpty) {
@@ -227,11 +319,18 @@ class Dekstoplayout extends ConsumerWidget {
                                     height: 20,
                                   ),
                                   RegisterTextfield(
-                                    labeltext: 'Last Name Per CNIC',
+                                    controller: cnicno,
+                                    labeltext: 'CNIC number',
                                     onvalidation: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Mandatory field Can\'t be empty ';
+                                      final nicno = int.tryParse(value ?? '');
+                                      if (nicno == null) {
+                                        return 'please Enter numbers';
                                       }
+                                      if (value!.length < 12 ||
+                                          value.length > 12) {
+                                        return 'Please enter atleats 12 digits';
+                                      }
+
                                       ref
                                           .read(lastNameProvider.notifier)
                                           .state = value;
@@ -240,18 +339,6 @@ class Dekstoplayout extends ConsumerWidget {
                                   ),
                                   const SizedBox(
                                     height: 20,
-                                  ),
-                                  RegisterTextfield(
-                                    labeltext: 'Enter Your Business Email',
-                                    onvalidation: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Mandatory field Can\'t be empty ';
-                                      }
-                                      ref
-                                          .read(lastNameProvider.notifier)
-                                          .state = value;
-                                      return null;
-                                    },
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -282,6 +369,7 @@ class Dekstoplayout extends ConsumerWidget {
                                         ),
                                         Expanded(
                                           child: RegisterTextfield(
+                                              controller: mobileno,
                                               labeltext: 'Mobile Number',
                                               onvalidation: (value) {
                                                 if (value == null ||
@@ -352,21 +440,259 @@ class Dekstoplayout extends ConsumerWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20),
-                                    child: Center(
-                                      child: Text(
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
                                         'Add your bank details to recieve payments',
                                         style: GoogleFonts.mina(
-                                            fontSize: constraint.maxWidth < 400
-                                                ? constraint.maxWidth * 0.06
-                                                : 22,
+                                            fontSize:
+                                                widget.constraint.maxWidth < 400
+                                                    ? widget.constraint
+                                                            .maxWidth *
+                                                        0.06
+                                                    : 22,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black),
                                       ),
-                                    ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Icon(
+                                            Icons.lock,
+                                            color: Colors.green,
+                                            shadows: const [
+                                              BoxShadow(
+                                                  color: Colors.black,
+                                                  offset: Offset(0.2, 0.1))
+                                            ],
+                                            size: widget.constraint.maxWidth <
+                                                    400
+                                                ? widget.constraint.maxWidth *
+                                                    0.05
+                                                : 15,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              'Your details are secure and encrypted with us.',
+                                              style: GoogleFonts.mina(
+                                                  fontSize: widget.constraint
+                                                              .maxWidth <
+                                                          400
+                                                      ? widget.constraint
+                                                              .maxWidth *
+                                                          0.04
+                                                      : 12,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
+                                  RegisterTextfield(
+                                    controller: bankname,
+                                    labeltext: 'Bank Name',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      ref
+                                          .read(firstAndMiddleNameProvider
+                                              .notifier)
+                                          .state = value;
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    controller: accountownername,
+                                    labeltext: 'Bank Account Owner/Title',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      ref
+                                          .read(firstAndMiddleNameProvider
+                                              .notifier)
+                                          .state = value;
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    controller: iban,
+                                    labeltext: 'IBAN',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+                                      ref
+                                          .read(firstAndMiddleNameProvider
+                                              .notifier)
+                                          .state = value;
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text(
+                                    'Legal Documents',
+                                    style: GoogleFonts.mina(
+                                        fontSize:
+                                            widget.constraint.maxWidth < 400
+                                                ? size.height * 0.03
+                                                : 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Stack(
+                                    children: [
+                                      Container(
+                                        constraints: const BoxConstraints(
+                                          maxHeight: 200,
+                                          minHeight: 100,
+                                          maxWidth: double.maxFinite,
+                                        ),
+                                        child: DottedBorder(
+                                          color: Colors.grey,
+                                          strokeWidth: 3,
+                                          dashPattern: const [12, 8],
+                                          child: idImage != null
+                                              ? Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Container(
+                                                          child: Center(
+                                                            child: Image.memory(
+                                                              idImage!,
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : Column(
+                                                  children: [
+                                                    const SizedBox(
+                                                      height: 20,
+                                                    ),
+                                                    Center(
+                                                      child: IconButton(
+                                                          onPressed: () async {
+                                                            pickImage();
+
+                                                            idImage != null
+                                                                ? ref
+                                                                        .read(isimage
+                                                                            .notifier)
+                                                                        .state =
+                                                                    true
+                                                                : ref
+                                                                    .read(isimage
+                                                                        .notifier)
+                                                                    .state = false;
+                                                          },
+                                                          icon: Icon(
+                                                            Icons
+                                                                .camera_front_rounded,
+                                                            size: widget.constraint
+                                                                        .maxWidth >
+                                                                    900
+                                                                ? 80
+                                                                : 50,
+                                                          )),
+                                                    ),
+                                                    Text(
+                                                      'Upload Identity Card Photo',
+                                                      style: TextStyle(
+                                                          fontSize:
+                                                              size.width > 767
+                                                                  ? size.width *
+                                                                      0.015
+                                                                  : 10,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          color: Colors.black),
+                                                    )
+                                                  ],
+                                                ),
+                                        ),
+                                      ),
+                                      idImage != null
+                                          ? Positioned(
+                                              top: 0,
+                                              left: 0,
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  pickImage();
+                                                  idImage != null
+                                                      ? ref
+                                                          .read(
+                                                              isimage.notifier)
+                                                          .state = true
+                                                      : ref
+                                                          .read(
+                                                              isimage.notifier)
+                                                          .state = false;
+                                                },
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  height: 50,
+                                                  width: 50,
+                                                  decoration: const BoxDecoration(
+                                                      color: Colors.black,
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          50))),
+                                                  child: const Icon(
+                                                    Icons.refresh,
+                                                    size: 15,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          : const SizedBox(),
+                                    ],
+                                  ),
+                                  isImageSelected == false
+                                      ? const Text(
+                                          'upload image please',
+                                          style: TextStyle(color: Colors.red),
+                                        )
+                                      : const SizedBox(),
                                   const SizedBox(
                                     height: 20,
                                   ),
@@ -427,16 +753,53 @@ class MobileLayout extends ConsumerStatefulWidget {
 }
 
 class _MobileLayoutState extends ConsumerState<MobileLayout> {
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    businessemail.dispose();
+    businessname.dispose();
+    bankname.dispose();
+    contactno.dispose();
+    accountownername.dispose();
+    iban.dispose();
+    cnicno.dispose();
+    lastname.dispose();
+    firstandmiddlename.dispose();
+    mobileno.dispose();
+    password.dispose();
+  }
+
+  final businessname = TextEditingController();
+  final firstandmiddlename = TextEditingController();
+  final lastname = TextEditingController();
+  final cnicno = TextEditingController();
+  final businessemail = TextEditingController();
+  final contactno = TextEditingController();
+  final bankname = TextEditingController();
+  final accountownername = TextEditingController();
+  final iban = TextEditingController();
+  final mobileno = TextEditingController();
+  final password = TextEditingController();
+
+  double? latitude;
+  double? longitude;
+  String? address;
+
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
 
   Uint8List? idImage;
 
   Future<void> pickImage() async {
-    final pickedFile = await ImagePickerWeb.getImageAsBytes();
-    if (pickedFile != null) {
-      setState(() {
-        idImage = pickedFile;
-      });
+    try {
+      final pickedFile = await ImagePickerWeb.getImageAsBytes();
+      if (pickedFile != null) {
+        setState(() {
+          idImage = pickedFile;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
     }
   }
 
@@ -448,34 +811,11 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
     return SingleChildScrollView(
       child: Stack(
         children: [
-          // Positioned(
-          //   bottom: 0,
-          //   top: 0,
-          //   right: 0,
-          //   left: 0,
-          //   child: Container(
-          //     // decoration:
-          //     //     BoxDecoration(borderRadius: BorderRadius.circular(10)),
-          //     child: ClipRRect(
-          //       borderRadius: BorderRadius.circular(10),
-          //       child: Image.asset(
-          //         'lib/assets/registerbg2.jpg',
-          //         fit: BoxFit.cover,
-          //       ),
-          //     ),
-          //   ),
-          // ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                // boxShadow: [
-                //   BoxShadow(
-                //       color: Colors.black,
-                //       offset: Offset(0.1, -0.2),
-                //       blurRadius: 6)
-                // ],
                 color: Colors.white.withOpacity(0.3),
               ),
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -529,14 +869,14 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               RegisterTextfield(
-                                labeltext: 'Your Business Name',
+                                controller: businessemail,
+                                labeltext: 'Enter Your Business Email',
                                 onvalidation: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Mandatory field Can\'t be empty ';
                                   }
-                                  ref
-                                      .read(businessNameProvider.notifier)
-                                      .state = value;
+                                  ref.read(lastNameProvider.notifier).state =
+                                      value;
                                   return null;
                                 },
                               ),
@@ -544,6 +884,25 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                 height: 20,
                               ),
                               RegisterTextfield(
+                                controller: password,
+                                labeltext: 'Enter Password',
+                                onvalidation: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Mandatory field Can\'t be empty ';
+                                  }
+                                  if (value.length < 9) {
+                                    return 'Password length should be atleast 9 ';
+                                  }
+                                  ref.read(lastNameProvider.notifier).state =
+                                      value;
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              RegisterTextfield(
+                                controller: firstandmiddlename,
                                 labeltext: 'First & Middle Name per CNIC',
                                 onvalidation: (value) {
                                   if (value == null || value.isEmpty) {
@@ -559,6 +918,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                 height: 20,
                               ),
                               RegisterTextfield(
+                                controller: lastname,
                                 labeltext: 'Last Name Per CNIC',
                                 onvalidation: (value) {
                                   if (value == null || value.isEmpty) {
@@ -573,11 +933,17 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                 height: 20,
                               ),
                               RegisterTextfield(
-                                labeltext: 'Last Name Per CNIC',
+                                controller: cnicno,
+                                labeltext: 'CNIC number',
                                 onvalidation: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Mandatory field Can\'t be empty ';
+                                  final nicno = int.tryParse(value ?? '');
+                                  if (nicno == null) {
+                                    return 'please Enter numbers';
                                   }
+                                  if (value!.length < 12 || value.length > 12) {
+                                    return 'Please enter atleats 12 digits';
+                                  }
+
                                   ref.read(lastNameProvider.notifier).state =
                                       value;
                                   return null;
@@ -587,6 +953,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                 height: 20,
                               ),
                               RegisterTextfield(
+                                controller: businessemail,
                                 labeltext: 'Enter Your Business Email',
                                 onvalidation: (value) {
                                   if (value == null || value.isEmpty) {
@@ -647,6 +1014,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 20),
                                       child: RegisterTextfield(
+                                          controller: mobileno,
                                           labeltext: 'Mobile Number',
                                           onvalidation: (value) {
                                             if (value == null ||
@@ -748,9 +1116,6 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                             ? widget.constraint.maxWidth * 0.05
                                             : 15,
                                       ),
-                                      // const SizedBox(
-                                      //   width: 10,
-                                      // ),
                                       Expanded(
                                         child: Text(
                                           'Your details are secure and encrypted with us.',
@@ -773,6 +1138,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                 height: 20,
                               ),
                               RegisterTextfield(
+                                controller: bankname,
                                 labeltext: 'Bank Name',
                                 onvalidation: (value) {
                                   if (value == null || value.isEmpty) {
@@ -788,6 +1154,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                 height: 20,
                               ),
                               RegisterTextfield(
+                                controller: accountownername,
                                 labeltext: 'Bank Account Owner/Title',
                                 onvalidation: (value) {
                                   if (value == null || value.isEmpty) {
@@ -803,6 +1170,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                 height: 20,
                               ),
                               RegisterTextfield(
+                                controller: iban,
                                 labeltext: 'IBAN',
                                 onvalidation: (value) {
                                   if (value == null || value.isEmpty) {
@@ -821,126 +1189,127 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                 'Legal Documents',
                                 style: GoogleFonts.mina(
                                     fontSize: widget.constraint.maxWidth < 400
-                                        ? widget.constraint.maxWidth * 0.06
+                                        ? size.height * 0.03
                                         : 22,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black),
                               ),
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                height: 210,
-                                width: double.infinity,
-                                child: DottedBorder(
-                                  color: Colors.grey,
-                                  strokeWidth: 3,
-                                  dashPattern: const [12, 8],
-                                  child: idImage != null
-                                      ? Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Container(
-                                                  padding: EdgeInsets.all(10),
-                                                  height: 100,
-                                                  color: Colors.blueGrey,
-                                                  child: Column(
-                                                    children: [
-                                                      IconButton(
-                                                          onPressed: () {
-                                                            pickImage();
-                                                            idImage != null
-                                                                ? ref
-                                                                        .read(isimage
-                                                                            .notifier)
-                                                                        .state =
-                                                                    true
-                                                                : ref
-                                                                    .read(isimage
-                                                                        .notifier)
-                                                                    .state = false;
-                                                          },
-                                                          icon: const Icon(
-                                                            Icons.upload,
-                                                            size: 40,
-                                                            color: Colors.white,
-                                                          )),
-                                                      const Text(
-                                                        'upload again',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
+                              Stack(
+                                children: [
+                                  Container(
+                                    constraints: const BoxConstraints(
+                                      maxHeight: 200,
+                                      minHeight: 100,
+                                      maxWidth: double.maxFinite,
+                                    ),
+                                    child: DottedBorder(
+                                      color: Colors.grey,
+                                      strokeWidth: 3,
+                                      dashPattern: const [12, 8],
+                                      child: idImage != null
+                                          ? Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Center(
+                                                        child: Image.memory(
+                                                          idImage!,
+                                                          fit: BoxFit.cover,
+                                                        ),
                                                       ),
-                                                    ],
+                                                    ),
                                                   ),
-                                                ),
+                                                ],
                                               ),
-                                              Center(
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      boxShadow: const [
-                                                        BoxShadow(
-                                                          color: Colors.black26,
-                                                          offset: Offset(1, 3),
-                                                          spreadRadius: 2,
-                                                          blurRadius: 2,
-                                                        )
-                                                      ]),
-                                                  child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      child: Image.memory(
-                                                        idImage!,
-                                                        height: 200,
-                                                        width: 200,
-                                                        fit: BoxFit.cover,
+                                            )
+                                          : Column(
+                                              children: [
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                Center(
+                                                  child: IconButton(
+                                                      onPressed: () async {
+                                                        pickImage();
+                                                        // pickimagefromgallery();
+                                                        idImage != null
+                                                            ? ref
+                                                                .read(isimage
+                                                                    .notifier)
+                                                                .state = true
+                                                            : ref
+                                                                .read(isimage
+                                                                    .notifier)
+                                                                .state = false;
+                                                      },
+                                                      icon: Icon(
+                                                        Icons
+                                                            .camera_front_rounded,
+                                                        size: widget.constraint
+                                                                    .maxWidth >
+                                                                300
+                                                            ? 80
+                                                            : 50,
                                                       )),
                                                 ),
+                                                Text(
+                                                  'Upload Identity Card Photo',
+                                                  style: TextStyle(
+                                                      fontSize: size.width > 400
+                                                          ? size.width * 0.03
+                                                          : 10,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      color: Colors.black),
+                                                )
+                                              ],
+                                            ),
+                                    ),
+                                  ),
+                                  idImage != null
+                                      ? Positioned(
+                                          top: 0,
+                                          left: 0,
+                                          child: InkWell(
+                                            onTap: () async {
+                                              pickImage();
+                                              idImage != null
+                                                  ? ref
+                                                      .read(isimage.notifier)
+                                                      .state = true
+                                                  : ref
+                                                      .read(isimage.notifier)
+                                                      .state = false;
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.all(10),
+                                              height: 50,
+                                              width: 50,
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  50))),
+                                              child: const Icon(
+                                                Icons.refresh,
+                                                size: 15,
+                                                color: Colors.white,
                                               ),
-                                            ],
+                                            ),
                                           ),
                                         )
-                                      : Column(
-                                          children: [
-                                            const SizedBox(
-                                              height: 20,
-                                            ),
-                                            Center(
-                                              child: IconButton(
-                                                onPressed: () {
-                                                  pickImage();
-                                                  // pickimagefromgallery();
-                                                  idImage != null
-                                                      ? ref
-                                                          .read(
-                                                              isimage.notifier)
-                                                          .state = true
-                                                      : ref
-                                                          .read(
-                                                              isimage.notifier)
-                                                          .state = false;
-                                                },
-                                                icon: const Icon(
-                                                  Icons.camera_front_rounded,
-                                                  size: 100,
-                                                ),
-                                              ),
-                                            ),
-                                            const Text(
-                                                'Upload Identity Card Photo')
-                                          ],
-                                        ),
-                                ),
+                                      : const SizedBox(),
+                                ],
                               ),
                               isImageSelected == false
                                   ? const Text(
@@ -948,6 +1317,9 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                       style: TextStyle(color: Colors.red),
                                     )
                                   : const SizedBox(),
+                              const SizedBox(
+                                height: 20,
+                              ),
                               SizedBox(
                                 height: Responsive.isDesktop(context) ? 40 : 30,
                                 width: double.maxFinite,

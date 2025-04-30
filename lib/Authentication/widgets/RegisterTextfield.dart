@@ -4,16 +4,18 @@ import 'package:spicy_eats_admin/utils/colors.dart';
 class RegisterTextfield extends StatelessWidget {
   final String labeltext;
   final String? Function(String?) onvalidation;
+  TextEditingController controller;
 
-  RegisterTextfield({
-    super.key,
-    required this.labeltext,
-    required this.onvalidation,
-  });
+  RegisterTextfield(
+      {super.key,
+      required this.labeltext,
+      required this.onvalidation,
+      required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
       validator: onvalidation,
       cursorColor: MyAppColor.iconGray,
       decoration: InputDecoration(
@@ -23,7 +25,9 @@ class RegisterTextfield extends StatelessWidget {
           contentPadding:
               const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           label: Text(labeltext),
-          labelStyle: const TextStyle(color: Colors.black),
+          labelStyle: const TextStyle(color: Colors.black, fontSize: 12),
+          floatingLabelStyle:
+              const TextStyle(color: Colors.black, fontSize: 15),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/Authentication/LoginScreen.dart';
-import 'package:spicy_eats_admin/Authentication/Register/RegisterScreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/map.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
@@ -10,8 +10,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const LoginScreen());
 
     //Register screen
-    case RegisterScreen.routename:
-      return MaterialPageRoute(builder: (_) => const RegisterScreen());
+    case RestaurantRegister.routename:
+      return MaterialPageRoute(builder: (_) => const RestaurantRegister());
 
     //map location picker
 

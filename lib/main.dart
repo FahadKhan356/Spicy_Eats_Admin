@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spicy_eats_admin/Authentication/Register/RegisterScreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Routes.dart';
 
 void main() {
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const RegisterScreen(),
+      home: const RestaurantRegister(),
       onGenerateRoute: generateRoute,
       //const LoginScreen(),
       // Dashboard()

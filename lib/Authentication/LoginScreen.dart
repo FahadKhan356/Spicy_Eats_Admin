@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:spicy_eats_admin/Authentication/Register/RegisterScreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 
@@ -216,7 +216,7 @@ class DekstopLayout extends StatelessWidget {
                                   ),
                                   InkWell(
                                     onTap: () => Navigator.pushNamed(
-                                        context, RegisterScreen.routename),
+                                        context, RestaurantRegister.routename),
                                     child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
