@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:spicy_eats_admin/Authentication/LoginScreen.dart';
-import 'package:spicy_eats_admin/Authentication/Register/RestaurantRegister.dart';
+import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/map.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {

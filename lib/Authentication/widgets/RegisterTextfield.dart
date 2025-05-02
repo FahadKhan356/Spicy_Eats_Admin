@@ -4,7 +4,7 @@ import 'package:spicy_eats_admin/utils/colors.dart';
 class RegisterTextfield extends StatelessWidget {
   final String labeltext;
   final String? Function(String?) onvalidation;
-  TextEditingController controller;
+  final TextEditingController controller;
 
   RegisterTextfield(
       {super.key,

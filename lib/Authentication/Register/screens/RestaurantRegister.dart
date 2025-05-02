@@ -1,22 +1,16 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker_web/image_picker_web.dart';
-import 'package:spicy_eats_admin/Authentication/LoginScreen.dart';
+import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
+import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/Authentication/utils/commonImagePicker.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/map.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
-import 'package:spicy_eats_admin/utils/colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RestaurantRegister extends StatelessWidget {
@@ -241,9 +235,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       if (value == null || value.isEmpty) {
                                         return 'Mandatory field Can\'t be empty ';
                                       }
-                                      ref
-                                          .read(lastNameProvider.notifier)
-                                          .state = value;
+
                                       return null;
                                     },
                                   ),
@@ -260,9 +252,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       if (value.length < 9) {
                                         return 'Password length should be atleast 9 ';
                                       }
-                                      ref
-                                          .read(lastNameProvider.notifier)
-                                          .state = value;
+
                                       return null;
                                     },
                                   ),
@@ -276,9 +266,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       if (value == null || value.isEmpty) {
                                         return 'Mandatory field Can\'t be empty ';
                                       }
-                                      ref
-                                          .read(businessNameProvider.notifier)
-                                          .state = value;
+
                                       return null;
                                     },
                                   ),
@@ -292,10 +280,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       if (value == null || value.isEmpty) {
                                         return 'Mandatory field Can\'t be empty ';
                                       }
-                                      ref
-                                          .read(firstAndMiddleNameProvider
-                                              .notifier)
-                                          .state = value;
+
                                       return null;
                                     },
                                   ),
@@ -309,9 +294,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       if (value == null || value.isEmpty) {
                                         return 'Mandatory field Can\'t be empty ';
                                       }
-                                      ref
-                                          .read(lastNameProvider.notifier)
-                                          .state = value;
+
                                       return null;
                                     },
                                   ),
@@ -331,9 +314,6 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                         return 'Please enter atleats 12 digits';
                                       }
 
-                                      ref
-                                          .read(lastNameProvider.notifier)
-                                          .state = value;
                                       return null;
                                     },
                                   ),
@@ -505,10 +485,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       if (value == null || value.isEmpty) {
                                         return 'Mandatory field Can\'t be empty ';
                                       }
-                                      ref
-                                          .read(firstAndMiddleNameProvider
-                                              .notifier)
-                                          .state = value;
+
                                       return null;
                                     },
                                   ),
@@ -522,10 +499,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       if (value == null || value.isEmpty) {
                                         return 'Mandatory field Can\'t be empty ';
                                       }
-                                      ref
-                                          .read(firstAndMiddleNameProvider
-                                              .notifier)
-                                          .state = value;
+
                                       return null;
                                     },
                                   ),
@@ -539,10 +513,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       if (value == null || value.isEmpty) {
                                         return 'Mandatory field Can\'t be empty ';
                                       }
-                                      ref
-                                          .read(firstAndMiddleNameProvider
-                                              .notifier)
-                                          .state = value;
+
                                       return null;
                                     },
                                   ),
@@ -745,7 +716,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
 }
 
 class MobileLayout extends ConsumerStatefulWidget {
-  BoxConstraints constraint;
+  final BoxConstraints constraint;
   MobileLayout({super.key, required this.constraint});
 
   @override
@@ -875,8 +846,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   if (value == null || value.isEmpty) {
                                     return 'Mandatory field Can\'t be empty ';
                                   }
-                                  ref.read(lastNameProvider.notifier).state =
-                                      value;
+
                                   return null;
                                 },
                               ),
@@ -893,8 +863,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   if (value.length < 9) {
                                     return 'Password length should be atleast 9 ';
                                   }
-                                  ref.read(lastNameProvider.notifier).state =
-                                      value;
+
                                   return null;
                                 },
                               ),
@@ -908,9 +877,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   if (value == null || value.isEmpty) {
                                     return 'Mandatory field Can\'t be empty ';
                                   }
-                                  ref
-                                      .read(firstAndMiddleNameProvider.notifier)
-                                      .state = value;
+
                                   return null;
                                 },
                               ),
@@ -924,8 +891,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   if (value == null || value.isEmpty) {
                                     return 'Mandatory field Can\'t be empty ';
                                   }
-                                  ref.read(lastNameProvider.notifier).state =
-                                      value;
+
                                   return null;
                                 },
                               ),
@@ -944,8 +910,6 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                     return 'Please enter atleats 12 digits';
                                   }
 
-                                  ref.read(lastNameProvider.notifier).state =
-                                      value;
                                   return null;
                                 },
                               ),
@@ -959,8 +923,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   if (value == null || value.isEmpty) {
                                     return 'Mandatory field Can\'t be empty ';
                                   }
-                                  ref.read(lastNameProvider.notifier).state =
-                                      value;
+
                                   return null;
                                 },
                               ),
@@ -1144,9 +1107,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   if (value == null || value.isEmpty) {
                                     return 'Mandatory field Can\'t be empty ';
                                   }
-                                  ref
-                                      .read(firstAndMiddleNameProvider.notifier)
-                                      .state = value;
+
                                   return null;
                                 },
                               ),
@@ -1160,9 +1121,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   if (value == null || value.isEmpty) {
                                     return 'Mandatory field Can\'t be empty ';
                                   }
-                                  ref
-                                      .read(firstAndMiddleNameProvider.notifier)
-                                      .state = value;
+
                                   return null;
                                 },
                               ),
@@ -1176,9 +1135,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   if (value == null || value.isEmpty) {
                                     return 'Mandatory field Can\'t be empty ';
                                   }
-                                  ref
-                                      .read(firstAndMiddleNameProvider.notifier)
-                                      .state = value;
+
                                   return null;
                                 },
                               ),
@@ -1332,9 +1289,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                   .notifier)
                                           .state = true;
                                     }
-                                    if (_form.currentState!.validate()) {
-                                      return;
-                                    }
+                                    if (_form.currentState!.validate()) {}
                                   },
                                   style: ElevatedButton.styleFrom(
                                     surfaceTintColor: Colors.blue,

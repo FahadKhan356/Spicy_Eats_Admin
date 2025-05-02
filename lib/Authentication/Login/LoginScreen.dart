@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:spicy_eats_admin/Authentication/Register/RestaurantRegister.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 
@@ -283,7 +283,7 @@ class DekstopLayout extends StatelessWidget {
 }
 
 class MobileLayout extends StatelessWidget {
-  BoxConstraints constraint;
+  final BoxConstraints constraint;
   MobileLayout({super.key, required this.constraint});
 
   @override
@@ -341,7 +341,7 @@ class MobileLayout extends StatelessWidget {
                     height: 20,
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -383,7 +383,7 @@ class MobileLayout extends StatelessWidget {
                           cursorColor: MyAppColor.iconGray,
                           decoration: InputDecoration(
                               suffixIcon: IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.visibility_off,
                                 ),
                                 onPressed: () {},
@@ -413,7 +413,7 @@ class MobileLayout extends StatelessWidget {
                                       children: [
                                         Checkbox(
                                             value: true, onChanged: (value) {}),
-                                        Text(
+                                        const Text(
                                           "Remember Me",
                                           style: TextStyle(
                                             overflow: TextOverflow.ellipsis,
@@ -424,7 +424,7 @@ class MobileLayout extends StatelessWidget {
                                         ),
                                       ],
                                     ),
-                                    Text(
+                                    const Text(
                                       "Forget Your Password?",
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -444,7 +444,7 @@ class MobileLayout extends StatelessWidget {
                                     children: [
                                       Checkbox(
                                           value: true, onChanged: (value) {}),
-                                      Text(
+                                      const Text(
                                         "Remember Me",
                                         style: TextStyle(
                                           overflow: TextOverflow.ellipsis,
@@ -455,7 +455,7 @@ class MobileLayout extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  Text(
+                                  const Text(
                                     "Forget Your Password?",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
