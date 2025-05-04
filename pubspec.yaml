@@ -46,6 +46,8 @@ dependencies:
   dotted_border: ^2.1.0
   supabase_flutter: ^2.0.0
   riverpod: ^2.6.1
+  timeline_tile_plus: ^0.0.3
+  google_sign_in: ^6.3.0
 
 
 

@@ -1,8 +1,11 @@
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/model/user.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 var authRepoProvider = Provider((ref) => AuthRepository());
 
@@ -69,13 +72,43 @@ class AuthRepository {
     }
     debugPrint('done sign up');
   }
-}
 
-Future<void> asyncfun() async {
-  try {} catch (e) {
-    debugPrint(e.toString());
+  Future<void> signInWithGoogleUniversal() async {
+    if (kIsWeb) {
+      await supabaseClient.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'http://localhost:3000/auth/callback',
+      );
+    } else {
+      const webClientId =
+          '1018000999497-f8j2q1fg4gu1i95d33apej6v42mq9km0.apps.googleusercontent.com';
+      GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId: webClientId,
+        // Optional clientId
+        // clientId: 'your-client_id.apps.googleusercontent.com',
+      );
+      // Android/iOS implementation
+      final googleUser = await googleSignIn.signIn();
+      final googleAuth = await googleUser!.authentication;
+      final accessToken = await googleAuth.accessToken;
+      final idtoken = googleAuth.idToken;
+
+      if (accessToken == null) {
+        throw 'No access token found';
+      }
+      if (idtoken == null) {
+        throw 'No access token found';
+      }
+
+      await Supabase.instance.client.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: googleAuth.idToken!,
+        accessToken: accessToken,
+      );
+    }
   }
 }
+
 // //register restaurant
 //   Future<void> registerRestaurant({
 //     required businessEmail,
