@@ -16,7 +16,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     //map location picker
 
     case MyMap.routename:
-      return MaterialPageRoute(builder: (_) => MyMap());
+      return MaterialPageRoute(builder: (_) => const MyMap());
     default:
       return MaterialPageRoute(
           builder: (_) => const Scaffold(body: Text("there is no such page")));

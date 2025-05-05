@@ -6,7 +6,7 @@ class RegisterTextfield extends StatelessWidget {
   final String? Function(String?) onvalidation;
   final TextEditingController controller;
 
-  RegisterTextfield(
+  const RegisterTextfield(
       {super.key,
       required this.labeltext,
       required this.onvalidation,

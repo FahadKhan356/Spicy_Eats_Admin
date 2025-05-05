@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spicy_eats_admin/Dashboard/model.dart';
@@ -8,7 +7,7 @@ import 'package:spicy_eats_admin/utils/colors.dart';
 
 class CustomBox extends StatelessWidget {
   final InfoCardModel infoCardModel;
-  CustomBox({super.key, required this.infoCardModel});
+  const CustomBox({super.key, required this.infoCardModel});
 
   @override
   Widget build(BuildContext context) {

@@ -112,6 +112,7 @@ class CustomMap extends StatefulWidget {
       this.locationNameTextStyle,
       this.locale});
 
+  @override
   State<StatefulWidget> createState() => _MapLocationPickerState();
 }
 
@@ -121,14 +122,14 @@ class _MapLocationPickerState extends State<CustomMap> {
   Timer? _timer;
   final MapController _controller = MapController();
   final List<Location> _locationList = [];
-  List<LocationResult> _locationlistWeb = [];
+  final List<LocationResult> _locationlistWeb = [];
   MapType _mapType = MapType.normal;
 
   LocationResult? _locationResult;
 
   double _latitude = -6.984072660841485;
   double _longitude = 110.40950678599624;
-  String _completeaddress = '';
+  final String _completeaddress = '';
 
   @override
   void initState() {
@@ -296,7 +297,7 @@ class _MapLocationPickerState extends State<CustomMap> {
                             },
                             itemCount: _locationlistWeb.length,
                             shrinkWrap: true,
-                            physics: AlwaysScrollableScrollPhysics(),
+                            physics: const AlwaysScrollableScrollPhysics(),
                           )
                         : Container()
                     : _locationList.isNotEmpty
@@ -324,7 +325,7 @@ class _MapLocationPickerState extends State<CustomMap> {
                             },
                             itemCount: _locationList.length,
                             shrinkWrap: true,
-                            physics: AlwaysScrollableScrollPhysics(),
+                            physics: const AlwaysScrollableScrollPhysics(),
                           )
                         : Container(),
                 _error
@@ -520,7 +521,8 @@ class _MapLocationPickerState extends State<CustomMap> {
                       permission == LocationPermission.deniedForever) {
                     // Handle permission denied case
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Location permission denied")),
+                      const SnackBar(
+                          content: Text("Location permission denied")),
                     );
                     return;
                   }

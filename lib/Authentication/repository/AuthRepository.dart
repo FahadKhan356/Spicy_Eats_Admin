@@ -1,8 +1,5 @@
-import 'dart:typed_data';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spicy_eats_admin/Authentication/model/user.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -90,7 +87,7 @@ class AuthRepository {
       // Android/iOS implementation
       final googleUser = await googleSignIn.signIn();
       final googleAuth = await googleUser!.authentication;
-      final accessToken = await googleAuth.accessToken;
+      final accessToken = googleAuth.accessToken;
       final idtoken = googleAuth.idToken;
 
       if (accessToken == null) {

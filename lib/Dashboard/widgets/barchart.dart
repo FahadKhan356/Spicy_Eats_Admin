@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
-import 'package:spicy_eats_admin/utils/colors.dart';
 
 class BarChartRepresentation extends StatelessWidget {
   const BarChartRepresentation({super.key});

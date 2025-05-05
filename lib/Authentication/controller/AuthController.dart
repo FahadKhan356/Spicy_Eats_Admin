@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
-import 'package:spicy_eats_admin/Authentication/model/user.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 
 var restaurantLatProvider = StateProvider<double?>((ref) => null);

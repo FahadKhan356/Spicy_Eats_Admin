@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 
@@ -46,7 +43,7 @@ class HeaderPart extends StatelessWidget {
             const Spacer(
               flex: 1,
             ),
-            Container(
+            SizedBox(
               height:
                   // Responsive.isDesktop(context)
                   //     ? size.width * 0.025

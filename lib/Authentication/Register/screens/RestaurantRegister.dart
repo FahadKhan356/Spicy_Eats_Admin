@@ -1,19 +1,21 @@
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker_web/image_picker_web.dart';
-import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
+
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
-import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
-import 'package:spicy_eats_admin/Authentication/utils/commonImagePicker.dart';
+
+import 'package:spicy_eats_admin/Authentication/utils/comon_image_picker.dart';
+
 import 'package:spicy_eats_admin/Authentication/widgets/MyTimeLine.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/map.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:timeline_tile_plus/timeline_tile_plus.dart';
+
+var isimage = StateProvider<bool>((ref) => true);
 
 class RestaurantRegister extends StatelessWidget {
   static const String routename = '/Register';
@@ -54,7 +56,7 @@ class RestaurantRegister extends StatelessWidget {
 
 class Dekstoplayout extends ConsumerStatefulWidget {
   final BoxConstraints constraint;
-  Dekstoplayout({super.key, required this.constraint});
+  const Dekstoplayout({super.key, required this.constraint});
 
   @override
   ConsumerState<Dekstoplayout> createState() => _DekstoplayoutState();
@@ -63,16 +65,19 @@ class Dekstoplayout extends ConsumerStatefulWidget {
 class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
   Uint8List? idImage;
-  Future<void> pickImage() async {
-    try {
-      final pickedimage = await ImagePickerWeb.getImageAsBytes();
-      if (pickedimage != null) {
-        setState(() {
-          idImage = pickedimage;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error picking image: $e');
+  File? image;
+
+  Future<void> handlePickImage() async {
+    dynamic result = await pickImage();
+
+    if (result is Uint8List) {
+      setState(() {
+        idImage = result;
+      });
+    } else if (result is File) {
+      setState(() {
+        image = result;
+      });
     }
   }
 
@@ -126,7 +131,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                   bottomLeft: Radius.circular(10)),
               child: Container(
                 child: Image.asset(
-                  'lib/assets/registerbg2.jpg',
+                  'lib/assets/registerbg1.jpg',
                   fit: BoxFit.cover,
                   height: double.maxFinite,
                 ),
@@ -137,7 +142,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
               flex: 5,
               child: Column(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 80,
                     // color: Colors.red,
                     width: double.infinity,
@@ -146,6 +151,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                       child: Row(
                         children: [
                           MyTimeLine(
+                            widthsize: size.width / 8,
                             isFirst: true,
                             isLast: false,
                             endChild: Text(
@@ -156,6 +162,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                             ),
                           ),
                           MyTimeLine(
+                            widthsize: size.width / 8,
                             isFirst: false,
                             isLast: false,
                             endChild: Text(
@@ -166,6 +173,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                             ),
                           ),
                           MyTimeLine(
+                            widthsize: size.width / 8,
                             isFirst: false,
                             isLast: false,
                             endChild: Text(
@@ -176,6 +184,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                             ),
                           ),
                           MyTimeLine(
+                            widthsize: size.width / 8,
                             isFirst: false,
                             isLast: true,
                             endChild: Text(
@@ -384,7 +393,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                         color: Colors.grey,
                                         strokeWidth: 3,
                                         dashPattern: const [12, 8],
-                                        child: idImage != null
+                                        child: kIsWeb && idImage != null
                                             ? Padding(
                                                 padding:
                                                     const EdgeInsets.all(8.0),
@@ -408,58 +417,91 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                                   ],
                                                 ),
                                               )
-                                            : Column(
-                                                children: [
-                                                  const SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                  Center(
-                                                    child: IconButton(
-                                                        onPressed: () async {
-                                                          pickImage();
-
-                                                          idImage != null
-                                                              ? ref
-                                                                  .read(isimage
-                                                                      .notifier)
-                                                                  .state = true
-                                                              : ref
-                                                                  .read(isimage
-                                                                      .notifier)
-                                                                  .state = false;
-                                                        },
-                                                        icon: Icon(
-                                                          Icons
-                                                              .camera_front_rounded,
-                                                          size: widget.constraint
-                                                                      .maxWidth >
-                                                                  900
-                                                              ? 80
-                                                              : 50,
-                                                        )),
-                                                  ),
-                                                  Text(
-                                                    'Upload Identity Card Photo',
-                                                    style: TextStyle(
-                                                        fontSize: size.width >
-                                                                767
-                                                            ? size.width * 0.015
-                                                            : 10,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        color: Colors.black),
+                                            : !kIsWeb && image != null
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        Expanded(
+                                                          child: Container(
+                                                            child: Center(
+                                                              child: Image.file(
+                                                                image!,
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   )
-                                                ],
-                                              ),
+                                                : Column(
+                                                    children: [
+                                                      const SizedBox(
+                                                        height: 20,
+                                                      ),
+                                                      Center(
+                                                        child: IconButton(
+                                                            onPressed:
+                                                                () async {
+                                                              handlePickImage();
+
+                                                              image != null
+                                                                  ? ref
+                                                                          .read(isimage
+                                                                              .notifier)
+                                                                          .state =
+                                                                      true
+                                                                  : ref
+                                                                      .read(isimage
+                                                                          .notifier)
+                                                                      .state = false;
+                                                            },
+                                                            icon: Icon(
+                                                              Icons
+                                                                  .camera_front_rounded,
+                                                              size: widget.constraint
+                                                                          .maxWidth >
+                                                                      900
+                                                                  ? 80
+                                                                  : 50,
+                                                            )),
+                                                      ),
+                                                      Text(
+                                                        'Upload Identity Card Photo',
+                                                        style: TextStyle(
+                                                            fontSize: size
+                                                                        .width >
+                                                                    767
+                                                                ? size.width *
+                                                                    0.015
+                                                                : 10,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            color:
+                                                                Colors.black),
+                                                      )
+                                                    ],
+                                                  ),
                                       ),
                                     ),
-                                    idImage != null
+                                    kIsWeb && idImage != null
                                         ? Positioned(
                                             top: 0,
                                             left: 0,
                                             child: InkWell(
                                               onTap: () async {
-                                                pickImage();
+                                                handlePickImage();
                                                 idImage != null
                                                     ? ref
                                                         .read(isimage.notifier)
@@ -488,7 +530,45 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                               ),
                                             ),
                                           )
-                                        : const SizedBox(),
+                                        : !kIsWeb && image == null
+                                            ? Positioned(
+                                                top: 0,
+                                                left: 0,
+                                                child: InkWell(
+                                                  onTap: () async {
+                                                    handlePickImage();
+                                                    image != null
+                                                        ? ref
+                                                            .read(isimage
+                                                                .notifier)
+                                                            .state = true
+                                                        : ref
+                                                            .read(isimage
+                                                                .notifier)
+                                                            .state = false;
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    height: 50,
+                                                    width: 50,
+                                                    decoration: const BoxDecoration(
+                                                        color: Colors.black,
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                                bottomRight: Radius
+                                                                    .circular(
+                                                                        50))),
+                                                    child: const Icon(
+                                                      Icons.refresh,
+                                                      size: 15,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            : const SizedBox(),
                                   ],
                                 ),
                                 isImageSelected == false
@@ -549,7 +629,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
 
 class MobileLayout extends ConsumerStatefulWidget {
   final BoxConstraints constraint;
-  MobileLayout({super.key, required this.constraint});
+  const MobileLayout({super.key, required this.constraint});
 
   @override
   ConsumerState<MobileLayout> createState() => _MobileLayoutState();
@@ -593,238 +673,99 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
 
   Uint8List? idImage;
 
-  Future<void> pickImage() async {
-    try {
-      final pickedFile = await ImagePickerWeb.getImageAsBytes();
-      if (pickedFile != null) {
-        setState(() {
-          idImage = pickedFile;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error picking image: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isImageSelected = ref.watch(isimage);
     final address = ref.watch(restaurantLocationSelectedProvider);
     final size = MediaQuery.of(context).size;
-    return SingleChildScrollView(
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white.withOpacity(0.3),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Center(
-                      child: Text(
-                        'From Local Favorite to Delivery Star!',
-                        style: GoogleFonts.mina(
-                          fontSize: widget.constraint.maxWidth < 400
-                              ? widget.constraint.maxWidth * 0.07
-                              : 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
+    return Column(
+      children: [
+        SizedBox(
+          height: 80,
+          // color: Colors.red,
+          width: double.infinity,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                MyTimeLine(
+                  widthsize: size.width / 5,
+                  isFirst: true,
+                  isLast: false,
+                  endChild: Text(
+                    'Create Account',
+                    style: TextStyle(
+                        fontSize: size.width / 60, color: Colors.black),
+                  ),
+                ),
+                MyTimeLine(
+                  widthsize: size.width / 5,
+                  isFirst: false,
+                  isLast: false,
+                  endChild: Text(
+                    'Register Restaurant',
+                    style: TextStyle(
+                        fontSize: size.width / 60, color: Colors.black),
+                  ),
+                ),
+                MyTimeLine(
+                  widthsize: size.width / 5,
+                  isFirst: false,
+                  isLast: false,
+                  endChild: Text(
+                    'Approved',
+                    style: TextStyle(
+                        fontSize: size.width / 60, color: Colors.black),
+                  ),
+                ),
+                MyTimeLine(
+                  widthsize: size.width / 5,
+                  isFirst: false,
+                  isLast: true,
+                  endChild: Text(
+                    'Choose Plan',
+                    style: TextStyle(
+                        fontSize: size.width / 60, color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Stack(
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white.withValues(alpha: 0.3),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Form(
-                    key: _form,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              textDirection: TextDirection.ltr,
-                              'Let spicyeats handle the delivery while you focus on what you do best - creating amazing food! ',
-                              style: TextStyle(
-                                  fontSize: widget.constraint.maxWidth < 400
-                                      ? widget.constraint.maxWidth * 0.07
-                                      : 20,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black),
-                            ),
-                          ),
+                        Text(
+                          'Register Your Restaurant',
+                          style: GoogleFonts.mina(
+                              fontSize: widget.constraint.maxWidth < 900
+                                  ? widget.constraint.maxWidth * 0.05
+                                  : widget.constraint.maxWidth > 400
+                                      ? widget.constraint.maxWidth * 0.03
+                                      : 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
                         ),
                         const SizedBox(
-                          height: 20,
+                          height: 10,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                        Form(
+                          key: _form,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              RegisterTextfield(
-                                controller: businessemail,
-                                labeltext: 'Enter Your Business Email',
-                                onvalidation: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Mandatory field Can\'t be empty ';
-                                  }
-
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              RegisterTextfield(
-                                controller: password,
-                                labeltext: 'Enter Password',
-                                onvalidation: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Mandatory field Can\'t be empty ';
-                                  }
-                                  if (value.length < 9) {
-                                    return 'Password length should be atleast 9 ';
-                                  }
-
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              RegisterTextfield(
-                                controller: firstandmiddlename,
-                                labeltext: 'First & Middle Name per CNIC',
-                                onvalidation: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Mandatory field Can\'t be empty ';
-                                  }
-
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              RegisterTextfield(
-                                controller: lastname,
-                                labeltext: 'Last Name Per CNIC',
-                                onvalidation: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Mandatory field Can\'t be empty ';
-                                  }
-
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              RegisterTextfield(
-                                controller: cnicno,
-                                labeltext: 'CNIC number',
-                                onvalidation: (value) {
-                                  final nicno = int.tryParse(value ?? '');
-                                  if (nicno == null) {
-                                    return 'please Enter numbers';
-                                  }
-                                  if (value!.length < 12 || value.length > 12) {
-                                    return 'Please enter atleats 12 digits';
-                                  }
-
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              RegisterTextfield(
-                                controller: businessemail,
-                                labeltext: 'Enter Your Business Email',
-                                onvalidation: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Mandatory field Can\'t be empty ';
-                                  }
-
-                                  return null;
-                                },
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  widget.constraint.maxWidth > 200
-                                      ? Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Container(
-                                            color: Colors.grey[100],
-                                            height: 40,
-                                            width: 70,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
-                                              children: [
-                                                Image.asset(
-                                                  'lib/assets/pak1.png',
-                                                  fit: BoxFit.cover,
-                                                  height: widget.constraint
-                                                              .maxWidth >
-                                                          200
-                                                      ? 20
-                                                      : size.height * 0.02,
-                                                  width: widget.constraint
-                                                              .maxWidth >
-                                                          200
-                                                      ? 30
-                                                      : size.width * 0.02,
-                                                ),
-                                                Text(
-                                                  '+92',
-                                                  style: TextStyle(
-                                                    fontSize: widget.constraint
-                                                                .maxWidth >
-                                                            200
-                                                        ? 14
-                                                        : 6,
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      : const SizedBox(),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 20),
-                                      child: RegisterTextfield(
-                                          controller: mobileno,
-                                          labeltext: 'Mobile Number',
-                                          onvalidation: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Mandatory field Can\'t be empty ';
-                                            }
-                                            return null;
-                                          }), //textfield
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
                               Stack(
                                 children: [
                                   Center(
@@ -855,9 +796,14 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                           Navigator.pushNamed(
                                               context, MyMap.routename);
                                         },
-                                        child: const Text(
+                                        child: Text(
                                           'Select restaurant location',
-                                          style: TextStyle(color: Colors.white),
+                                          style: TextStyle(
+                                              overflow: TextOverflow.ellipsis,
+                                              color: Colors.white,
+                                              fontSize: size.width < 400
+                                                  ? size.width / 20
+                                                  : 15),
                                         ),
                                       ),
                                     ),
@@ -885,7 +831,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                     style: GoogleFonts.mina(
                                         fontSize: widget.constraint.maxWidth <
                                                 400
-                                            ? widget.constraint.maxWidth * 0.06
+                                            ? widget.constraint.maxWidth * 0.05
                                             : 22,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black),
@@ -919,7 +865,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                           .constraint.maxWidth <
                                                       400
                                                   ? widget.constraint.maxWidth *
-                                                      0.04
+                                                      0.03
                                                   : 12,
                                               fontWeight: FontWeight.w900,
                                               color: Colors.black),
@@ -1144,12 +1090,12 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

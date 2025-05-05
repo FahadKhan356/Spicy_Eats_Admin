@@ -11,20 +11,20 @@ class MyTimeLine extends StatelessWidget {
   final bool isFirst;
   final bool isLast;
   final Widget endChild;
+  final double widthsize;
 
   const MyTimeLine({
     super.key,
     required this.isFirst,
     required this.isLast,
     required this.endChild,
+    required this.widthsize,
   });
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-
     return Container(
-      width: width / 8,
+      width: widthsize,
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TimelineTile(
           axis: TimelineAxis.horizontal,

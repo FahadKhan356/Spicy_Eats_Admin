@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
@@ -6,7 +5,7 @@ import 'package:spicy_eats_admin/Authentication/widgets/customMap.dart';
 
 class MyMap extends ConsumerStatefulWidget {
   static const String routename = '/map';
-  MyMap({super.key});
+  const MyMap({super.key});
 
   @override
   ConsumerState<MyMap> createState() => _MyMapState();

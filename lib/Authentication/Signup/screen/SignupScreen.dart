@@ -1,15 +1,8 @@
-import 'dart:typed_data';
-
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker_web/image_picker_web.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
-import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
-import 'package:spicy_eats_admin/Authentication/utils/commonImagePicker.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
-import 'package:spicy_eats_admin/Authentication/widgets/map.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +16,7 @@ class SignUpScreen extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
         leading: Image.asset(
           'lib/assets/SpicyeatsLogo-removebg.png',
           width: 40,
@@ -94,7 +88,7 @@ class SignUpScreen extends StatelessWidget {
 
 class Dekstoplayout extends ConsumerStatefulWidget {
   final BoxConstraints constraint;
-  Dekstoplayout({super.key, required this.constraint});
+  const Dekstoplayout({super.key, required this.constraint});
 
   @override
   ConsumerState<Dekstoplayout> createState() => _DekstoplayoutState();
@@ -364,7 +358,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
 
 class MobileLayout extends ConsumerStatefulWidget {
   final BoxConstraints constraint;
-  MobileLayout({super.key, required this.constraint});
+  const MobileLayout({super.key, required this.constraint});
 
   @override
   ConsumerState<MobileLayout> createState() => _MobileLayoutState();
@@ -525,7 +519,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           child: Container(
-                                            padding: EdgeInsets.all(8),
+                                            padding: const EdgeInsets.all(8),
                                             color: Colors.black12,
                                             height: 40,
                                             width: 80,

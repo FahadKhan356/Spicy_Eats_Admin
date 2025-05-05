@@ -1,10 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
@@ -201,10 +197,11 @@ class DekstopLayout extends StatelessWidget {
                               const SizedBox(
                                 height: 10,
                               ),
-                              InkWell(
-                                onTap: () => Navigator.pushNamed(
-                                    context, RestaurantRegister.routename),
-                                child: const Row(
+                              const InkWell(
+                                // onTap: () => Navigator.pushNamed(
+                                //     context, RestaurantRegister.routename),
+
+                                child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
@@ -299,7 +296,7 @@ class DekstopLayout extends StatelessWidget {
 
 class MobileLayout extends ConsumerWidget {
   final BoxConstraints constraint;
-  MobileLayout({super.key, required this.constraint});
+  const MobileLayout({super.key, required this.constraint});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -482,8 +479,11 @@ class MobileLayout extends ConsumerWidget {
                     child: Text(
                       'Log In ',
                       style: TextStyle(
-                          fontSize: constraint.maxWidth / 30,
+                          fontSize: constraint.maxWidth > 400
+                              ? constraint.maxWidth / 45
+                              : 12,
                           fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis,
                           color: Colors.white),
                     ),
                   ),
@@ -491,27 +491,6 @@ class MobileLayout extends ConsumerWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                // InkWell(
-                //   onTap: () => Navigator.pushNamed(
-                //       context, RestaurantRegister.routename),
-                //   child: Container(
-                //     color: Colors.red,
-                //     child: const Row(
-                //       mainAxisAlignment: MainAxisAlignment.center,
-                //       children: [
-                //         Text(
-                //           'Don\'t Have An Account?',
-                //           style: TextStyle(color: MyAppColor.iconGray),
-                //         ),
-                //         Text(
-                //           'Register Now',
-                //           style: TextStyle(
-                //               fontWeight: FontWeight.bold, color: Colors.black),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
                 const SizedBox(
                   height: 20,
                 ),
@@ -547,12 +526,15 @@ class MobileLayout extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Flexible(child: Image.asset('lib/assets/google.png')),
-                        constraint.maxWidth > 250
+                        constraint.maxWidth > 300
                             ? Text(
                                 'Sign in with Google',
                                 style: TextStyle(
-                                  fontSize: constraint.maxWidth / 30,
+                                  fontSize: constraint.maxWidth > 400
+                                      ? constraint.maxWidth / 45
+                                      : 12,
                                   fontWeight: FontWeight.bold,
+                                  overflow: TextOverflow.ellipsis,
                                   color: Colors.black,
                                 ),
                               )

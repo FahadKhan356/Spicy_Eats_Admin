@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
-import 'package:spicy_eats_admin/config/size_config.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 import 'package:spicy_eats_admin/utils/list.dart';
@@ -18,8 +17,8 @@ class _SideDrawerMenuState extends State<SideDrawerMenu> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Drawer(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      child: Container(
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      child: SizedBox(
         // height: SizeConfig.screenheight,
         // height: 100,
 
@@ -46,7 +45,7 @@ class _SideDrawerMenuState extends State<SideDrawerMenu> {
                           });
                         },
                         child: Container(
-                          margin: EdgeInsets.only(left: 10),
+                          margin: const EdgeInsets.only(left: 10),
                           // color: Colors.red,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

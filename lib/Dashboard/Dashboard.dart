@@ -60,10 +60,10 @@ class Dashboard extends StatelessWidget {
                                   .toList(),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 200,
                             child: BarChartRepresentation(),
                           )
