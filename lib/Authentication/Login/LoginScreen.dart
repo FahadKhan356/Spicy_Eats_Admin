@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:spicy_eats_admin/Authentication/Signup/screen/SignupScreen.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
@@ -172,6 +173,18 @@ class DekstopLayout extends StatelessWidget {
                                   ),
                                 ],
                               ),
+                              InkWell(
+                                onTap: () => Navigator.pushNamed(
+                                    context, SignUpScreen.routename),
+                                child: const Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    'Don\'t Have An Account?',
+                                    style:
+                                        TextStyle(color: MyAppColor.iconGray),
+                                  ),
+                                ),
+                              ),
                               const SizedBox(
                                 height: 10,
                               ),
@@ -195,33 +208,12 @@ class DekstopLayout extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(
-                                height: 10,
+                                height: 20,
                               ),
-                              const InkWell(
-                                // onTap: () => Navigator.pushNamed(
-                                //     context, RestaurantRegister.routename),
-
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Don\'t Have An Account?',
-                                      style:
-                                          TextStyle(color: MyAppColor.iconGray),
-                                    ),
-                                    Text(
-                                      'Register Now',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              buildOrDivider(),
                               const SizedBox(
                                 height: 20,
                               ),
-                              _buildOrDivider(),
                               SizedBox(
                                 height: Responsive.isDesktop(context) ? 40 : 30,
                                 width: double.maxFinite,
@@ -466,6 +458,20 @@ class MobileLayout extends ConsumerWidget {
                 const SizedBox(
                   height: 10,
                 ),
+                InkWell(
+                  onTap: () =>
+                      Navigator.pushNamed(context, SignUpScreen.routename),
+                  child: const Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'Don\'t Have An Account?',
+                      style: TextStyle(color: MyAppColor.iconGray),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
                 SizedBox(
                   height: Responsive.isDesktop(context) ? 40 : 30,
                   width: double.maxFinite,
@@ -491,10 +497,7 @@ class MobileLayout extends ConsumerWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                _buildOrDivider(),
+                buildOrDivider(),
                 const SizedBox(
                   height: 20,
                 ),
@@ -511,10 +514,6 @@ class MobileLayout extends ConsumerWidget {
                             context: context,
                             message: 'Error: $e');
                       }
-                      showCustomSnackbar(
-                          backgroundColor: Colors.black,
-                          context: context,
-                          message: 'Sign in Successfully');
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -552,7 +551,7 @@ class MobileLayout extends ConsumerWidget {
   }
 }
 
-Widget _buildOrDivider() {
+Widget buildOrDivider() {
   return Row(
     children: [
       Expanded(

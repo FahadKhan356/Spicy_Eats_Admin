@@ -52,17 +52,17 @@ class AuthRepository {
       //   debugPrint('User already exists in users table.');
       //   return;
       // }
-      // final userdata = User(
-      //   id: user.userId,
-      //   contactno: contackNo,
-      //   email: businessEmail,
-      //   firstname: firstmiddleName,
-      //   role: 'restaurant-admin',
-      //   password: password,
-      //   lastname: lastName,
-      // );
 
-      // await supabaseClient.from('users').insert(userdata.toMap());
+      await supabaseClient.from('users').insert({
+        'id': user.userId,
+        'email': businessEmail,
+        'firstname': firstmiddleName,
+        'contactno': contackNo,
+        'lastname': lastName,
+        'Role': 'restaurant-admin',
+        'password': password,
+        'status': 'pending',
+      });
     } catch (e) {
       // throw Exception(e);
       debugPrint('failed to signup and store user data 1 $e');
@@ -74,7 +74,7 @@ class AuthRepository {
     if (kIsWeb) {
       await supabaseClient.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: 'http://localhost:3000/auth/callback',
+        redirectTo: 'http://localhost:50500',
       );
     } else {
       const webClientId =

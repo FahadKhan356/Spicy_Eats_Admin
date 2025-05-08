@@ -224,6 +224,91 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                RegisterTextfield(
+                                  controller: businessemail,
+                                  labeltext: 'Enter Your Business Email',
+                                  onvalidation: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Mandatory field Can\'t be empty ';
+                                    }
+
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                RegisterTextfield(
+                                  controller: firstandmiddlename,
+                                  labeltext: 'First & Middle Name per CNIC',
+                                  onvalidation: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Mandatory field Can\'t be empty ';
+                                    }
+
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                RegisterTextfield(
+                                  controller: lastname,
+                                  labeltext: 'Last Name Per CNIC',
+                                  onvalidation: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Mandatory field Can\'t be empty ';
+                                    }
+
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        color: Colors.black12,
+                                        height: 40,
+                                        width: 80,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Image.asset(
+                                              'lib/assets/pak1.png',
+                                              height: 30,
+                                              width: 30,
+                                            ),
+                                            const Text('+92')
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: RegisterTextfield(
+                                          controller: contactno,
+                                          labeltext: 'Mobile Number',
+                                          onvalidation: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Mandatory field Can\'t be empty ';
+                                            }
+                                            final mobileno =
+                                                int.tryParse(value);
+                                            if (mobileno == null) {
+                                              return 'please enter only numbers';
+                                            }
+                                            return null;
+                                          }),
+                                    ),
+                                  ],
+                                ),
                                 Stack(
                                   children: [
                                     ClipRRect(
