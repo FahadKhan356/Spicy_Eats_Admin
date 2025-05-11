@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:spicy_eats_admin/Authentication/Register/widgets/MobileTimeLineTask.dart';
 import 'package:spicy_eats_admin/Authentication/Register/widgets/RestaurantAddress.dart';
 
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
@@ -812,148 +813,81 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
 
     return LayoutBuilder(
       builder: (context, constraints) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // size.width > 300
           //     ?
-          SizedBox(
-            height: 80,
-            // color: Colors.red,
-            width: double.infinity,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  MyTimeLine(
-                    widthsize:
-                        size.width < 350 ? size.width / 5 : size.width / 4.5,
-                    isFirst: true,
-                    isLast: false,
-                    endChild: Text(
-                      'Create Account',
-                      style: TextStyle(
-                          fontSize: size.width / 60, color: Colors.black),
+          constraints.maxWidth >= 350
+              ? SizedBox(
+                  height: 80,
+                  // color: Colors.red,
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        MyTimeLine(
+                          widthsize: size.width < 350
+                              ? size.width / 5
+                              : size.width / 4.5,
+                          isFirst: true,
+                          isLast: false,
+                          endChild: Text(
+                            'Create Account',
+                            style: TextStyle(
+                                fontSize: size.width / 60, color: Colors.black),
+                          ),
+                        ),
+                        MyTimeLine(
+                          widthsize: size.width < 350
+                              ? size.width / 5
+                              : size.width / 4.5,
+                          isFirst: false,
+                          isLast: false,
+                          endChild: Text(
+                            'Register Restaurant',
+                            style: TextStyle(
+                                fontSize: size.width / 60, color: Colors.black),
+                          ),
+                        ),
+                        MyTimeLine(
+                          widthsize: size.width < 350
+                              ? size.width / 5
+                              : size.width / 4.5,
+                          isFirst: false,
+                          isLast: false,
+                          endChild: Text(
+                            'Approved',
+                            style: TextStyle(
+                                fontSize: size.width / 60, color: Colors.black),
+                          ),
+                        ),
+                        MyTimeLine(
+                          widthsize: size.width < 350
+                              ? size.width / 5
+                              : size.width / 4.5,
+                          isFirst: false,
+                          isLast: true,
+                          endChild: Text(
+                            'Choose Plan',
+                            style: TextStyle(
+                                fontSize: size.width / 60, color: Colors.black),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  MyTimeLine(
-                    widthsize:
-                        size.width < 350 ? size.width / 5 : size.width / 4.5,
-                    isFirst: false,
-                    isLast: false,
-                    endChild: Text(
-                      'Register Restaurant',
-                      style: TextStyle(
-                          fontSize: size.width / 60, color: Colors.black),
+                )
+              : Column(
+                  children: [
+                    Mobiletimelinetask(),
+                    SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  MyTimeLine(
-                    widthsize:
-                        size.width < 350 ? size.width / 5 : size.width / 4.5,
-                    isFirst: false,
-                    isLast: false,
-                    endChild: Text(
-                      'Approved',
-                      style: TextStyle(
-                          fontSize: size.width / 60, color: Colors.black),
-                    ),
-                  ),
-                  MyTimeLine(
-                    widthsize:
-                        size.width < 350 ? size.width / 5 : size.width / 4.5,
-                    isFirst: false,
-                    isLast: true,
-                    endChild: Text(
-                      'Choose Plan',
-                      style: TextStyle(
-                          fontSize: size.width / 60, color: Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // : SizedBox(
-          //     height: 200,
-          //     // color: Colors.red,
-          //     // width: double.infinity,
-          //     child: SingleChildScrollView(
-          //       scrollDirection: Axis.vertical,
-          //       child: Column(
-          //         children: [
-          //           MyTimeLine(
-          //             widthsize: size.width < 350
-          //                 ? size.width / 5
-          //                 : size.width / 4.5,
-          //             isFirst: false,
-          //             isLast: true,
-          //             endChild: Text(
-          //               'Create Account',
-          //               style: TextStyle(
-          //                   fontSize: size.width / 60, color: Colors.black),
-          //             ),
-          //           ),
-          //           MyTimeLine(
-          //             widthsize: size.width < 350
-          //                 ? size.width / 5
-          //                 : size.width / 4.5,
-          //             isFirst: false,
-          //             isLast: true,
-          //             endChild: Text(
-          //               'Register Restaurant',
-          //               style: TextStyle(
-          //                   fontSize: size.width / 60, color: Colors.black),
-          //             ),
-          //           ),
-          //           MyTimeLine(
-          //             widthsize: size.width < 350
-          //                 ? size.width / 5
-          //                 : size.width / 4.5,
-          //             isFirst: false,
-          //             isLast: true,
-          //             endChild: Text(
-          //               'Approved',
-          //               style: TextStyle(
-          //                   fontSize: size.width / 60, color: Colors.black),
-          //             ),
-          //           ),
-          //           MyTimeLine(
-          //             widthsize: size.width < 350
-          //                 ? size.width / 5
-          //                 : size.width / 4.5,
-          //             isFirst: false,
-          //             isLast: true,
-          //             endChild: Text(
-          //               'Choose Plan',
-          //               style: TextStyle(
-          //                   fontSize: size.width / 60, color: Colors.black),
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ),
-          //   ),
+                    Mobiletimelinetask(),
+                  ],
+                ),
 
-          Container(
-            color: Colors.red,
-            height: 70,
-            width: double.infinity,
-            child: MyTimeLine(
-                isFirst: false,
-                isLast: true,
-                startChild: Text('data'),
-                // endChild: Text('data1'),
-                widthsize: 20),
-          ),
-          Container(
-            color: Colors.red,
-            height: 70,
-            width: double.infinity,
-            child: MyTimeLine(
-                isFirst: true,
-                isLast: false,
-                startChild: Text('data'),
-                // endChild: Text('data1'),
-                widthsize: 20),
-          ),
           Expanded(
             child: SingleChildScrollView(
               child: Stack(

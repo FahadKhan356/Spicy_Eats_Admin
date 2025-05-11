@@ -74,7 +74,7 @@ class AuthRepository {
     if (kIsWeb) {
       await supabaseClient.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: 'http://localhost:51927/auth/callback',
+        redirectTo: 'http://localhost:49967/auth/callback',
       );
     } else {
       const webClientId =
