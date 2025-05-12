@@ -127,54 +127,56 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
       child: Column(
         children: [
           SizedBox(
-            height: 80,
+            height: 100,
             // color: Colors.red,
             width: double.infinity,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  MyTimeLine(
-                    widthsize: size.width / 5,
-                    isFirst: true,
-                    isLast: false,
-                    endChild: Text(
-                      'Create Account',
-                      style: TextStyle(
-                          fontSize: size.width / 77, color: Colors.black),
+            child: Center(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    MyTimeLine(
+                      widthsize: size.width / 5,
+                      isFirst: true,
+                      isLast: false,
+                      endChild: Text(
+                        'Create Account',
+                        style: TextStyle(
+                            fontSize: size.width / 77, color: Colors.black),
+                      ),
                     ),
-                  ),
-                  MyTimeLine(
-                    widthsize: size.width / 5,
-                    isFirst: false,
-                    isLast: false,
-                    endChild: Text(
-                      'Register Restaurant',
-                      style: TextStyle(
-                          fontSize: size.width / 77, color: Colors.black),
+                    MyTimeLine(
+                      widthsize: size.width / 5,
+                      isFirst: false,
+                      isLast: false,
+                      endChild: Text(
+                        'Register Restaurant',
+                        style: TextStyle(
+                            fontSize: size.width / 77, color: Colors.black),
+                      ),
                     ),
-                  ),
-                  MyTimeLine(
-                    widthsize: size.width / 3,
-                    isFirst: false,
-                    isLast: false,
-                    endChild: Text(
-                      'Approved',
-                      style: TextStyle(
-                          fontSize: size.width / 75, color: Colors.black),
+                    MyTimeLine(
+                      widthsize: size.width / 3,
+                      isFirst: false,
+                      isLast: false,
+                      endChild: Text(
+                        'Approved',
+                        style: TextStyle(
+                            fontSize: size.width / 75, color: Colors.black),
+                      ),
                     ),
-                  ),
-                  MyTimeLine(
-                    widthsize: size.width / 5,
-                    isFirst: false,
-                    isLast: true,
-                    endChild: Text(
-                      'Choose Plan',
-                      style: TextStyle(
-                          fontSize: size.width / 75, color: Colors.black),
+                    MyTimeLine(
+                      widthsize: size.width / 5,
+                      isFirst: false,
+                      isLast: true,
+                      endChild: Text(
+                        'Choose Plan',
+                        style: TextStyle(
+                            fontSize: size.width / 75, color: Colors.black),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -812,552 +814,609 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
     final size = MediaQuery.of(context).size;
 
     return LayoutBuilder(
-      builder: (context, constraints) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // size.width > 300
-          //     ?
-          constraints.maxWidth >= 350
-              ? SizedBox(
-                  height: 80,
-                  // color: Colors.red,
-                  width: double.infinity,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        MyTimeLine(
-                          widthsize: size.width < 350
-                              ? size.width / 5
-                              : size.width / 4.5,
-                          isFirst: true,
-                          isLast: false,
-                          endChild: Text(
-                            'Create Account',
-                            style: TextStyle(
-                                fontSize: size.width / 60, color: Colors.black),
-                          ),
+      builder: (context, constraints) => Scaffold(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 80,
+              // color: Colors.red,
+              width: double.infinity,
+              child: Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      MyTimeLine(
+                        widthsize: size.width < 350
+                            ? size.width / 5
+                            : size.width / 4.5,
+                        isFirst: true,
+                        isLast: false,
+                        endChild: Text(
+                          textAlign: TextAlign.center,
+                          'Create Account',
+                          style: TextStyle(
+                              fontSize: constraints.maxWidth > 600
+                                  ? size.width / 60
+                                  : 8,
+                              color: Colors.black),
                         ),
-                        MyTimeLine(
-                          widthsize: size.width < 350
-                              ? size.width / 5
-                              : size.width / 4.5,
-                          isFirst: false,
-                          isLast: false,
-                          endChild: Text(
-                            'Register Restaurant',
-                            style: TextStyle(
-                                fontSize: size.width / 60, color: Colors.black),
-                          ),
-                        ),
-                        MyTimeLine(
-                          widthsize: size.width < 350
-                              ? size.width / 5
-                              : size.width / 4.5,
-                          isFirst: false,
-                          isLast: false,
-                          endChild: Text(
-                            'Approved',
-                            style: TextStyle(
-                                fontSize: size.width / 60, color: Colors.black),
-                          ),
-                        ),
-                        MyTimeLine(
-                          widthsize: size.width < 350
-                              ? size.width / 5
-                              : size.width / 4.5,
-                          isFirst: false,
-                          isLast: true,
-                          endChild: Text(
-                            'Choose Plan',
-                            style: TextStyle(
-                                fontSize: size.width / 60, color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : Column(
-                  children: [
-                    Mobiletimelinetask(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Mobiletimelinetask(),
-                  ],
-                ),
-
-          Expanded(
-            child: SingleChildScrollView(
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white.withValues(alpha: 0.3),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Register Your Restaurant',
-                            style: GoogleFonts.mina(
-                                fontSize: widget.constraint.maxWidth < 900
-                                    ? widget.constraint.maxWidth * 0.05
-                                    : widget.constraint.maxWidth > 400
-                                        ? widget.constraint.maxWidth * 0.03
-                                        : 26,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Form(
-                            key: _form,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                RegisterTextfield(
-                                  controller: businessemail,
-                                  labeltext: 'Enter Your Business Email',
-                                  onvalidation: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mandatory field Can\'t be empty ';
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                RegisterTextfield(
-                                  controller: firstandmiddlename,
-                                  labeltext: 'First & Middle Name per CNIC',
-                                  onvalidation: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mandatory field Can\'t be empty ';
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                RegisterTextfield(
-                                  controller: lastname,
-                                  labeltext: 'Last Name Per CNIC',
-                                  onvalidation: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mandatory field Can\'t be empty ';
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        color: Colors.black12,
-                                        height: 40,
-                                        width: 80,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            Image.asset(
-                                              'lib/assets/pak1.png',
-                                              height: 30,
-                                              width: 30,
-                                            ),
-                                            const Text('+92')
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: RegisterTextfield(
-                                          controller: contactno,
-                                          labeltext: 'Mobile Number',
-                                          onvalidation: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Mandatory field Can\'t be empty ';
-                                            }
-                                            final mobileno =
-                                                int.tryParse(value);
-                                            if (mobileno == null) {
-                                              return 'please enter only numbers';
-                                            }
-                                            return null;
-                                          }),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Restaurantaddress(
-                                    controller: restaurantaddress,
+                      MyTimeLine(
+                        widthsize: size.width < 350
+                            ? size.width / 5
+                            : size.width / 4.5,
+                        isFirst: false,
+                        isLast: false,
+                        endChild: Text(
+                          textAlign: TextAlign.center,
+                          'Register Restaurant',
+                          style: TextStyle(
+                              fontSize: constraints.maxWidth > 600
+                                  ? size.width / 60
+                                  : 8,
+                              color: Colors.black),
+                        ),
+                      ),
+                      MyTimeLine(
+                        widthsize: size.width < 350
+                            ? size.width / 5
+                            : size.width / 4.5,
+                        isFirst: false,
+                        isLast: false,
+                        endChild: Text(
+                          textAlign: TextAlign.center,
+                          'Approved',
+                          style: TextStyle(
+                              fontSize: constraints.maxWidth > 600
+                                  ? size.width / 60
+                                  : 8,
+                              color: Colors.black),
+                        ),
+                      ),
+                      MyTimeLine(
+                        widthsize: size.width < 350
+                            ? size.width / 5
+                            : size.width / 4.5,
+                        isFirst: false,
+                        isLast: true,
+                        endChild: Text(
+                          textAlign: TextAlign.center,
+                          'Choose Plan',
+                          style: TextStyle(
+                              fontSize: constraints.maxWidth > 600
+                                  ? size.width / 60
+                                  : 8,
+                              color: Colors.black),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white.withValues(alpha: 0.3),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Register Your Restaurant',
+                              style: GoogleFonts.mina(
+                                  fontSize: widget.constraint.maxWidth < 900
+                                      ? widget.constraint.maxWidth * 0.05
+                                      : widget.constraint.maxWidth > 400
+                                          ? widget.constraint.maxWidth * 0.03
+                                          : 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Form(
+                              key: _form,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  RegisterTextfield(
+                                    controller: businessemail,
+                                    labeltext: 'Enter Your Business Email',
                                     onvalidation: (value) {
                                       if (value == null || value.isEmpty) {
-                                        return 'Mandatory field Can\'t be empty';
+                                        return 'Mandatory field Can\'t be empty ';
                                       }
+
                                       return null;
                                     },
-                                    labeltext: 'Restaurant Address'),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Stack(
-                                  children: [
-                                    Center(
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.asset(
-                                          'lib/assets/map2.jpg',
-                                          fit: BoxFit.cover,
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    controller: firstandmiddlename,
+                                    labeltext: 'First & Middle Name per CNIC',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    controller: lastname,
+                                    labeltext: 'Last Name Per CNIC',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        flex: 1,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            padding: EdgeInsets.all(5),
+                                            constraints: BoxConstraints(
+                                              maxWidth:
+                                                  constraints.maxWidth > 300
+                                                      ? 80
+                                                      : 40,
+                                              maxHeight:
+                                                  constraints.maxWidth > 300
+                                                      ? 40
+                                                      : 60,
+                                            ),
+                                            color: Colors.black12,
+                                            // height: 40,
+                                            // width: 80,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                // constraints.maxWidth > 200
+                                                //     ?
+                                                Flexible(
+                                                  child: Image.asset(
+                                                    'lib/assets/pak1.png',
+                                                    height:
+                                                        constraints.maxWidth <
+                                                                300
+                                                            ? 20
+                                                            : 30,
+                                                    width:
+                                                        // constraints.maxWidth <
+                                                        //         300
+                                                        //     ? 20
+                                                        //     :
+                                                        30,
+                                                  ),
+                                                ),
+
+                                                constraints.maxWidth > 300
+                                                    ? Flexible(
+                                                        child: const Text(
+                                                          '+92',
+                                                          style: TextStyle(
+                                                              fontSize: 10),
+                                                        ),
+                                                      )
+                                                    : const SizedBox(),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Center(
-                                      child: SizedBox(
-                                        height: Responsive.isDesktop(context)
-                                            ? 40
-                                            : 30,
-                                        width: double.maxFinite,
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            surfaceTintColor: Colors.blue,
-                                            backgroundColor:
-                                                Colors.black.withOpacity(0.5),
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10)),
+                                      Expanded(
+                                        flex: 4,
+                                        child: RegisterTextfield(
+                                            controller: contactno,
+                                            labeltext: 'Mobile Number',
+                                            onvalidation: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Mandatory field Can\'t be empty ';
+                                              }
+                                              final mobileno =
+                                                  int.tryParse(value);
+                                              if (mobileno == null) {
+                                                return 'please enter only numbers';
+                                              }
+                                              return null;
+                                            }),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Restaurantaddress(
+                                      controller: restaurantaddress,
+                                      onvalidation: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Mandatory field Can\'t be empty';
+                                        }
+                                        return null;
+                                      },
+                                      labeltext: 'Restaurant Address'),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Stack(
+                                    children: [
+                                      Center(
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.asset(
+                                            'lib/assets/map2.jpg',
+                                            fit: BoxFit.cover,
                                           ),
-                                          onPressed: () {
-                                            Navigator.pushNamed(
-                                                context, MyMap.routename);
-                                          },
+                                        ),
+                                      ),
+                                      Center(
+                                        child: SizedBox(
+                                          height: Responsive.isDesktop(context)
+                                              ? 40
+                                              : 30,
+                                          width: double.maxFinite,
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              surfaceTintColor: Colors.blue,
+                                              backgroundColor:
+                                                  Colors.black.withOpacity(0.5),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                  context, MyMap.routename);
+                                            },
+                                            child: Text(
+                                              'Select restaurant location',
+                                              style: TextStyle(
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  color: Colors.white,
+                                                  fontSize: size.width < 400
+                                                      ? size.width / 20
+                                                      : 15),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  address != null && address == true
+                                      ? const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
                                           child: Text(
-                                            'Select restaurant location',
-                                            style: TextStyle(
-                                                overflow: TextOverflow.ellipsis,
-                                                color: Colors.white,
-                                                fontSize: size.width < 400
-                                                    ? size.width / 20
-                                                    : 15),
+                                            'Location is not selected',
+                                            style: TextStyle(color: Colors.red),
                                           ),
-                                        ),
+                                        )
+                                      : const SizedBox(),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Add your bank details to recieve payments',
+                                        style: GoogleFonts.mina(
+                                            fontSize:
+                                                widget.constraint.maxWidth < 400
+                                                    ? widget.constraint
+                                                            .maxWidth *
+                                                        0.05
+                                                    : 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                address != null && address == true
-                                    ? const Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          'Location is not selected',
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      )
-                                    : const SizedBox(),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Add your bank details to recieve payments',
-                                      style: GoogleFonts.mina(
-                                          fontSize:
-                                              widget.constraint.maxWidth < 400
-                                                  ? widget.constraint.maxWidth *
-                                                      0.05
-                                                  : 22,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Icon(
-                                          Icons.lock,
-                                          color: Colors.green,
-                                          shadows: const [
-                                            BoxShadow(
-                                                color: Colors.black,
-                                                offset: Offset(0.2, 0.1))
-                                          ],
-                                          size: widget.constraint.maxWidth < 400
-                                              ? widget.constraint.maxWidth *
-                                                  0.05
-                                              : 15,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            'Your details are secure and encrypted with us.',
-                                            style: GoogleFonts.mina(
-                                                fontSize:
-                                                    widget.constraint.maxWidth <
-                                                            400
-                                                        ? widget.constraint
-                                                                .maxWidth *
-                                                            0.03
-                                                        : 12,
-                                                fontWeight: FontWeight.w900,
-                                                color: Colors.black),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Icon(
+                                            Icons.lock,
+                                            color: Colors.green,
+                                            shadows: const [
+                                              BoxShadow(
+                                                  color: Colors.black,
+                                                  offset: Offset(0.2, 0.1))
+                                            ],
+                                            size: widget.constraint.maxWidth <
+                                                    400
+                                                ? widget.constraint.maxWidth *
+                                                    0.05
+                                                : 15,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                RegisterTextfield(
-                                  controller: bankname,
-                                  labeltext: 'Bank Name',
-                                  onvalidation: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mandatory field Can\'t be empty ';
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                RegisterTextfield(
-                                  controller: accountownername,
-                                  labeltext: 'Bank Account Owner/Title',
-                                  onvalidation: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mandatory field Can\'t be empty ';
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                RegisterTextfield(
-                                  controller: iban,
-                                  labeltext: 'IBAN',
-                                  onvalidation: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Mandatory field Can\'t be empty ';
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Text(
-                                  'Legal Documents',
-                                  style: GoogleFonts.mina(
-                                      fontSize: widget.constraint.maxWidth < 400
-                                          ? size.height * 0.03
-                                          : 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                                Stack(
-                                  children: [
-                                    Container(
-                                      constraints: const BoxConstraints(
-                                        maxHeight: 200,
-                                        minHeight: 100,
-                                        maxWidth: double.maxFinite,
+                                          Expanded(
+                                            child: Text(
+                                              'Your details are secure and encrypted with us.',
+                                              style: GoogleFonts.mina(
+                                                  fontSize: widget.constraint
+                                                              .maxWidth <
+                                                          400
+                                                      ? widget.constraint
+                                                              .maxWidth *
+                                                          0.03
+                                                      : 12,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      child: DottedBorder(
-                                        color: Colors.grey,
-                                        strokeWidth: 3,
-                                        dashPattern: const [12, 8],
-                                        child: idImage != null
-                                            ? Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Container(
-                                                        child: Center(
-                                                          child: Image.memory(
-                                                            idImage!,
-                                                            fit: BoxFit.cover,
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    controller: bankname,
+                                    labeltext: 'Bank Name',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    controller: accountownername,
+                                    labeltext: 'Bank Account Owner/Title',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RegisterTextfield(
+                                    controller: iban,
+                                    labeltext: 'IBAN',
+                                    onvalidation: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Mandatory field Can\'t be empty ';
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text(
+                                    'Legal Documents',
+                                    style: GoogleFonts.mina(
+                                        fontSize:
+                                            widget.constraint.maxWidth < 400
+                                                ? size.height * 0.03
+                                                : 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  Stack(
+                                    children: [
+                                      Container(
+                                        constraints: const BoxConstraints(
+                                          maxHeight: 200,
+                                          minHeight: 100,
+                                          maxWidth: double.maxFinite,
+                                        ),
+                                        child: DottedBorder(
+                                          color: Colors.grey,
+                                          strokeWidth: 3,
+                                          dashPattern: const [12, 8],
+                                          child: idImage != null
+                                              ? Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Container(
+                                                          child: Center(
+                                                            child: Image.memory(
+                                                              idImage!,
+                                                              fit: BoxFit.cover,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : Column(
+                                                  children: [
+                                                    const SizedBox(
+                                                      height: 20,
                                                     ),
+                                                    Center(
+                                                      child: IconButton(
+                                                          onPressed: () async {
+                                                            pickImage();
+                                                            // pickimagefromgallery();
+                                                            idImage != null
+                                                                ? ref
+                                                                        .read(isimage
+                                                                            .notifier)
+                                                                        .state =
+                                                                    true
+                                                                : ref
+                                                                    .read(isimage
+                                                                        .notifier)
+                                                                    .state = false;
+                                                          },
+                                                          icon: Icon(
+                                                            Icons
+                                                                .camera_front_rounded,
+                                                            size: widget.constraint
+                                                                        .maxWidth >
+                                                                    300
+                                                                ? 80
+                                                                : 50,
+                                                          )),
+                                                    ),
+                                                    Text(
+                                                      'Upload Identity Card Photo',
+                                                      style: TextStyle(
+                                                          fontSize:
+                                                              size.width > 400
+                                                                  ? size.width *
+                                                                      0.03
+                                                                  : 10,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          color: Colors.black),
+                                                    )
                                                   ],
                                                 ),
-                                              )
-                                            : Column(
-                                                children: [
-                                                  const SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                  Center(
-                                                    child: IconButton(
-                                                        onPressed: () async {
-                                                          pickImage();
-                                                          // pickimagefromgallery();
-                                                          idImage != null
-                                                              ? ref
-                                                                  .read(isimage
-                                                                      .notifier)
-                                                                  .state = true
-                                                              : ref
-                                                                  .read(isimage
-                                                                      .notifier)
-                                                                  .state = false;
-                                                        },
-                                                        icon: Icon(
-                                                          Icons
-                                                              .camera_front_rounded,
-                                                          size: widget.constraint
-                                                                      .maxWidth >
-                                                                  300
-                                                              ? 80
-                                                              : 50,
-                                                        )),
-                                                  ),
-                                                  Text(
-                                                    'Upload Identity Card Photo',
-                                                    style: TextStyle(
-                                                        fontSize: size.width >
-                                                                400
-                                                            ? size.width * 0.03
-                                                            : 10,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        color: Colors.black),
-                                                  )
-                                                ],
-                                              ),
+                                        ),
                                       ),
-                                    ),
-                                    idImage != null
-                                        ? Positioned(
-                                            top: 0,
-                                            left: 0,
-                                            child: InkWell(
-                                              onTap: () async {
-                                                pickImage();
-                                                idImage != null
-                                                    ? ref
-                                                        .read(isimage.notifier)
-                                                        .state = true
-                                                    : ref
-                                                        .read(isimage.notifier)
-                                                        .state = false;
-                                              },
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                height: 50,
-                                                width: 50,
-                                                decoration: const BoxDecoration(
-                                                    color: Colors.black,
-                                                    borderRadius:
-                                                        BorderRadius.only(
-                                                            bottomRight:
-                                                                Radius.circular(
-                                                                    50))),
-                                                child: const Icon(
-                                                  Icons.refresh,
-                                                  size: 15,
-                                                  color: Colors.white,
+                                      idImage != null
+                                          ? Positioned(
+                                              top: 0,
+                                              left: 0,
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  pickImage();
+                                                  idImage != null
+                                                      ? ref
+                                                          .read(
+                                                              isimage.notifier)
+                                                          .state = true
+                                                      : ref
+                                                          .read(
+                                                              isimage.notifier)
+                                                          .state = false;
+                                                },
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  height: 50,
+                                                  width: 50,
+                                                  decoration: const BoxDecoration(
+                                                      color: Colors.black,
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          50))),
+                                                  child: const Icon(
+                                                    Icons.refresh,
+                                                    size: 15,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          )
-                                        : const SizedBox(),
-                                  ],
-                                ),
-                                isImageSelected == false
-                                    ? const Text(
-                                        'upload image please',
-                                        style: TextStyle(color: Colors.red),
-                                      )
-                                    : const SizedBox(),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                SizedBox(
-                                  height:
-                                      Responsive.isDesktop(context) ? 40 : 30,
-                                  width: double.maxFinite,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      if (address == null) {
-                                        ref
-                                            .read(
-                                                restaurantLocationSelectedProvider
-                                                    .notifier)
-                                            .state = true;
-                                      }
-                                      if (_form.currentState!.validate()) {}
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      surfaceTintColor: Colors.blue,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      backgroundColor: Colors.black,
-                                    ),
-                                    child: const Text(
-                                      ' Get Started ',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
+                                            )
+                                          : const SizedBox(),
+                                    ],
+                                  ),
+                                  isImageSelected == false
+                                      ? const Text(
+                                          'upload image please',
+                                          style: TextStyle(color: Colors.red),
+                                        )
+                                      : const SizedBox(),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  SizedBox(
+                                    height:
+                                        Responsive.isDesktop(context) ? 40 : 30,
+                                    width: double.maxFinite,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        if (address == null) {
+                                          ref
+                                              .read(
+                                                  restaurantLocationSelectedProvider
+                                                      .notifier)
+                                              .state = true;
+                                        }
+                                        if (_form.currentState!.validate()) {}
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        surfaceTintColor: Colors.blue,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        backgroundColor: Colors.black,
+                                      ),
+                                      child: const Text(
+                                        ' Get Started ',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
