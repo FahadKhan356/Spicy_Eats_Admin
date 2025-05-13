@@ -4,13 +4,13 @@ import 'package:spicy_eats_admin/utils/colors.dart';
 class RegisterTextfield extends StatelessWidget {
   final String labeltext;
   final String? Function(String?) onvalidation;
-  final TextEditingController controller;
+  final TextEditingController? controller;
 
   const RegisterTextfield(
       {super.key,
       required this.labeltext,
       required this.onvalidation,
-      required this.controller});
+      this.controller});
 
   @override
   Widget build(BuildContext context) {

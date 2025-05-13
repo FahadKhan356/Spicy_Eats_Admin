@@ -20,10 +20,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 var isimage = StateProvider<bool>((ref) => true);
 
-class RestaurantRegister extends StatelessWidget {
+class RestaurantRegister extends StatefulWidget {
   static const String routename = '/Register';
   const RestaurantRegister({super.key});
 
+  @override
+  State<RestaurantRegister> createState() => _RestaurantRegisterState();
+}
+
+final TextEditingController storeController = TextEditingController();
+final TextEditingController floorController = TextEditingController();
+final TextEditingController cityController = TextEditingController();
+final TextEditingController postalController = TextEditingController();
+
+class _RestaurantRegisterState extends State<RestaurantRegister> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -322,6 +332,10 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                         height: 10,
                                       ),
                                       Restaurantaddress(
+                                          storeController: storeController,
+                                          floorController: floorController,
+                                          cityController: cityController,
+                                          postalController: postalController,
                                           controller: restaurantaddress,
                                           onvalidation: (value) {
                                             if (value == null ||
@@ -334,59 +348,59 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      Stack(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'lib/assets/map2.jpg',
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height:
-                                                Responsive.isDesktop(context)
-                                                    ? 40
-                                                    : 30,
-                                            width: double.maxFinite,
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                surfaceTintColor: Colors.blue,
-                                                backgroundColor: Colors.black
-                                                    .withOpacity(0.5),
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.pushNamed(
-                                                    context, MyMap.routename);
-                                              },
-                                              child: const Text(
-                                                'Select restaurant location',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      address != null && address == true
-                                          ? const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 10),
-                                              child: Text(
-                                                'Location is not selected',
-                                                style: TextStyle(
-                                                    color: Colors.red),
-                                              ),
-                                            )
-                                          : const SizedBox(),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
+                                      // Stack(
+                                      //   children: [
+                                      //     ClipRRect(
+                                      //       borderRadius:
+                                      //           BorderRadius.circular(10),
+                                      //       child: Image.asset(
+                                      //         'lib/assets/map2.jpg',
+                                      //         fit: BoxFit.cover,
+                                      //       ),
+                                      //     ),
+                                      //     SizedBox(
+                                      //       height:
+                                      //           Responsive.isDesktop(context)
+                                      //               ? 40
+                                      //               : 30,
+                                      //       width: double.maxFinite,
+                                      //       child: ElevatedButton(
+                                      //         style: ElevatedButton.styleFrom(
+                                      //           surfaceTintColor: Colors.blue,
+                                      //           backgroundColor: Colors.black
+                                      //               .withOpacity(0.5),
+                                      //           shape: RoundedRectangleBorder(
+                                      //               borderRadius:
+                                      //                   BorderRadius.circular(
+                                      //                       10)),
+                                      //         ),
+                                      //         onPressed: () {
+                                      //           Navigator.pushNamed(
+                                      //               context, MyMap.routename);
+                                      //         },
+                                      //         child: const Text(
+                                      //           'Select restaurant location',
+                                      //           style: TextStyle(
+                                      //               color: Colors.white),
+                                      //         ),
+                                      //       ),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      // address != null && address == true
+                                      //     ? const Padding(
+                                      //         padding: EdgeInsets.symmetric(
+                                      //             vertical: 10),
+                                      //         child: Text(
+                                      //           'Location is not selected',
+                                      //           style: TextStyle(
+                                      //               color: Colors.red),
+                                      //         ),
+                                      //       )
+                                      //     : const SizedBox(),
+                                      // const SizedBox(
+                                      //   height: 20,
+                                      // ),
                                       Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -1056,6 +1070,10 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                     height: 10,
                                   ),
                                   Restaurantaddress(
+                                      storeController: storeController,
+                                      floorController: floorController,
+                                      cityController: cityController,
+                                      postalController: postalController,
                                       controller: restaurantaddress,
                                       onvalidation: (value) {
                                         if (value == null || value.isEmpty) {
@@ -1067,66 +1085,66 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  Stack(
-                                    children: [
-                                      Center(
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: Image.asset(
-                                            'lib/assets/map2.jpg',
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                      Center(
-                                        child: SizedBox(
-                                          height: Responsive.isDesktop(context)
-                                              ? 40
-                                              : 30,
-                                          width: double.maxFinite,
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              surfaceTintColor: Colors.blue,
-                                              backgroundColor:
-                                                  Colors.black.withOpacity(0.5),
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.pushNamed(
-                                                  context, MyMap.routename);
-                                            },
-                                            child: Text(
-                                              'Select restaurant location',
-                                              style: TextStyle(
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  color: Colors.white,
-                                                  fontSize: size.width < 400
-                                                      ? size.width / 20
-                                                      : 15),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  address != null && address == true
-                                      ? const Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10),
-                                          child: Text(
-                                            'Location is not selected',
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                        )
-                                      : const SizedBox(),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
+                                  // Stack(
+                                  //   children: [
+                                  //     Center(
+                                  //       child: ClipRRect(
+                                  //         borderRadius:
+                                  //             BorderRadius.circular(10),
+                                  //         child: Image.asset(
+                                  //           'lib/assets/map2.jpg',
+                                  //           fit: BoxFit.cover,
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //     Center(
+                                  //       child: SizedBox(
+                                  //         height: Responsive.isDesktop(context)
+                                  //             ? 40
+                                  //             : 30,
+                                  //         width: double.maxFinite,
+                                  //         child: ElevatedButton(
+                                  //           style: ElevatedButton.styleFrom(
+                                  //             surfaceTintColor: Colors.blue,
+                                  //             backgroundColor:
+                                  //                 Colors.black.withOpacity(0.5),
+                                  //             shape: RoundedRectangleBorder(
+                                  //                 borderRadius:
+                                  //                     BorderRadius.circular(
+                                  //                         10)),
+                                  //           ),
+                                  //           onPressed: () {
+                                  //             Navigator.pushNamed(
+                                  //                 context, MyMap.routename);
+                                  //           },
+                                  //           child: Text(
+                                  //             'Select restaurant location',
+                                  //             style: TextStyle(
+                                  //                 overflow:
+                                  //                     TextOverflow.ellipsis,
+                                  //                 color: Colors.white,
+                                  //                 fontSize: size.width < 400
+                                  //                     ? size.width / 20
+                                  //                     : 15),
+                                  //           ),
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  // address != null && address == true
+                                  //     ? const Padding(
+                                  //         padding: EdgeInsets.symmetric(
+                                  //             vertical: 10),
+                                  //         child: Text(
+                                  //           'Location is not selected',
+                                  //           style: TextStyle(color: Colors.red),
+                                  //         ),
+                                  //       )
+                                  //     : const SizedBox(),
+                                  // const SizedBox(
+                                  //   height: 20,
+                                  // ),
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
