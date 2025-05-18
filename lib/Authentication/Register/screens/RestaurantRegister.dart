@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:spicy_eats_admin/Authentication/Register/widgets/MobileTimeLineTask.dart';
 import 'package:spicy_eats_admin/Authentication/Register/widgets/RestaurantAddress.dart';
 
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
@@ -146,6 +145,9 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                 child: Row(
                   children: [
                     MyTimeLine(
+                      icon: Icons.account_box,
+                      iconColor: Colors.white,
+                      iconBg: Colors.black,
                       widthsize: size.width / 5,
                       isFirst: true,
                       isLast: false,
@@ -156,6 +158,9 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                       ),
                     ),
                     MyTimeLine(
+                      icon: Icons.restaurant,
+                      iconColor: Colors.white,
+                      iconBg: Colors.black,
                       widthsize: size.width / 5,
                       isFirst: false,
                       isLast: false,
@@ -166,21 +171,27 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                       ),
                     ),
                     MyTimeLine(
+                      icon: Icons.subscriptions,
+                      iconColor: Colors.white,
+                      iconBg: Colors.black,
                       widthsize: size.width / 3,
                       isFirst: false,
                       isLast: false,
                       endChild: Text(
-                        'Approved',
+                        'Choose Plan',
                         style: TextStyle(
                             fontSize: size.width / 75, color: Colors.black),
                       ),
                     ),
                     MyTimeLine(
+                      icon: Icons.verified_user_sharp,
+                      iconColor: Colors.white,
+                      iconBg: Colors.black,
                       widthsize: size.width / 5,
                       isFirst: false,
                       isLast: true,
                       endChild: Text(
-                        'Choose Plan',
+                        'Approved',
                         style: TextStyle(
                             fontSize: size.width / 75, color: Colors.black),
                       ),
@@ -856,8 +867,14 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   : 8,
                               color: Colors.black),
                         ),
+                        icon: Icons.account_box,
+                        iconColor: Colors.white,
+                        iconBg: Colors.black,
                       ),
                       MyTimeLine(
+                        icon: Icons.restaurant,
+                        iconColor: Colors.white,
+                        iconBg: Colors.black,
                         widthsize: size.width < 350
                             ? size.width / 5
                             : size.width / 4.5,
@@ -874,6 +891,9 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                         ),
                       ),
                       MyTimeLine(
+                        icon: Icons.subscriptions,
+                        iconColor: Colors.white,
+                        iconBg: Colors.black,
                         widthsize: size.width < 350
                             ? size.width / 5
                             : size.width / 4.5,
@@ -881,7 +901,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                         isLast: false,
                         endChild: Text(
                           textAlign: TextAlign.center,
-                          'Approved',
+                          'Choose Plan',
                           style: TextStyle(
                               fontSize: constraints.maxWidth > 600
                                   ? size.width / 60
@@ -890,6 +910,9 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                         ),
                       ),
                       MyTimeLine(
+                        icon: Icons.verified_user_sharp,
+                        iconColor: Colors.white,
+                        iconBg: Colors.black,
                         widthsize: size.width < 350
                             ? size.width / 5
                             : size.width / 4.5,
@@ -897,7 +920,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                         isLast: true,
                         endChild: Text(
                           textAlign: TextAlign.center,
-                          'Choose Plan',
+                          'Approved',
                           style: TextStyle(
                               fontSize: constraints.maxWidth > 600
                                   ? size.width / 60
@@ -995,7 +1018,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Container(
-                                            padding: EdgeInsets.all(5),
+                                            padding: const EdgeInsets.all(5),
                                             constraints: BoxConstraints(
                                               maxWidth:
                                                   constraints.maxWidth > 300
@@ -1033,8 +1056,8 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                 ),
 
                                                 constraints.maxWidth > 300
-                                                    ? Flexible(
-                                                        child: const Text(
+                                                    ? const Flexible(
+                                                        child: Text(
                                                           '+92',
                                                           style: TextStyle(
                                                               fontSize: 10),
@@ -1085,66 +1108,6 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  // Stack(
-                                  //   children: [
-                                  //     Center(
-                                  //       child: ClipRRect(
-                                  //         borderRadius:
-                                  //             BorderRadius.circular(10),
-                                  //         child: Image.asset(
-                                  //           'lib/assets/map2.jpg',
-                                  //           fit: BoxFit.cover,
-                                  //         ),
-                                  //       ),
-                                  //     ),
-                                  //     Center(
-                                  //       child: SizedBox(
-                                  //         height: Responsive.isDesktop(context)
-                                  //             ? 40
-                                  //             : 30,
-                                  //         width: double.maxFinite,
-                                  //         child: ElevatedButton(
-                                  //           style: ElevatedButton.styleFrom(
-                                  //             surfaceTintColor: Colors.blue,
-                                  //             backgroundColor:
-                                  //                 Colors.black.withOpacity(0.5),
-                                  //             shape: RoundedRectangleBorder(
-                                  //                 borderRadius:
-                                  //                     BorderRadius.circular(
-                                  //                         10)),
-                                  //           ),
-                                  //           onPressed: () {
-                                  //             Navigator.pushNamed(
-                                  //                 context, MyMap.routename);
-                                  //           },
-                                  //           child: Text(
-                                  //             'Select restaurant location',
-                                  //             style: TextStyle(
-                                  //                 overflow:
-                                  //                     TextOverflow.ellipsis,
-                                  //                 color: Colors.white,
-                                  //                 fontSize: size.width < 400
-                                  //                     ? size.width / 20
-                                  //                     : 15),
-                                  //           ),
-                                  //         ),
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  // address != null && address == true
-                                  //     ? const Padding(
-                                  //         padding: EdgeInsets.symmetric(
-                                  //             vertical: 10),
-                                  //         child: Text(
-                                  //           'Location is not selected',
-                                  //           style: TextStyle(color: Colors.red),
-                                  //         ),
-                                  //       )
-                                  //     : const SizedBox(),
-                                  // const SizedBox(
-                                  //   height: 20,
-                                  // ),
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,

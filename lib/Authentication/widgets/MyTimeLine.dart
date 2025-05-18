@@ -13,9 +13,15 @@ class MyTimeLine extends StatelessWidget {
   final Widget? endChild;
   final Widget? startChild;
   final double widthsize;
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
 
   const MyTimeLine({
     super.key,
+    required this.iconBg,
+    required this.iconColor,
+    required this.icon,
     required this.isFirst,
     required this.isLast,
     this.endChild,
@@ -38,10 +44,10 @@ class MyTimeLine extends StatelessWidget {
         afterLineStyle: const LineStyle(color: Colors.black45),
         indicatorStyle: IndicatorStyle(
           width: size.width < 300 ? 20 : 100,
-          color: Colors.green,
+          color: iconBg,
           iconStyle: IconStyle(
-            iconData: Icons.done,
-            color: Colors.white,
+            iconData: icon,
+            color: iconColor,
           ),
         ),
         endChild: endChild,

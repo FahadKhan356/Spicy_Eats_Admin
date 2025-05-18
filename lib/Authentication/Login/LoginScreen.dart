@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:spicy_eats_admin/Authentication/Signup/screen/SignupScreen.dart';
+import 'package:spicy_eats_admin/Authentication/authCallBack.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
@@ -507,13 +508,14 @@ class MobileLayout extends ConsumerWidget {
                   child: ElevatedButton(
                     onPressed: () async {
                       try {
-                        await authrepo.signInWithGoogleUniversal();
+                        await authrepo.signInWithGoogleUniversal(context);
                       } catch (e) {
                         showCustomSnackbar(
                             backgroundColor: Colors.black,
                             context: context,
                             message: 'Error: $e');
                       }
+                      Navigator.pushNamed(context, AuthCallbackPage.routename);
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(

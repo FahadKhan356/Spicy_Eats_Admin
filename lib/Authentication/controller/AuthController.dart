@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 var restaurantLatProvider = StateProvider<double?>((ref) => null);
 var restaurantLongProvider = StateProvider<double?>((ref) => null);
@@ -19,19 +20,13 @@ class AuthController {
   Ref ref;
 
   void singupAndStoreNewUserData({
-    required businessEmail,
-    required password,
-    required firstmiddleName,
-    required contackNo,
-    String? lastName,
+    required BuildContext context,
+    required User user,
   }) {
     try {
       authRepository.storeNewUserData(
-        businessEmail: businessEmail,
-        password: password,
-        firstmiddleName: firstmiddleName,
-        lastName: lastName,
-        contackNo: contackNo,
+        user: user,
+        context: context,
       );
     } catch (e) {
       // throw Exception(e);

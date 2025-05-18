@@ -260,16 +260,13 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         if (_form.currentState!.validate()) {
-                                          ref
-                                              .read(authControllerProvider)
-                                              .singupAndStoreNewUserData(
-                                                  businessEmail:
-                                                      businessemail.text,
-                                                  password: password.text,
-                                                  firstmiddleName:
-                                                      firstandmiddlename.text,
-                                                  contackNo: int.parse(
-                                                      contactno.text));
+                                          // ref
+                                          //     .read(authControllerProvider)
+                                          //     .singupAndStoreNewUserData(
+                                          //       businessEmail:
+                                          //           businessemail.text,
+                                          //       password: password.text,
+                                          //     );
                                           showCustomSnackbar(
                                               context: context,
                                               message:
@@ -587,7 +584,21 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_form.currentState!.validate()) {
-                                  return;
+                                  // ref
+                                  //     .read(authControllerProvider)
+                                  //     .singupAndStoreNewUserData(
+                                  //         businessEmail: businessemail.text,
+                                  //         password: password.text
+
+                                  //         );
+
+                                  showCustomSnackbar(
+                                      context: context,
+                                      message:
+                                          'please sign in with same credentials');
+
+                                  Navigator.pushNamed(
+                                      context, LoginScreen.routename);
                                 }
                               },
                               style: ElevatedButton.styleFrom(

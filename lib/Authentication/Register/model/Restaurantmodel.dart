@@ -1,27 +1,27 @@
 class Restaurant {
   final String userId;
   final String restaurantName;
-  // final double deliveryFee;
-  // final int minTime;
-  // final int maxTime;
+  final double? deliveryFee;
+  final int? minTime;
+  final int? maxTime;
   final String address;
   final String phoneNumber;
-  // final String deliveryArea;
-  // final String postalCode;
+  final String? deliveryArea;
+  final String? postalCode;
   final String idNumber;
-  // final String description;
+  final String? description;
   final double long;
   final double lat;
   final String businessEmail;
   final String idFirstMiddleName;
   final String idLastName;
-  // final String openingHours;
-  // final String restaurantImageUrl;
+  final String? openingHours;
+  final String? restaurantImageUrl;
   final String idPhotoUrl;
   final String bankname;
   final String bankownerTitle;
   final String iban;
-  // final String restLogoUrl;
+  final String? restLogoUrl;
 
   Restaurant({
     required this.iban,
@@ -29,48 +29,48 @@ class Restaurant {
     required this.bankname,
     required this.userId,
     required this.restaurantName,
-    // required this.deliveryFee,
-    // required this.minTime,
-    // required this.maxTime,
+    this.deliveryFee,
+    this.minTime,
+    this.maxTime,
     required this.address,
     required this.phoneNumber,
-    // required this.deliveryArea,
-    // required this.postalCode,
+    this.deliveryArea,
+    this.postalCode,
     required this.idNumber,
-    // required this.description,
+    this.description,
     required this.long,
     required this.lat,
     required this.businessEmail,
     required this.idFirstMiddleName,
     required this.idLastName,
-    // required this.openingHours,
-    // required this.restaurantImageUrl,
+    this.openingHours,
+    this.restaurantImageUrl,
     required this.idPhotoUrl,
-    // required this.restLogoUrl,
+    this.restLogoUrl,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'user_id': userId,
       'restaurantName': restaurantName,
-      // 'deliveryFee': deliveryFee,
-      // 'minTime': minTime,
-      // 'maxTime': maxTime,
+      'deliveryFee': deliveryFee,
+      'minTime': minTime,
+      'maxTime': maxTime,
       'address': address,
       'phoneNumber': phoneNumber,
-      // 'deliveryArea': deliveryArea,
-      // 'postalCode': postalCode,
+      'deliveryArea': deliveryArea,
+      'postalCode': postalCode,
       'idNumber': idNumber,
-      // 'description': description,
+      'description': description,
       'long': long,
       'lat': lat,
       'businessEmail': businessEmail,
       'idFirstMiddleName': idFirstMiddleName,
       'idLastName': idLastName,
-      // 'openingHours': openingHours,
-      // 'restaurantImageUrl': restaurantImageUrl,
+      'openingHours': openingHours,
+      'restaurantImageUrl': restaurantImageUrl,
       'idPhotoUrl': idPhotoUrl,
-      // 'restLogoUrl': restLogoUrl,
+      'restLogoUrl': restLogoUrl,
       'bankname': bankname,
       'bankownerTitle': bankownerTitle,
       'iban': iban,

@@ -1,5 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spicy_eats_admin/Authentication/Register/model/Restaurantmodel.dart';
+import 'package:spicy_eats_admin/Authentication/authCallBack.dart';
+import 'package:spicy_eats_admin/Authentication/utils/commonImagePicker.dart';
+import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -27,41 +32,26 @@ class AuthRepository {
   }
 
 //store user data to user table
-  Future<void> storeNewUserData({
-    required businessEmail,
-    required password,
-    required firstmiddleName,
-    required contackNo,
-    String? lastName,
-  }) async {
+  Future<void> storeNewUserData(
+      {required User user, required BuildContext context}) async {
     try {
-      final user =
-          await signup(businessEmail: businessEmail, password: password);
-      if (user.userId == null) {
-        debugPrint('sign up failed');
-        return;
+      final existinguser = await supabaseClient
+          .from('users')
+          .select('id')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (existinguser == null && user != null) {
+        await supabaseClient.from('users').insert({
+          'id': user.id,
+          'email': user.email,
+          'Role': 'restaurant-admin',
+          'status': 'pending',
+        });
       }
-      // Check if user already exists in the 'users' table
-      // final existingUser = await supabaseClient
-      //     .from('users')
-      //     .select('id')
-      //     .eq('id', user.userId!)
-      //     .maybeSingle();
-
-      // if (existingUser != null) {
-      //   debugPrint('User already exists in users table.');
-      //   return;
-      // }
-
-      await supabaseClient.from('users').insert({
-        'id': user.userId,
-        'email': businessEmail,
-        'firstname': firstmiddleName,
-        'contactno': contackNo,
-        'lastname': lastName,
-        'Role': 'restaurant-admin',
-        'password': password,
-        'status': 'pending',
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showCustomSnackbar(
+            context: context, message: 'User stored and login successfully');
       });
     } catch (e) {
       // throw Exception(e);
@@ -70,11 +60,11 @@ class AuthRepository {
     debugPrint('done sign up');
   }
 
-  Future<void> signInWithGoogleUniversal() async {
+  Future<void> signInWithGoogleUniversal(BuildContext context) async {
     if (kIsWeb) {
       await supabaseClient.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: 'http://localhost:49967/auth/callback',
+        redirectTo: 'http://localhost:62180',
       );
     } else {
       const webClientId =
@@ -104,69 +94,68 @@ class AuthRepository {
       );
     }
   }
+
+//register restaurant
+  Future<void> registerRestaurant({
+    required businessEmail,
+    required password,
+    required bussinessName,
+    required firstmiddleName,
+    required cnicNo,
+    required mobileNo,
+    required bankName,
+    required bankownerTitle,
+    required iban,
+    required Uint8List cnicPhoto,
+    required lat,
+    required long,
+    required address,
+    required lastName,
+  }) async {
+    try {
+      //sign up
+      // final response =
+      //     await signup(businessEmail: businessEmail, password: password);
+      // if (response.userId == null) {
+      //   throw Exception('failed to signup');
+      // }
+      // print('sucessfully sign up ${response.userId}');
+      //uploading image and retrieving url
+      // final cnicPhotoUrl = await uploadSupabseStorageGetRrl(
+      //     foldername: 'bussinessdocuments',
+      //     imagepath: 'CnicPhoto/${response.userId}',
+      //     file: cnicPhoto);
+
+      // if (cnicPhotoUrl == null) {
+      //   throw Exception('Failed to upload CNIC photo');
+      // }
+
+      final restaurant = Restaurant(
+        iban: iban,
+        bankownerTitle: bankownerTitle,
+        bankname: bankName,
+        userId: supabaseClient.auth.currentUser!.id,
+        restaurantName: bussinessName,
+        address: address,
+        phoneNumber: mobileNo,
+        idNumber: cnicNo,
+        long: long,
+        lat: lat,
+        businessEmail: businessEmail,
+        idFirstMiddleName: firstmiddleName,
+        idLastName: lastName,
+        idPhotoUrl: '',
+      );
+
+      final res =
+          await supabaseClient.from('restaurants').insert(restaurant.toMap());
+
+      if (res.error != null) {
+      } else {
+        print('Restaurant inserted successfully');
+      }
+    } catch (e) {
+      debugPrint('Error in Resgister Restaurant $e');
+    }
+  }
 }
-
-// //register restaurant
-//   Future<void> registerRestaurant({
-//     required businessEmail,
-//     required password,
-//     required bussinessName,
-//     required firstmiddleName,
-//     required cnicNo,
-//     required mobileNo,
-//     required bankName,
-//     required bankownerTitle,
-//     required iban,
-//     required Uint8List cnicPhoto,
-//     required lat,
-//     required long,
-//     required address,
-//     required lastName,
-//   }) async {
-//     try {
-//       //sign up
-//       final response =
-//           await signup(businessEmail: businessEmail, password: password);
-//       if (response.userId == null) {
-//         throw Exception('failed to signup');
-//       }
-//       print('sucessfully sign up ${response.userId}');
-//       //uploading image and retrieving url
-//       final cnicPhotoUrl = await uploadSupabseStorageGetRrl(
-//           foldername: 'bussinessdocuments',
-//           imagepath: 'CnicPhoto/${response.userId}',
-//           file: cnicPhoto);
-
-//       if (cnicPhotoUrl == null) {
-//         throw Exception('Failed to upload CNIC photo');
-//       }
-//       print('cnic photourl ${cnicPhotoUrl}');
-//       final restaurant = Restaurant(
-//           iban: iban,
-//           bankownerTitle: bankownerTitle,
-//           bankname: bankName,
-//           userId: supabaseClient.auth.currentUser!.id,
-//           restaurantName: bussinessName,
-//           address: address,
-//           phoneNumber: mobileNo,
-//           idNumber: cnicNo,
-//           long: long,
-//           lat: lat,
-//           businessEmail: businessEmail,
-//           idFirstMiddleName: firstmiddleName,
-//           idLastName: lastName,
-//           idPhotoUrl: cnicPhotoUrl);
-
-//       final res =
-//           await supabaseClient.from('restaurants').insert(restaurant.toMap());
-
-//       if (res.error != null) {
-//         print('Error inserting restaurant: ${response.error!}');
-//       } else {
-//         print('Restaurant inserted successfully');
-//       }
-//     } catch (e) {
-//       debugPrint('Error in Resgister Restaurant $e');
-//     }
-//   }
-// }

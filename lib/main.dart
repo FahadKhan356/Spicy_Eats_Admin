@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
+import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/Routes.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,22 +18,70 @@ void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
+
+  @override
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  GlobalKey<NavigatorState> navigatorkey = GlobalKey<NavigatorState>();
+  late final StreamSubscription<AuthState> _authstateSubscription;
+
+  _initialAuth() {
+    _authstateSubscription =
+        supabaseClient.auth.onAuthStateChange.listen((event) {
+      final session = event.session;
+
+      if (session != null && navigatorkey.currentState != null) {
+        final user = supabaseClient.auth.currentUser;
+        ref
+            .read(authRepoProvider)
+            .storeNewUserData(user: user!, context: context);
+
+        debugPrint('User just signed in');
+        navigatorkey.currentState!.pushNamedAndRemoveUntil(
+          RestaurantRegister.routename,
+          (route) => false,
+        );
+      } else {
+        debugPrint('No user ');
+        navigatorkey.currentState!.pushNamedAndRemoveUntil(
+          LoginScreen.routename,
+          (route) => false,
+        );
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    _initialAuth();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _authstateSubscription.cancel();
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorkey,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const RestaurantRegister(),
-      // supabaseClient.auth.currentUser != null
-      //     ? const RestaurantRegister()
-      //     : const LoginScreen(),
+      home: supabaseClient.auth.currentUser != null
+          ? const RestaurantRegister()
+          : const LoginScreen(),
       onGenerateRoute: generateRoute,
     );
   }
