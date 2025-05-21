@@ -16,6 +16,8 @@ class MyTimeLine extends StatelessWidget {
   final IconData icon;
   final Color iconBg;
   final Color iconColor;
+  final Color? beforelineColor;
+  final Color? afterlineColor;
 
   const MyTimeLine({
     super.key,
@@ -27,6 +29,8 @@ class MyTimeLine extends StatelessWidget {
     this.endChild,
     this.startChild,
     required this.widthsize,
+    this.beforelineColor,
+    this.afterlineColor,
   });
 
   @override
@@ -40,8 +44,8 @@ class MyTimeLine extends StatelessWidget {
         alignment: TimelineAlign.center,
         isFirst: isFirst,
         isLast: isLast,
-        beforeLineStyle: const LineStyle(color: Colors.black45),
-        afterLineStyle: const LineStyle(color: Colors.black45),
+        beforeLineStyle: LineStyle(color: beforelineColor ?? Colors.red),
+        afterLineStyle: LineStyle(color: afterlineColor ?? Colors.red),
         indicatorStyle: IndicatorStyle(
           width: size.width < 300 ? 20 : 100,
           color: iconBg,

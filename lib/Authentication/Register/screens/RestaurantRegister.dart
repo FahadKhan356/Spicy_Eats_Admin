@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:spicy_eats_admin/Authentication/Register/widgets/RestaurantAddress.dart';
 
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
+import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 
 import 'package:spicy_eats_admin/Authentication/utils/comon_image_picker.dart';
 
@@ -796,6 +797,13 @@ class MobileLayout extends ConsumerStatefulWidget {
 
 class _MobileLayoutState extends ConsumerState<MobileLayout> {
   @override
+  void initState() {
+    ref.read(authRepoProvider).checkAuthSteps(context, ref);
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
@@ -834,6 +842,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
 
   @override
   Widget build(BuildContext context) {
+    final authStep = ref.watch(authStepsProvider);
     final isImageSelected = ref.watch(isimage);
     final address = ref.watch(restaurantLocationSelectedProvider);
     final size = MediaQuery.of(context).size;
@@ -853,6 +862,9 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                   child: Row(
                     children: [
                       MyTimeLine(
+                        afterlineColor: authStep != null && authStep >= 2
+                            ? Colors.black
+                            : Colors.black26,
                         widthsize: size.width < 350
                             ? size.width / 5
                             : size.width / 4.5,
@@ -865,16 +877,28 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                               fontSize: constraints.maxWidth > 600
                                   ? size.width / 60
                                   : 8,
-                              color: Colors.black),
+                              color: authStep != null && authStep >= 1
+                                  ? Colors.black
+                                  : Colors.black26),
                         ),
                         icon: Icons.account_box,
                         iconColor: Colors.white,
-                        iconBg: Colors.black,
+                        iconBg: authStep != null && authStep >= 1
+                            ? Colors.black
+                            : Colors.black26,
                       ),
                       MyTimeLine(
+                        afterlineColor: authStep != null && authStep >= 3
+                            ? Colors.black
+                            : Colors.black26,
+                        beforelineColor: authStep != null && authStep >= 2
+                            ? Colors.black
+                            : Colors.black26,
                         icon: Icons.restaurant,
                         iconColor: Colors.white,
-                        iconBg: Colors.black,
+                        iconBg: authStep != null && authStep >= 2
+                            ? Colors.black
+                            : Colors.black26,
                         widthsize: size.width < 350
                             ? size.width / 5
                             : size.width / 4.5,
@@ -887,13 +911,23 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                               fontSize: constraints.maxWidth > 600
                                   ? size.width / 60
                                   : 8,
-                              color: Colors.black),
+                              color: authStep != null && authStep >= 2
+                                  ? Colors.black
+                                  : Colors.black26),
                         ),
                       ),
                       MyTimeLine(
+                        afterlineColor: authStep != null && authStep >= 4
+                            ? Colors.black
+                            : Colors.black26,
+                        beforelineColor: authStep != null && authStep >= 3
+                            ? Colors.black
+                            : Colors.black26,
                         icon: Icons.subscriptions,
                         iconColor: Colors.white,
-                        iconBg: Colors.black,
+                        iconBg: authStep != null && authStep >= 3
+                            ? Colors.black
+                            : Colors.black26,
                         widthsize: size.width < 350
                             ? size.width / 5
                             : size.width / 4.5,
@@ -906,13 +940,20 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                               fontSize: constraints.maxWidth > 600
                                   ? size.width / 60
                                   : 8,
-                              color: Colors.black),
+                              color: authStep != null && authStep >= 3
+                                  ? Colors.black
+                                  : Colors.black26),
                         ),
                       ),
                       MyTimeLine(
+                        beforelineColor: authStep != null && authStep >= 4
+                            ? Colors.black
+                            : Colors.black26,
                         icon: Icons.verified_user_sharp,
                         iconColor: Colors.white,
-                        iconBg: Colors.black,
+                        iconBg: authStep != null && authStep >= 4
+                            ? Colors.black
+                            : Colors.black26,
                         widthsize: size.width < 350
                             ? size.width / 5
                             : size.width / 4.5,
@@ -925,7 +966,9 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                               fontSize: constraints.maxWidth > 600
                                   ? size.width / 60
                                   : 8,
-                              color: Colors.black),
+                              color: authStep != null && authStep >= 4
+                                  ? Colors.black
+                                  : Colors.black26),
                         ),
                       ),
                     ],
