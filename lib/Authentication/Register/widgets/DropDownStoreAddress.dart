@@ -21,11 +21,12 @@ class MyDrop extends ConsumerStatefulWidget {
 }
 
 class _MyDropState extends ConsumerState<MyDrop> {
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Container(
+      child: SizedBox(
         height: 100,
         width: double.maxFinite,
         // color: Colors.red,
@@ -64,7 +65,7 @@ class _MyDropState extends ConsumerState<MyDrop> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(
+                    const Expanded(
                       flex: 3,
                       child: Icon(
                         size: 15,
@@ -73,7 +74,7 @@ class _MyDropState extends ConsumerState<MyDrop> {
                       ),
                     ),
                     size.width > 200
-                        ? Expanded(
+                        ? const Expanded(
                             flex: 7,
                             child: Text(
                               'Enter manually',
@@ -81,7 +82,7 @@ class _MyDropState extends ConsumerState<MyDrop> {
                                   TextStyle(color: Colors.black, fontSize: 12),
                             ),
                           )
-                        : SizedBox(),
+                        : const SizedBox(),
                   ],
                 ),
               ),

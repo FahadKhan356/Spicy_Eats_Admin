@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 
 void showCustomSnackbar({
+  // bool? isweb,
   required BuildContext context,
   required String message,
   Color? backgroundColor,
   Duration duration = const Duration(seconds: 3),
   double elevation = 6.0,
   IconData? icon,
+  bool? showFromTop,
 }) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      // padding: isweb!
+      //     ? const EdgeInsets.symmetric(horizontal: 300)
+      //     : EdgeInsets.zero,
+      margin: showFromTop == true
+          ? EdgeInsets.only(
+              bottom: MediaQuery.of(context).size.height -
+                  100, // Adjust 100 as needed
+              left: 20,
+              right: 20,
+            )
+          : null,
       behavior: SnackBarBehavior.floating,
       elevation: elevation,
       backgroundColor: Colors.transparent,

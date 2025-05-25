@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Register/widgets/DropDownStoreAddress.dart';
+import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 
 var isNextProvider = StateProvider<bool>((ref) => false);
@@ -56,6 +57,7 @@ class _RestaurantaddressState extends ConsumerState<Restaurantaddress> {
 
   @override
   Widget build(BuildContext context) {
+    final address = ref.watch(restaurantAddProvider);
     return Stack(
       children: [
         Column(

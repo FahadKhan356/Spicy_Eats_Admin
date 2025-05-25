@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Register/model/Restaurantmodel.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
+import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -13,13 +15,18 @@ var authRepoProvider = Provider((ref) => AuthRepository());
 class AuthRepository {
 //sign up
   Future<({String? userId, String? error})> signup(
-      {required businessEmail, required password}) async {
+      {required businessEmail,
+      required password,
+      required BuildContext context}) async {
     try {
       final authResponse = await supabaseClient.auth.signUp(
         email: businessEmail,
         password: password,
       );
       if (authResponse.user?.id != null) {
+        await storeNewUserData(
+            user: authResponse.user!, context: context, password: password);
+
         return (userId: authResponse.user?.id, error: null);
       } else {
         return (userId: null, error: "Signup failed - no user ID returned");
@@ -30,31 +37,78 @@ class AuthRepository {
     }
   }
 
+  //sign in
+  Future<void> signIn({
+    required email,
+    required password,
+    required BuildContext context,
+    required WidgetRef ref,
+  }) async {
+    try {
+      final res = await supabaseClient.auth
+          .signInWithPassword(email: email, password: password);
+      if (res.user != null) {
+        await supabaseClient
+            .from('users')
+            .update({
+              'id': res.user!.id,
+              'email': res.user!.email,
+              'password': password,
+              'Role': 'restaurant-admin',
+              'status': 'pending',
+              'Auth_steps': 1,
+            })
+            .eq('id', res.user!.id)
+            .eq('Auth_steps', 0);
+        debugPrint('user auth steps updated ...');
+      }
+      showCustomSnackbar(
+          context: context,
+          message: 'Sign In Successfully',
+          backgroundColor: Colors.black);
+
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const RestaurantRegister()),
+          (route) => false);
+    } catch (e) {
+      throw Exception(e);
+      // showCustomSnackbar(
+      //     context: context,
+      //     message: 'Sign in failed $e',
+      //     backgroundColor: Colors.black);
+    }
+  }
+
 //store user data to user table
   Future<void> storeNewUserData(
-      {required User user, required BuildContext context}) async {
+      {required User user,
+      required BuildContext context,
+      required String password}) async {
     try {
-      final existinguser = await supabaseClient
-          .from('users')
-          .select('id')
-          .eq('id', user.id)
-          .maybeSingle();
+      // final existinguser = await supabaseClient
+      //     .from('users')
+      //     .select('id')
+      //     .eq('id', user.id)
+      //     .maybeSingle();
 
-      if (existinguser == null && user != null) {
-        await supabaseClient.from('users').insert({
-          'id': user.id,
-          'email': user.email,
-          'Role': 'restaurant-admin',
-          'status': 'pending',
-        });
-      }
+      // if (existinguser == null) {
+      await supabaseClient.from('users').insert({
+        'id': user.id,
+        'email': user.email,
+        'password': password,
+        'Role': 'restaurant-admin',
+        'status': 'pending',
+        'Auth_steps': 1,
+      }).eq('id', user.id);
+      // }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showCustomSnackbar(
             context: context, message: 'User stored and login successfully');
       });
     } catch (e) {
-      // throw Exception(e);
-      debugPrint('failed to signup and store user data 1 $e');
+      throw Exception(e);
+      // debugPrint('failed to signup and store user data 1 $e');
     }
     debugPrint('done sign up');
   }
@@ -64,7 +118,7 @@ class AuthRepository {
       if (kIsWeb) {
         await supabaseClient.auth.signInWithOAuth(
           OAuthProvider.google,
-          redirectTo: 'http://localhost:51591',
+          redirectTo: 'http://localhost:49872',
         );
       } else {
         const webClientId =
@@ -101,7 +155,12 @@ class AuthRepository {
 //to change auth steps
   Future<void> checkAuthSteps(BuildContext context, WidgetRef ref) async {
     try {
-      final userid = supabaseClient.auth.currentUser!.id;
+      final userid = supabaseClient.auth.currentUser?.id;
+
+      if (userid == null) {
+        showCustomSnackbar(context: context, message: 'Errro: user id in null');
+        return;
+      }
 
       final response = await supabaseClient
           .from('users')
@@ -124,53 +183,43 @@ class AuthRepository {
 //register restaurant
   Future<void> registerRestaurant({
     required businessEmail,
-    required password,
     required bussinessName,
     required firstmiddleName,
-    required cnicNo,
+    // required cnicNo,
     required mobileNo,
     required bankName,
     required bankownerTitle,
     required iban,
-    required Uint8List cnicPhoto,
     required lat,
     required long,
     required address,
     required lastName,
+    required BuildContext context,
+    required Uint8List image,
   }) async {
-    try {
-      //sign up
-      // final response =
-      //     await signup(businessEmail: businessEmail, password: password);
-      // if (response.userId == null) {
-      //   throw Exception('failed to signup');
-      // }
-      // print('sucessfully sign up ${response.userId}');
-      //uploading image and retrieving url
-      // final cnicPhotoUrl = await uploadSupabseStorageGetRrl(
-      //     foldername: 'bussinessdocuments',
-      //     imagepath: 'CnicPhoto/${response.userId}',
-      //     file: cnicPhoto);
+    final userid = supabaseClient.auth.currentUser!.id;
 
-      // if (cnicPhotoUrl == null) {
-      //   throw Exception('Failed to upload CNIC photo');
-      // }
+    try {
+      // final imageurl = await uploadImageToSupabase(
+      //     context,
+      //     image,
+      //     "Restaurant_Registeration",
+      //     '${supabaseClient.auth.currentUser!.email}/Owner_id/id.png');
 
       final restaurant = Restaurant(
         iban: iban,
         bankownerTitle: bankownerTitle,
         bankname: bankName,
-        userId: supabaseClient.auth.currentUser!.id,
+        userId: userid,
         restaurantName: bussinessName,
         address: address,
         phoneNumber: mobileNo,
-        idNumber: cnicNo,
         long: long,
         lat: lat,
         businessEmail: businessEmail,
         idFirstMiddleName: firstmiddleName,
         idLastName: lastName,
-        idPhotoUrl: '',
+        idPhotoUrl: ' imageurl!',
       );
 
       final res =
@@ -178,10 +227,23 @@ class AuthRepository {
 
       if (res.error != null) {
       } else {
+        await supabaseClient
+            .from('users')
+            .update({'Auth_steps': 2}).eq('id', userid);
+
+        showCustomSnackbar(
+            context: context,
+            message: 'Restaurant inserted successfully',
+            backgroundColor: Colors.black);
         print('Restaurant inserted successfully');
       }
     } catch (e) {
-      debugPrint('Error in Resgister Restaurant $e');
+      throw Exception(e);
+      // showCustomSnackbar(
+      //     context: context,
+      //     message: 'Error in Resgister Restaurant $e',
+      //     backgroundColor: Colors.black);
+      // debugPrint('Error in Resgister Restaurant $e');
     }
   }
 }

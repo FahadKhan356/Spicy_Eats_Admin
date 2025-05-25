@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/customMap.dart';
+import 'package:spicy_eats_admin/common/snackbar.dart';
 
 class MyMap extends ConsumerStatefulWidget {
   static const String routename = '/map';
@@ -71,6 +72,15 @@ class _MyMapState extends ConsumerState<MyMap> {
                         ref
                             .read(restaurantLocationSelectedProvider.notifier)
                             .state = false;
+
+                        result.completeAddress != null
+                            ? showCustomSnackbar(
+                                context: context,
+                                message:
+                                    'Location Picked:${result.completeAddress}',
+                                // showFromTop: true,
+                                backgroundColor: Colors.black)
+                            : const SizedBox();
                       }
 
                       print(address);
@@ -84,9 +94,9 @@ class _MyMapState extends ConsumerState<MyMap> {
             ],
           ),
         ),
-        bottomNavigationBar: address != null
-            ? Text('$address (Lat: $lat, Long: $long)')
-            : const Text('Loading location...'),
+        // bottomNavigationBar: address != null
+        //     ? Text('$address (Lat: $lat, Long: $long)')
+        //     : const Text('Loading location...'),
       ),
     );
   }

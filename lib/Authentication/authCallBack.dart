@@ -26,34 +26,20 @@ class _AuthCallbackPageState extends ConsumerState<AuthCallbackPage> {
           .getSessionFromUrl(Uri.base, storeSession: true);
       final session = sessionUrl.session;
 
-      if (session != null) {
-        debugPrint('✅ OAuth login successful');
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ref.read(authRepoProvider).storeNewUserData(
-                user: session.user,
-                context: context,
-              );
+      debugPrint('✅ OAuth login successful');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(authRepoProvider).storeNewUserData(
+              password: '',
+              user: session.user,
+              context: context,
+            );
 
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            RestaurantRegister.routename,
-            (_) => false,
-          );
-        });
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          debugPrint('❌ Session is null after OAuth');
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            LoginScreen.routename,
-            (_) => false,
-          );
-          // if (navigatorkey.currentState != null && mounted) {
-          //   navigatorkey.currentState!.pushNamedAndRemoveUntil(
-          //       LoginScreen.routename, (route) => false);
-          // }
-        });
-      }
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          RestaurantRegister.routename,
+          (_) => false,
+        );
+      });
     } catch (e) {
       debugPrint('❌ Error during OAuth callback: $e');
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -121,7 +107,7 @@ class _AuthCallbackPageState extends ConsumerState<AuthCallbackPage> {
             storeSession: true,
           );
           debugPrint(
-              '✅ OAuth session restored: ${response.session?.user?.email}');
+              '✅ OAuth session restored: ${response.session.user.email}');
         } catch (e) {
           debugPrint('❌ Failed to restore session from URL: $e');
         }
@@ -136,7 +122,7 @@ class _AuthCallbackPageState extends ConsumerState<AuthCallbackPage> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ref
                 .read(authRepoProvider)
-                .storeNewUserData(user: user!, context: context);
+                .storeNewUserData(user: user!, context: context, password: '');
 
             debugPrint('User just signed in: ${user.email}');
             Navigator.pushAndRemoveUntil(

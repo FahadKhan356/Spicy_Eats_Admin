@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
-import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
-import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
@@ -429,176 +427,28 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                             height: 20,
                           ),
 
-                          // RegisterTextfield(
-                          //   controller: businessname,
-                          //   labeltext: 'Your Business Name',
-                          //   onvalidation: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Mandatory field Can\'t be empty ';
-                          //     }
-
-                          //     return null;
-                          //   },
-                          // ),
-                          // const SizedBox(
-                          //   height: 20,
-                          // ),
-                          // RegisterTextfield(
-                          //   controller: firstandmiddlename,
-                          //   labeltext: 'First & Middle Name per CNIC',
-                          //   onvalidation: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Mandatory field Can\'t be empty ';
-                          //     }
-
-                          //     return null;
-                          //   },
-                          // ),
-                          // const SizedBox(
-                          //   height: 20,
-                          // ),
-                          // RegisterTextfield(
-                          //   controller: lastname,
-                          //   labeltext: 'Last Name Per CNIC',
-                          //   onvalidation: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Mandatory field Can\'t be empty ';
-                          //     }
-
-                          //     return null;
-                          //   },
-                          // ),
-                          // const SizedBox(
-                          //   height: 20,
-                          // ),
-                          // RegisterTextfield(
-                          //   controller: businessemail,
-                          //   labeltext: 'Enter Your Business Email',
-                          //   onvalidation: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Mandatory field Can\'t be empty ';
-                          //     }
-
-                          //     return null;
-                          //   },
-                          // ),
-                          // const SizedBox(
-                          //   height: 20,
-                          // ),
-                          // RegisterTextfield(
-                          //   controller: password,
-                          //   labeltext: 'Enter Password',
-                          //   onvalidation: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Mandatory field Can\'t be empty ';
-                          //     }
-                          //     if (value.length < 9) {
-                          //       return 'Password length should be atleast 9 ';
-                          //     }
-
-                          //     return null;
-                          //   },
-                          // ),
-                          // const SizedBox(
-                          //   height: 20,
-                          // ),
-                          // widget.constraint.maxWidth > 300
-                          //     ? Row(
-                          //         mainAxisAlignment:
-                          //             MainAxisAlignment.spaceBetween,
-                          //         children: [
-                          //           Expanded(
-                          //             flex: widget.constraint.maxWidth > 400
-                          //                 ? 2
-                          //                 : 3,
-                          //             child: Padding(
-                          //               padding: const EdgeInsets.all(8.0),
-                          //               child: ClipRRect(
-                          //                 borderRadius:
-                          //                     BorderRadius.circular(10),
-                          //                 child: Container(
-                          //                   padding: const EdgeInsets.all(8),
-                          //                   color: Colors.black12,
-                          //                   height: 40,
-                          //                   width: 80,
-                          //                   child: Row(
-                          //                     mainAxisAlignment:
-                          //                         MainAxisAlignment.spaceAround,
-                          //                     children: [
-                          //                       Expanded(
-                          //                         flex: 4,
-                          //                         child: Image.asset(
-                          //                           'lib/assets/pak1.png',
-                          //                           height: 25,
-                          //                           width: 25,
-                          //                         ),
-                          //                       ),
-                          //                       const SizedBox(
-                          //                         width: 5,
-                          //                       ),
-                          //                       const Expanded(
-                          //                           flex: 5,
-                          //                           child: Text(
-                          //                             '+92',
-                          //                             style: TextStyle(
-                          //                                 fontSize: 10),
-                          //                           ))
-                          //                     ],
-                          //                   ),
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //           ),
-                          //           Expanded(
-                          //             flex: widget.constraint.maxWidth > 500
-                          //                 ? 8
-                          //                 : 5,
-                          //             child: RegisterTextfield(
-                          //                 controller: contactno,
-                          //                 labeltext: 'Mobile Number',
-                          //                 onvalidation: (value) {
-                          //                   if (value == null ||
-                          //                       value.isEmpty) {
-                          //                     return 'Mandatory field Can\'t be empty ';
-                          //                   }
-                          //                   return null;
-                          //                 }),
-                          //           ),
-                          //         ],
-                          //       )
-                          //     : RegisterTextfield(
-                          //         controller: contactno,
-                          //         labeltext: 'Mobile Number',
-                          //         onvalidation: (value) {
-                          //           if (value == null || value.isEmpty) {
-                          //             return 'Mandatory field Can\'t be empty ';
-                          //           }
-                          //           return null;
-                          //         }),
-                          // const SizedBox(
-                          //   height: 20,
-                          // ),
                           SizedBox(
                             height: Responsive.isDesktop(context) ? 40 : 30,
                             width: double.maxFinite,
                             child: ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 if (_form.currentState!.validate()) {
-                                  // ref
-                                  //     .read(authControllerProvider)
-                                  //     .singupAndStoreNewUserData(
-                                  //         businessEmail: businessemail.text,
-                                  //         password: password.text
-
-                                  //         );
-
-                                  showCustomSnackbar(
+                                  try {
+                                    await authrepo.signup(
                                       context: context,
-                                      message:
-                                          'please sign in with same credentials');
+                                      businessEmail: businessemail.text,
+                                      password: password.text,
+                                    );
+                                    showCustomSnackbar(
+                                        context: context,
+                                        message:
+                                            'Sign up successfully please sign in with same credentials');
 
-                                  Navigator.pushNamed(
-                                      context, LoginScreen.routename);
+                                    Navigator.pushNamed(
+                                        context, LoginScreen.routename);
+                                  } catch (e) {
+                                    throw Exception(e);
+                                  }
                                 }
                               },
                               style: ElevatedButton.styleFrom(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Register/widgets/RestaurantAddress.dart';
+import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/map.dart';
+import 'package:spicy_eats_admin/common/snackbar.dart';
 
 void showStoreAddressDialog(
   BuildContext context, {
@@ -12,7 +14,7 @@ void showStoreAddressDialog(
   TextEditingController? postalController,
   WidgetRef? ref,
 }) {
-  final ismap = ref!.watch(showmapProvider);
+  final address = ref!.watch(restaurantAddProvider);
   showDialog(
     context: context,
     barrierDismissible: true,
@@ -51,7 +53,7 @@ void showStoreAddressDialog(
                 onvalidation: (value) {
                   if (value != null || value!.isNotEmpty) {}
 
-                  return null;
+                  return 'Mandatory field Can\'t be empty';
                 },
               ),
               const SizedBox(height: 20),
@@ -59,7 +61,7 @@ void showStoreAddressDialog(
                 controller: floorController!,
                 labeltext: 'Floor/Suite',
                 onvalidation: (value) {
-                  return null;
+                  return 'Mandatory field Can\'t be empty';
                 },
               ),
               const SizedBox(height: 20),
@@ -67,7 +69,7 @@ void showStoreAddressDialog(
                 controller: cityController!,
                 labeltext: 'City and Postal Code',
                 onvalidation: (value) {
-                  return null;
+                  return 'Mandatory field Can\'t be empty';
                 },
               ),
               const SizedBox(height: 20),
@@ -75,7 +77,7 @@ void showStoreAddressDialog(
                 controller: postalController!,
                 labeltext: 'Postal Code',
                 onvalidation: (value) {
-                  return null;
+                  return 'Mandatory field Can\'t be empty';
                 },
               ),
               const SizedBox(
@@ -119,12 +121,13 @@ void showStoreAddressDialog(
                                 isNext ? Colors.black : Colors.white,
                           ),
                           onPressed: () {
-                            isNext
-                                ? () {
-                                    ref.read(showmapProvider.notifier).state =
-                                        true;
-                                  }
-                                : null;
+                            address == null
+                                ? showCustomSnackbar(
+                                    context: context,
+                                    message: 'Please Pick Location',
+                                    // showFromTop: true,
+                                    backgroundColor: Colors.black)
+                                : const SizedBox();
                           },
                           child: Text('Next',
                               style: TextStyle(

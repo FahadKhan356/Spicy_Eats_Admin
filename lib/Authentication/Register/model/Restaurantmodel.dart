@@ -8,7 +8,6 @@ class Restaurant {
   final String phoneNumber;
   final String? deliveryArea;
   final String? postalCode;
-  final String idNumber;
   final String? description;
   final double long;
   final double lat;
@@ -36,7 +35,6 @@ class Restaurant {
     required this.phoneNumber,
     this.deliveryArea,
     this.postalCode,
-    required this.idNumber,
     this.description,
     required this.long,
     required this.lat,
@@ -60,7 +58,6 @@ class Restaurant {
       'phoneNumber': phoneNumber,
       'deliveryArea': deliveryArea,
       'postalCode': postalCode,
-      'idNumber': idNumber,
       'description': description,
       'long': long,
       'lat': lat,

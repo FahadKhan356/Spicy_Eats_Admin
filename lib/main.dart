@@ -13,7 +13,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Supabase.initialize(url: supabseURL, anonKey: supabaseKEY);
+  await Supabase.initialize(
+    url: supabseURL,
+    anonKey: supabaseKEY,
+  );
   // Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
 
   final uri = Uri.base;
@@ -24,11 +27,12 @@ void main() async {
     try {
       final response = await Supabase.instance.client.auth
           .getSessionFromUrl(uri, storeSession: true);
-      debugPrint('✅ OAuth session restored: ${response.session?.user?.email}');
+      debugPrint('✅ OAuth session restored: ${response.session.user.email}');
     } catch (e) {
       debugPrint('❌ Failed to restore OAuth session: $e');
     }
   }
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -69,12 +73,14 @@ class _MyAppState extends ConsumerState<MyApp> {
   //   });
   // }
 
-  // @override
-  // void initState() {
-  //   _initialAuth();
-  //   // TODO: implement initState
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    debugPrint(supabaseClient.auth.currentUser?.email);
+    debugPrint(supabaseClient.auth.currentUser?.id);
+
+    // TODO: implement initState
+    super.initState();
+  }
 
   // @override
   // void dispose() {
@@ -93,11 +99,12 @@ class _MyAppState extends ConsumerState<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: AuthCallbackPage(),
-      // supabaseClient.auth.currentSession != null &&
-      //         supabaseClient.auth.currentUser != null
-      //     ? const RestaurantRegister()
-      //     : const LoginScreen(),
+      home:
+          // AuthCallbackPage(),
+          supabaseClient.auth.currentSession != null &&
+                  supabaseClient.auth.currentUser != null
+              ? const RestaurantRegister()
+              : const LoginScreen(),
       onGenerateRoute: generateRoute,
     );
   }

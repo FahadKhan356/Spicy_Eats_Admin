@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,6 +8,7 @@ var restaurantLatProvider = StateProvider<double?>((ref) => null);
 var restaurantLongProvider = StateProvider<double?>((ref) => null);
 var restaurantAddProvider = StateProvider<String?>((ref) => null);
 var restaurantLocationSelectedProvider = StateProvider<bool?>((ref) => null);
+final isloadingprovider = StateProvider<bool>((ref) => false);
 
 var authControllerProvider = Provider((ref) {
   final authrepo = ref.watch(authRepoProvider);
@@ -19,18 +21,27 @@ class AuthController {
   AuthRepository authRepository;
   Ref ref;
 
-  void singupAndStoreNewUserData({
-    required BuildContext context,
-    required User user,
-  }) {
-    try {
-      authRepository.storeNewUserData(
-        user: user,
-        context: context,
-      );
-    } catch (e) {
-      // throw Exception(e);
-      debugPrint('failed to signup and store user data $e');
-    }
+// sign up
+  Future<void> signUp(
+      {required businessEmail, required password, required context}) async {
+    await authRepository.signup(
+        businessEmail: businessEmail, password: password, context: context);
+  }
+
+//sign in
+
+  Future<void> signIn(
+      {required email,
+      required password,
+      required context,
+      required WidgetRef ref}) async {
+    await authRepository.signIn(
+        email: email, password: password, context: context, ref: ref);
+  }
+
+//Google sign in
+  Future<void> signupWithGoogleUniversal(
+      {required BuildContext context}) async {
+    authRepository.signInWithGoogleUniversal(context);
   }
 }

@@ -5,20 +5,25 @@ class RegisterTextfield extends StatelessWidget {
   final String labeltext;
   final String? Function(String?) onvalidation;
   final TextEditingController? controller;
-
-  const RegisterTextfield(
+  Widget? suffixIcon;
+  bool? isObsecure;
+  RegisterTextfield(
       {super.key,
       required this.labeltext,
       required this.onvalidation,
-      this.controller});
+      this.controller,
+      this.suffixIcon,
+      this.isObsecure});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      obscureText: isObsecure ?? false,
       controller: controller,
       validator: onvalidation,
       cursorColor: MyAppColor.iconGray,
       decoration: InputDecoration(
+          suffixIcon: suffixIcon,
           filled: true,
           fillColor: Colors.black12,
           focusColor: Colors.transparent,
