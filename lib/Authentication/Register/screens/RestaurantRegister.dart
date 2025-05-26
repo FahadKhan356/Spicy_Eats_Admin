@@ -113,15 +113,22 @@ class Dekstoplayout extends ConsumerStatefulWidget {
 }
 
 class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
-  // Uint8List? idImage;
-
   Future<void> handlePickImage() async {
     dynamic result = await pickImage();
 
-    if (result is Uint8List) {
-      setState(() {
-        idImage = result;
-      });
+    if (result != null && result is Uint8List) {
+      const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+      if (result.length > maxSizeInBytes) {
+        showCustomSnackbar(
+            backgroundColor: Colors.black,
+            context: context,
+            message:
+                'Image too large (max ${maxSizeInBytes ~/ (1024 * 1024)}MB)');
+      } else {
+        setState(() {
+          idImage = result;
+        });
+      }
     } else if (result is File) {
       setState(() {
         image = result;
@@ -306,6 +313,20 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       RegisterTextfield(
+                                        controller: businessname,
+                                        labeltext: 'Enter Your Restaurant Name',
+                                        onvalidation: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Mandatory field Can\'t be empty ';
+                                          }
+
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      RegisterTextfield(
                                         controller: businessemail,
                                         labeltext: 'Enter Your Business Email',
                                         onvalidation: (value) {
@@ -412,59 +433,6 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      // Stack(
-                                      //   children: [
-                                      //     ClipRRect(
-                                      //       borderRadius:
-                                      //           BorderRadius.circular(10),
-                                      //       child: Image.asset(
-                                      //         'lib/assets/map2.jpg',
-                                      //         fit: BoxFit.cover,
-                                      //       ),
-                                      //     ),
-                                      //     SizedBox(
-                                      //       height:
-                                      //           Responsive.isDesktop(context)
-                                      //               ? 40
-                                      //               : 30,
-                                      //       width: double.maxFinite,
-                                      //       child: ElevatedButton(
-                                      //         style: ElevatedButton.styleFrom(
-                                      //           surfaceTintColor: Colors.blue,
-                                      //           backgroundColor: Colors.black
-                                      //               .withOpacity(0.5),
-                                      //           shape: RoundedRectangleBorder(
-                                      //               borderRadius:
-                                      //                   BorderRadius.circular(
-                                      //                       10)),
-                                      //         ),
-                                      //         onPressed: () {
-                                      //           Navigator.pushNamed(
-                                      //               context, MyMap.routename);
-                                      //         },
-                                      //         child: const Text(
-                                      //           'Select restaurant location',
-                                      //           style: TextStyle(
-                                      //               color: Colors.white),
-                                      //         ),
-                                      //       ),
-                                      //     ),
-                                      //   ],
-                                      // ),
-                                      // address != null && address == true
-                                      //     ? const Padding(
-                                      //         padding: EdgeInsets.symmetric(
-                                      //             vertical: 10),
-                                      //         child: Text(
-                                      //           'Location is not selected',
-                                      //           style: TextStyle(
-                                      //               color: Colors.red),
-                                      //         ),
-                                      //       )
-                                      //     : const SizedBox(),
-                                      // const SizedBox(
-                                      //   height: 20,
-                                      // ),
                                       Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -777,7 +745,6 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                                   : const SizedBox(),
                                         ],
                                       ),
-
                                       const SizedBox(
                                         height: 20,
                                       ),
@@ -790,7 +757,9 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                           onPressed: () async {
                                             if (_form.currentState!
                                                     .validate() &&
-                                                idImage != null) {
+                                                idImage != null &&
+                                                latitude != null &&
+                                                address != null) {
                                               ref
                                                   .read(isloadingprovider
                                                       .notifier)
@@ -831,6 +800,15 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                                   backgroundColor: Colors.black,
                                                   message:
                                                       "Please Upload Authentic Identity Card Image");
+                                            } else if (latitude == null ||
+                                                address == null) {
+                                              showCustomSnackbar(
+                                                  // isweb: true,
+                                                  showFromTop: true,
+                                                  context: context,
+                                                  backgroundColor: Colors.black,
+                                                  message:
+                                                      "Please Pick The location Manually");
                                             }
                                           },
                                           style: ElevatedButton.styleFrom(
@@ -1632,7 +1610,9 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                       try {
                                                         if (_form.currentState!
                                                                 .validate() &&
-                                                            idImage != null) {
+                                                            idImage != null &&
+                                                            latitude != null &&
+                                                            address != null) {
                                                           ref
                                                               .read(
                                                                   isloadingprovider
@@ -1683,6 +1663,17 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                                   Colors.black,
                                                               message:
                                                                   "Please Upload Authentic Identity Card Image");
+                                                        } else if (latitude ==
+                                                                null ||
+                                                            address == null) {
+                                                          showCustomSnackbar(
+                                                              // isweb: true,
+                                                              showFromTop: true,
+                                                              context: context,
+                                                              backgroundColor:
+                                                                  Colors.black,
+                                                              message:
+                                                                  "Please Pick The location Manually");
                                                         }
                                                       } catch (e) {
                                                         throw Exception(e);

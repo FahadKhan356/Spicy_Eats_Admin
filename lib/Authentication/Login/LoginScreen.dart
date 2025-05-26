@@ -14,7 +14,6 @@ import 'package:spicy_eats_admin/utils/colors.dart';
 var hidePasswordProvider = StateProvider<bool>((ref) => true);
 TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
-GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
 class LoginScreen extends StatefulWidget {
   static const String routename = '/Login';
@@ -48,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: constrain.maxWidth >= 767
-                  ? const DekstopLayout()
+                  ? DekstopLayout()
                   : MobileLayout(constraint: constrain)),
         );
       }),
@@ -58,7 +57,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
 //for Dekstop and tablet
 class DekstopLayout extends ConsumerWidget {
-  const DekstopLayout({super.key});
+  final GlobalKey<FormState> _dekstopformkey = GlobalKey<FormState>();
+  DekstopLayout({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -77,7 +77,7 @@ class DekstopLayout extends ConsumerWidget {
                   flex: 5,
                   child: SingleChildScrollView(
                     child: Form(
-                      key: _formkey,
+                      key: _dekstopformkey,
                       child: Column(
                         children: [
                           Padding(
@@ -209,7 +209,8 @@ class DekstopLayout extends ConsumerWidget {
                                   width: double.maxFinite,
                                   child: ElevatedButton(
                                     onPressed: () async {
-                                      if (_formkey.currentState!.validate()) {
+                                      if (_dekstopformkey.currentState!
+                                          .validate()) {
                                         ref
                                             .read(isloadingprovider.notifier)
                                             .state = true;
@@ -234,7 +235,7 @@ class DekstopLayout extends ConsumerWidget {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Log In ',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
@@ -318,7 +319,7 @@ class DekstopLayout extends ConsumerWidget {
                             end: Alignment.bottomRight,
                             colors: [
                           Colors.black,
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                         ])),
                     child: Column(
                       children: [
@@ -355,6 +356,7 @@ class MobileLayout extends ConsumerStatefulWidget {
 }
 
 class _MobileLayoutState extends ConsumerState<MobileLayout> {
+  final GlobalKey<FormState> _mobileformkey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final hidePassword = ref.watch(hidePasswordProvider);
@@ -373,7 +375,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Form(
-                  key: _formkey,
+                  key: _mobileformkey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -541,8 +543,8 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                         width: double.maxFinite,
                         child: ElevatedButton(
                           onPressed: () async {
-                            ref.read(isloadingprovider.notifier).state = true;
-                            if (_formkey.currentState!.validate()) {
+                            if (_mobileformkey.currentState!.validate()) {
+                              ref.read(isloadingprovider.notifier).state = true;
                               await authController.signIn(
                                   ref: ref,
                                   email: emailController.text,

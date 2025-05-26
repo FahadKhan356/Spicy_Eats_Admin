@@ -7,9 +7,26 @@ import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SignUpScreen extends StatelessWidget {
+final password = TextEditingController();
+final confirmpassword = TextEditingController();
+final businessemail = TextEditingController();
+
+class SignUpScreen extends StatefulWidget {
   static const String routename = '/Signup';
   const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    businessemail.dispose();
+    password.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,43 +103,17 @@ class SignUpScreen extends StatelessWidget {
   }
 }
 
-class Dekstoplayout extends ConsumerStatefulWidget {
+class Dekstoplayout extends ConsumerWidget {
   final BoxConstraints constraint;
-  const Dekstoplayout({super.key, required this.constraint});
+  final GlobalKey<FormState> _dekstopSignupform = GlobalKey<FormState>();
+  Dekstoplayout({super.key, required this.constraint});
 
   @override
-  ConsumerState<Dekstoplayout> createState() => _DekstoplayoutState();
-}
-
-class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
-  final GlobalKey<FormState> _form = GlobalKey<FormState>();
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    businessemail.dispose();
-    contactno.dispose();
-    lastname.dispose();
-    firstandmiddlename.dispose();
-    password.dispose();
-  }
-
-  final password = TextEditingController();
-  final confirmpassword = TextEditingController();
-
-  final businessname = TextEditingController();
-  final firstandmiddlename = TextEditingController();
-  final lastname = TextEditingController();
-  final businessemail = TextEditingController();
-  final contactno = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
     final authrepo = ref.watch(authRepoProvider);
     return Form(
-      key: _form,
+      key: _dekstopSignupform,
       child: Row(
         children: [
           Expanded(
@@ -156,10 +147,10 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                           child: Text(
                             'From Local Favorite to Delivery Star!',
                             style: GoogleFonts.mina(
-                                fontSize: widget.constraint.maxWidth < 1024
-                                    ? widget.constraint.maxWidth * 0.04
-                                    : widget.constraint.maxWidth > 1024
-                                        ? widget.constraint.maxWidth * 0.03
+                                fontSize: constraint.maxWidth < 1024
+                                    ? constraint.maxWidth * 0.04
+                                    : constraint.maxWidth > 1024
+                                        ? constraint.maxWidth * 0.03
                                         : 26,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black),
@@ -179,12 +170,10 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                   textDirection: TextDirection.ltr,
                                   'Let spicyeats handle the delivery while you focus on what you do best - creating amazing food! ',
                                   style: TextStyle(
-                                      fontSize: widget.constraint.maxWidth <
-                                              1024
-                                          ? widget.constraint.maxWidth * 0.03
-                                          : widget.constraint.maxWidth > 1024
-                                              ? widget.constraint.maxWidth *
-                                                  0.025
+                                      fontSize: constraint.maxWidth < 1024
+                                          ? constraint.maxWidth * 0.03
+                                          : constraint.maxWidth > 1024
+                                              ? constraint.maxWidth * 0.025
                                               : 22,
                                       fontWeight: FontWeight.w400,
                                       color: Colors.black),
@@ -257,7 +246,8 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                     width: double.maxFinite,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        if (_form.currentState!.validate()) {
+                                        if (_dekstopSignupform.currentState!
+                                            .validate()) {
                                           // ref
                                           //     .read(authControllerProvider)
                                           //     .singupAndStoreNewUserData(
@@ -302,38 +292,17 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
   }
 }
 
-class MobileLayout extends ConsumerStatefulWidget {
+class MobileLayout extends ConsumerWidget {
   final BoxConstraints constraint;
-  const MobileLayout({super.key, required this.constraint});
+  final GlobalKey<FormState> _mobileSignupform = GlobalKey<FormState>();
+  MobileLayout({super.key, required this.constraint});
 
   @override
-  ConsumerState<MobileLayout> createState() => _MobileLayoutState();
-}
-
-class _MobileLayoutState extends ConsumerState<MobileLayout> {
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    confirmpassword.dispose();
-    businessemail.dispose();
-    password.dispose();
-  }
-
-  final password = TextEditingController();
-  final confirmpassword = TextEditingController();
-
-  final businessemail = TextEditingController();
-
-  final GlobalKey<FormState> _form = GlobalKey<FormState>();
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+  Widget build(BuildContext context, WidgetRef ref) {
     final authrepo = ref.watch(authRepoProvider);
     return SingleChildScrollView(
       child: Form(
-        key: _form,
+        key: _mobileSignupform,
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
@@ -345,8 +314,8 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                   Text(
                     'From Local Favorite to Delivery Star!',
                     style: GoogleFonts.mina(
-                        fontSize: widget.constraint.maxWidth < 762
-                            ? widget.constraint.maxWidth * 0.04
+                        fontSize: constraint.maxWidth < 762
+                            ? constraint.maxWidth * 0.04
                             : 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
@@ -362,8 +331,8 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                           textDirection: TextDirection.ltr,
                           'Let spicyeats handle the delivery while you focus on what you do best - creating amazing food! ',
                           style: TextStyle(
-                              fontSize: widget.constraint.maxWidth < 762
-                                  ? widget.constraint.maxWidth * 0.03
+                              fontSize: constraint.maxWidth < 762
+                                  ? constraint.maxWidth * 0.03
                                   : 22,
                               fontWeight: FontWeight.w400,
                               color: Colors.black),
@@ -426,13 +395,13 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                           const SizedBox(
                             height: 20,
                           ),
-
                           SizedBox(
                             height: Responsive.isDesktop(context) ? 40 : 30,
                             width: double.maxFinite,
                             child: ElevatedButton(
                               onPressed: () async {
-                                if (_form.currentState!.validate()) {
+                                if (_mobileSignupform.currentState!
+                                    .validate()) {
                                   try {
                                     await authrepo.signup(
                                       context: context,
@@ -468,54 +437,6 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                           const SizedBox(
                             height: 10,
                           ),
-                          // buildOrDivider(),
-                          // const SizedBox(
-                          //   height: 10,
-                          // ),
-                          // SizedBox(
-                          //   height: Responsive.isDesktop(context) ? 40 : 30,
-                          //   width: double.maxFinite,
-                          //   child: ElevatedButton(
-                          //     onPressed: () async {
-                          //       try {
-                          //         await authrepo.signInWithGoogleUniversal();
-                          //       } catch (e) {
-                          //         showCustomSnackbar(
-                          //             backgroundColor: Colors.black,
-                          //             context: context,
-                          //             message: 'Error: $e');
-                          //       }
-                          //     },
-                          //     style: ElevatedButton.styleFrom(
-                          //       shape: RoundedRectangleBorder(
-                          //           side: const BorderSide(
-                          //               width: 1, color: Colors.black),
-                          //           borderRadius: BorderRadius.circular(10)),
-                          //       backgroundColor: Colors.white,
-                          //     ),
-                          //     child: Row(
-                          //       mainAxisAlignment: MainAxisAlignment.center,
-                          //       children: [
-                          //         Flexible(
-                          //             child:
-                          //                 Image.asset('lib/assets/google.png')),
-                          //         size.width > 300
-                          //             ? Text(
-                          //                 'Sign in with Google',
-                          //                 style: TextStyle(
-                          //                   fontSize: size.width > 400
-                          //                       ? size.width / 45
-                          //                       : 12,
-                          //                   fontWeight: FontWeight.bold,
-                          //                   overflow: TextOverflow.ellipsis,
-                          //                   color: Colors.black,
-                          //                 ),
-                          //               )
-                          //             : const SizedBox(),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
                         ],
                       ),
                     ],
