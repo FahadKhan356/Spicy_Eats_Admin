@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/model/Restaurantmodel.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
+import 'package:spicy_eats_admin/utils/UploadImageToSupabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -14,7 +16,7 @@ var authRepoProvider = Provider((ref) => AuthRepository());
 
 class AuthRepository {
 //sign up
-  Future<({String? userId, String? error})> signup(
+  Future<void> signup(
       {required businessEmail,
       required password,
       required BuildContext context}) async {
@@ -23,17 +25,22 @@ class AuthRepository {
         email: businessEmail,
         password: password,
       );
-      if (authResponse.user?.id != null) {
-        await storeNewUserData(
-            user: authResponse.user!, context: context, password: password);
 
-        return (userId: authResponse.user?.id, error: null);
-      } else {
-        return (userId: null, error: "Signup failed - no user ID returned");
+      if (authResponse.user?.id != null) {
+        await signout();
+        // Navigator.pushAndRemoveUntil(
+        //     context,
+        //     MaterialPageRoute(builder: (_) => const LoginScreen()),
+        //     (route) => false);
+        showCustomSnackbar(
+            showFromTop: true,
+            backgroundColor: Colors.black,
+            context: context,
+            message:
+                " Account Created Successfully Sign in With Same Credentials");
       }
     } catch (e) {
       debugPrint("auth error $e");
-      return (userId: null, error: e.toString());
     }
   }
 
@@ -45,8 +52,10 @@ class AuthRepository {
     required WidgetRef ref,
   }) async {
     try {
+      // final res =
       final res = await supabaseClient.auth
           .signInWithPassword(email: email, password: password);
+
       if (res.user != null) {
         await supabaseClient
             .from('users')
@@ -59,18 +68,14 @@ class AuthRepository {
               'Auth_steps': 1,
             })
             .eq('id', res.user!.id)
-            .eq('Auth_steps', 0);
-        debugPrint('user auth steps updated ...');
+            .isFilter('Auth_steps', null);
+
+        debugPrint('user auth steps updated ...${res.user!.email}');
       }
       showCustomSnackbar(
           context: context,
           message: 'Sign In Successfully',
           backgroundColor: Colors.black);
-
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const RestaurantRegister()),
-          (route) => false);
     } catch (e) {
       throw Exception(e);
       // showCustomSnackbar(
@@ -197,20 +202,20 @@ class AuthRepository {
     required BuildContext context,
     required Uint8List image,
   }) async {
-    final userid = supabaseClient.auth.currentUser!.id;
+    final user = supabaseClient.auth;
 
     try {
-      // final imageurl = await uploadImageToSupabase(
-      //     context,
-      //     image,
-      //     "Restaurant_Registeration",
-      //     '${supabaseClient.auth.currentUser!.email}/Owner_id/id.png');
+      String? imageurl = await uploadImageToSupabase(
+          context,
+          image,
+          "Restaurant_Registeration",
+          '${supabaseClient.auth.currentUser!.email}/Owner_id/id.png');
 
       final restaurant = Restaurant(
         iban: iban,
         bankownerTitle: bankownerTitle,
         bankname: bankName,
-        userId: userid,
+        userId: user.currentUser!.id,
         restaurantName: bussinessName,
         address: address,
         phoneNumber: mobileNo,
@@ -219,24 +224,20 @@ class AuthRepository {
         businessEmail: businessEmail,
         idFirstMiddleName: firstmiddleName,
         idLastName: lastName,
-        idPhotoUrl: ' imageurl!',
+        idPhotoUrl: imageurl!,
       );
 
-      final res =
-          await supabaseClient.from('restaurants').insert(restaurant.toMap());
+      await supabaseClient.from('restaurants').insert(restaurant.toMap());
 
-      if (res.error != null) {
-      } else {
-        await supabaseClient
-            .from('users')
-            .update({'Auth_steps': 2}).eq('id', userid);
+      await supabaseClient
+          .from('users')
+          .update({'Auth_steps': 2}).eq('email', user.currentUser!.email!);
 
-        showCustomSnackbar(
-            context: context,
-            message: 'Restaurant inserted successfully',
-            backgroundColor: Colors.black);
-        print('Restaurant inserted successfully');
-      }
+      showCustomSnackbar(
+          context: context,
+          message: 'Restaurant inserted successfully',
+          backgroundColor: Colors.black);
+      print('Restaurant inserted successfully');
     } catch (e) {
       throw Exception(e);
       // showCustomSnackbar(
@@ -244,6 +245,15 @@ class AuthRepository {
       //     message: 'Error in Resgister Restaurant $e',
       //     backgroundColor: Colors.black);
       // debugPrint('Error in Resgister Restaurant $e');
+    }
+  }
+
+//sign out
+  Future<void> signout() async {
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (e) {
+      debugPrint('Error in signout $e');
     }
   }
 }

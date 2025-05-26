@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
-import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
+import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
-import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-final password = TextEditingController();
-final confirmpassword = TextEditingController();
-final businessemail = TextEditingController();
 
 class SignUpScreen extends StatefulWidget {
   static const String routename = '/Signup';
@@ -20,12 +15,26 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  late TextEditingController confirmpassword;
+  late TextEditingController businessemail;
+  late TextEditingController password;
+
+  @override
+  void initState() {
+    confirmpassword = TextEditingController();
+    businessemail = TextEditingController();
+    password = TextEditingController();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     businessemail.dispose();
     password.dispose();
+    confirmpassword.dispose();
   }
 
   @override
@@ -89,9 +98,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 child: constrain.maxWidth > 767
                     ? Dekstoplayout(
+                        password: password,
+                        bussinessEmail: businessemail,
+                        confrimPassword: confirmpassword,
                         constraint: constrain,
                       )
                     : MobileLayout(
+                        password: password,
+                        bussinessEmail: businessemail,
+                        confrimPassword: confirmpassword,
                         constraint: constrain,
                       ),
               ),
@@ -103,15 +118,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-class Dekstoplayout extends ConsumerWidget {
+class Dekstoplayout extends ConsumerStatefulWidget {
+  final TextEditingController confrimPassword;
+  final TextEditingController bussinessEmail;
+  final TextEditingController password;
+
   final BoxConstraints constraint;
-  final GlobalKey<FormState> _dekstopSignupform = GlobalKey<FormState>();
-  Dekstoplayout({super.key, required this.constraint});
+
+  Dekstoplayout({
+    super.key,
+    required this.constraint,
+    required this.bussinessEmail,
+    required this.confrimPassword,
+    required this.password,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final size = MediaQuery.of(context).size;
-    final authrepo = ref.watch(authRepoProvider);
+  ConsumerState<Dekstoplayout> createState() => _DekstoplayoutState();
+}
+
+class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
+  final GlobalKey<FormState> _dekstopSignupform = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    final authController = ref.watch(authControllerProvider);
     return Form(
       key: _dekstopSignupform,
       child: Row(
@@ -147,10 +178,10 @@ class Dekstoplayout extends ConsumerWidget {
                           child: Text(
                             'From Local Favorite to Delivery Star!',
                             style: GoogleFonts.mina(
-                                fontSize: constraint.maxWidth < 1024
-                                    ? constraint.maxWidth * 0.04
-                                    : constraint.maxWidth > 1024
-                                        ? constraint.maxWidth * 0.03
+                                fontSize: widget.constraint.maxWidth < 1024
+                                    ? widget.constraint.maxWidth * 0.04
+                                    : widget.constraint.maxWidth > 1024
+                                        ? widget.constraint.maxWidth * 0.03
                                         : 26,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black),
@@ -170,10 +201,12 @@ class Dekstoplayout extends ConsumerWidget {
                                   textDirection: TextDirection.ltr,
                                   'Let spicyeats handle the delivery while you focus on what you do best - creating amazing food! ',
                                   style: TextStyle(
-                                      fontSize: constraint.maxWidth < 1024
-                                          ? constraint.maxWidth * 0.03
-                                          : constraint.maxWidth > 1024
-                                              ? constraint.maxWidth * 0.025
+                                      fontSize: widget.constraint.maxWidth <
+                                              1024
+                                          ? widget.constraint.maxWidth * 0.03
+                                          : widget.constraint.maxWidth > 1024
+                                              ? widget.constraint.maxWidth *
+                                                  0.025
                                               : 22,
                                       fontWeight: FontWeight.w400,
                                       color: Colors.black),
@@ -190,7 +223,7 @@ class Dekstoplayout extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   RegisterTextfield(
-                                    controller: businessemail,
+                                    controller: widget.bussinessEmail,
                                     labeltext: 'Enter your Business Email',
                                     onvalidation: (value) {
                                       if (value == null || value.isEmpty) {
@@ -206,7 +239,7 @@ class Dekstoplayout extends ConsumerWidget {
                                     height: 20,
                                   ),
                                   RegisterTextfield(
-                                    controller: password,
+                                    controller: widget.password,
                                     labeltext: 'Enter Password',
                                     onvalidation: (value) {
                                       if (value == null || value.isEmpty) {
@@ -222,7 +255,7 @@ class Dekstoplayout extends ConsumerWidget {
                                     height: 20,
                                   ),
                                   RegisterTextfield(
-                                    controller: confirmpassword,
+                                    controller: widget.confrimPassword,
                                     labeltext: 'Confirm Password',
                                     onvalidation: (value) {
                                       if (value == null || value.isEmpty) {
@@ -231,7 +264,7 @@ class Dekstoplayout extends ConsumerWidget {
                                       if (value.length <= 9) {
                                         return 'Password length should be atleast 9 ';
                                       }
-                                      if (value != password.text) {
+                                      if (value != widget.password.text) {
                                         return 'Password don\'t match';
                                       }
                                       return null;
@@ -245,20 +278,20 @@ class Dekstoplayout extends ConsumerWidget {
                                         Responsive.isDesktop(context) ? 40 : 30,
                                     width: double.maxFinite,
                                     child: ElevatedButton(
-                                      onPressed: () {
+                                      onPressed: () async {
                                         if (_dekstopSignupform.currentState!
                                             .validate()) {
-                                          // ref
-                                          //     .read(authControllerProvider)
-                                          //     .singupAndStoreNewUserData(
-                                          //       businessEmail:
-                                          //           businessemail.text,
-                                          //       password: password.text,
-                                          //     );
-                                          showCustomSnackbar(
-                                              context: context,
-                                              message:
-                                                  'Successfully Created Account');
+                                          await authController
+                                              .signUp(
+                                                context: context,
+                                                businessEmail:
+                                                    widget.bussinessEmail.text,
+                                                password:
+                                                    widget.confrimPassword.text,
+                                              )
+                                              .then((value) =>
+                                                  Navigator.pushNamed(context,
+                                                      LoginScreen.routename));
                                         }
                                       },
                                       style: ElevatedButton.styleFrom(
@@ -292,14 +325,30 @@ class Dekstoplayout extends ConsumerWidget {
   }
 }
 
-class MobileLayout extends ConsumerWidget {
+class MobileLayout extends ConsumerStatefulWidget {
+  final TextEditingController confrimPassword;
+  final TextEditingController bussinessEmail;
+  final TextEditingController password;
   final BoxConstraints constraint;
-  final GlobalKey<FormState> _mobileSignupform = GlobalKey<FormState>();
-  MobileLayout({super.key, required this.constraint});
+
+  MobileLayout({
+    super.key,
+    required this.constraint,
+    required this.bussinessEmail,
+    required this.confrimPassword,
+    required this.password,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authrepo = ref.watch(authRepoProvider);
+  ConsumerState<MobileLayout> createState() => _MobileLayoutState();
+}
+
+class _MobileLayoutState extends ConsumerState<MobileLayout> {
+  final GlobalKey<FormState> _mobileSignupform = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    final authController = ref.watch(authControllerProvider);
     return SingleChildScrollView(
       child: Form(
         key: _mobileSignupform,
@@ -314,8 +363,8 @@ class MobileLayout extends ConsumerWidget {
                   Text(
                     'From Local Favorite to Delivery Star!',
                     style: GoogleFonts.mina(
-                        fontSize: constraint.maxWidth < 762
-                            ? constraint.maxWidth * 0.04
+                        fontSize: widget.constraint.maxWidth < 762
+                            ? widget.constraint.maxWidth * 0.04
                             : 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
@@ -331,8 +380,8 @@ class MobileLayout extends ConsumerWidget {
                           textDirection: TextDirection.ltr,
                           'Let spicyeats handle the delivery while you focus on what you do best - creating amazing food! ',
                           style: TextStyle(
-                              fontSize: constraint.maxWidth < 762
-                                  ? constraint.maxWidth * 0.03
+                              fontSize: widget.constraint.maxWidth < 762
+                                  ? widget.constraint.maxWidth * 0.03
                                   : 22,
                               fontWeight: FontWeight.w400,
                               color: Colors.black),
@@ -345,7 +394,7 @@ class MobileLayout extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           RegisterTextfield(
-                            controller: businessemail,
+                            controller: widget.bussinessEmail,
                             labeltext: 'Enter your Business Email',
                             onvalidation: (value) {
                               if (value == null || value.isEmpty) {
@@ -361,7 +410,7 @@ class MobileLayout extends ConsumerWidget {
                             height: 20,
                           ),
                           RegisterTextfield(
-                            controller: password,
+                            controller: widget.password,
                             labeltext: 'Enter Password',
                             onvalidation: (value) {
                               if (value == null || value.isEmpty) {
@@ -377,7 +426,7 @@ class MobileLayout extends ConsumerWidget {
                             height: 20,
                           ),
                           RegisterTextfield(
-                            controller: confirmpassword,
+                            controller: widget.confrimPassword,
                             labeltext: 'Confirm Password',
                             onvalidation: (value) {
                               if (value == null || value.isEmpty) {
@@ -386,7 +435,7 @@ class MobileLayout extends ConsumerWidget {
                               if (value.length <= 9) {
                                 return 'Password length should be atleast 9 ';
                               }
-                              if (value != password.text) {
+                              if (value != widget.password.text) {
                                 return 'Password don\'t match ';
                               }
                               return null;
@@ -402,22 +451,15 @@ class MobileLayout extends ConsumerWidget {
                               onPressed: () async {
                                 if (_mobileSignupform.currentState!
                                     .validate()) {
-                                  try {
-                                    await authrepo.signup(
-                                      context: context,
-                                      businessEmail: businessemail.text,
-                                      password: password.text,
-                                    );
-                                    showCustomSnackbar(
+                                  await authController
+                                      .signUp(
                                         context: context,
-                                        message:
-                                            'Sign up successfully please sign in with same credentials');
-
-                                    Navigator.pushNamed(
-                                        context, LoginScreen.routename);
-                                  } catch (e) {
-                                    throw Exception(e);
-                                  }
+                                        businessEmail:
+                                            widget.bussinessEmail.text,
+                                        password: widget.password.text,
+                                      )
+                                      .then((value) => Navigator.pushNamed(
+                                          context, LoginScreen.routename));
                                 }
                               },
                               style: ElevatedButton.styleFrom(

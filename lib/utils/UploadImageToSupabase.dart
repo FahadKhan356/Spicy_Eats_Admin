@@ -8,11 +8,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<String?> uploadImageToSupabase(BuildContext context, Uint8List image,
     String bucketname, String path) async {
   try {
-    final String imageurl;
+    // final String imageurl;
     final response =
-        await supabaseClient.storage.from(bucketname).uploadBinary(path, image,
+        await supabaseClient.storage.from(bucketname).updateBinary(path, image,
             fileOptions: const FileOptions(
-              upsert: true,
+              upsert: false,
             ));
     // if (response != null) {
     //   showCustomSnackbar(
@@ -25,9 +25,12 @@ Future<String?> uploadImageToSupabase(BuildContext context, Uint8List image,
     //       message: 'Error: image upload failed ${}',
     //       backgroundColor: Colors.black);
     // }
-
-    imageurl = supabaseClient.storage.from(bucketname).getPublicUrl(path);
-    return imageurl;
+    if (response != null) {
+      final String imageurl =
+          supabaseClient.storage.from(bucketname).getPublicUrl(path);
+      debugPrint(' Image url - $imageurl');
+      return imageurl;
+    }
   } catch (e) {
     throw Exception(e);
     // showCustomSnackbar(

@@ -12,8 +12,6 @@ import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 
 var hidePasswordProvider = StateProvider<bool>((ref) => true);
-TextEditingController emailController = TextEditingController();
-TextEditingController passwordController = TextEditingController();
 
 class LoginScreen extends StatefulWidget {
   static const String routename = '/Login';
@@ -24,6 +22,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+
+  @override
+  void initState() {
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   void dispose() {
     emailController.dispose();
@@ -47,8 +57,15 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: constrain.maxWidth >= 767
-                  ? DekstopLayout()
-                  : MobileLayout(constraint: constrain)),
+                  ? DekstopLayout(
+                      emailcontroller: emailController,
+                      passwordcontroller: passwordController,
+                    )
+                  : MobileLayout(
+                      constraint: constrain,
+                      emailcontroller: emailController,
+                      passwordcontroller: passwordController,
+                    )),
         );
       }),
     ));
@@ -56,12 +73,24 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 //for Dekstop and tablet
-class DekstopLayout extends ConsumerWidget {
-  final GlobalKey<FormState> _dekstopformkey = GlobalKey<FormState>();
-  DekstopLayout({super.key});
+class DekstopLayout extends ConsumerStatefulWidget {
+  final TextEditingController emailcontroller;
+  final TextEditingController passwordcontroller;
+
+  DekstopLayout(
+      {super.key,
+      required this.emailcontroller,
+      required this.passwordcontroller});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DekstopLayout> createState() => _DekstopLayoutState();
+}
+
+class _DekstopLayoutState extends ConsumerState<DekstopLayout> {
+  final GlobalKey<FormState> _dekstopformkey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
     final hidePassword = ref.watch(hidePasswordProvider);
     final authController = ref.watch(authControllerProvider);
     final isloader = ref.watch(isloadingprovider);
@@ -122,7 +151,7 @@ class DekstopLayout extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 RegisterTextfield(
-                                    controller: emailController,
+                                    controller: widget.emailcontroller,
                                     labeltext: 'Email',
                                     onvalidation: (value) {
                                       var emailPattern =
@@ -142,7 +171,7 @@ class DekstopLayout extends ConsumerWidget {
                                 ),
                                 RegisterTextfield(
                                     isObsecure: hidePassword,
-                                    controller: passwordController,
+                                    controller: widget.passwordcontroller,
                                     labeltext: 'Password',
                                     suffixIcon: IconButton(
                                         onPressed: () {
@@ -214,11 +243,19 @@ class DekstopLayout extends ConsumerWidget {
                                         ref
                                             .read(isloadingprovider.notifier)
                                             .state = true;
-                                        await authController.signIn(
-                                            ref: ref,
-                                            email: emailController.text,
-                                            password: passwordController.text,
-                                            context: context);
+                                        await authController
+                                            .signIn(
+                                                ref: ref,
+                                                email:
+                                                    widget.emailcontroller.text,
+                                                password: widget
+                                                    .passwordcontroller.text,
+                                                context: context)
+                                            .then((value) =>
+                                                Navigator.pushNamed(
+                                                    context,
+                                                    RestaurantRegister
+                                                        .routename));
 
                                         ref
                                             .read(isloadingprovider.notifier)
@@ -348,8 +385,15 @@ class DekstopLayout extends ConsumerWidget {
 }
 
 class MobileLayout extends ConsumerStatefulWidget {
+  final TextEditingController emailcontroller;
+  final TextEditingController passwordcontroller;
+
   final BoxConstraints constraint;
-  const MobileLayout({super.key, required this.constraint});
+  MobileLayout(
+      {super.key,
+      required this.constraint,
+      required this.emailcontroller,
+      required this.passwordcontroller});
 
   @override
   ConsumerState<MobileLayout> createState() => _MobileLayoutState();
@@ -416,7 +460,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                         height: 20,
                       ),
                       RegisterTextfield(
-                          controller: emailController,
+                          controller: widget.emailcontroller,
                           labeltext: 'Email',
                           onvalidation: (value) {
                             var emailPattern =
@@ -436,7 +480,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                       ),
                       RegisterTextfield(
                           isObsecure: hidePassword,
-                          controller: passwordController,
+                          controller: widget.passwordcontroller,
                           labeltext: 'Password',
                           suffixIcon: IconButton(
                               onPressed: () {
@@ -545,11 +589,16 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                           onPressed: () async {
                             if (_mobileformkey.currentState!.validate()) {
                               ref.read(isloadingprovider.notifier).state = true;
-                              await authController.signIn(
-                                  ref: ref,
-                                  email: emailController.text,
-                                  password: passwordController.text,
-                                  context: context);
+                              await authController
+                                  .signIn(
+                                      ref: ref,
+                                      email: widget.emailcontroller.text,
+                                      password: widget.passwordcontroller.text,
+                                      context: context)
+                                  .then((value) => Navigator.pushNamed(
+                                      context, RestaurantRegister.routename));
+                              ref.read(isloadingprovider.notifier).state =
+                                  false;
                             }
                           },
                           style: ElevatedButton.styleFrom(
