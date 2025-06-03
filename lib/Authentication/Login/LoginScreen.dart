@@ -243,23 +243,20 @@ class _DekstopLayoutState extends ConsumerState<DekstopLayout> {
                                         ref
                                             .read(isloadingprovider.notifier)
                                             .state = true;
-                                        await authController
-                                            .signIn(
-                                                ref: ref,
-                                                email:
-                                                    widget.emailcontroller.text,
-                                                password: widget
-                                                    .passwordcontroller.text,
-                                                context: context)
-                                            .then((value) =>
-                                                Navigator.pushNamed(
-                                                    context,
-                                                    RestaurantRegister
-                                                        .routename));
+                                        await authController.signIn(
+                                            ref: ref,
+                                            email: widget.emailcontroller.text,
+                                            password:
+                                                widget.passwordcontroller.text,
+                                            context: context);
 
                                         ref
                                             .read(isloadingprovider.notifier)
-                                            .state = false;
+                                            .update((cb) => false);
+                                      } else {
+                                        ref
+                                            .read(isloadingprovider.notifier)
+                                            .update((cb) => false);
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -589,14 +586,15 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                           onPressed: () async {
                             if (_mobileformkey.currentState!.validate()) {
                               ref.read(isloadingprovider.notifier).state = true;
-                              await authController
-                                  .signIn(
-                                      ref: ref,
-                                      email: widget.emailcontroller.text,
-                                      password: widget.passwordcontroller.text,
-                                      context: context)
-                                  .then((value) => Navigator.pushNamed(
-                                      context, RestaurantRegister.routename));
+                              await authController.signIn(
+                                  ref: ref,
+                                  email: widget.emailcontroller.text,
+                                  password: widget.passwordcontroller.text,
+                                  context: context);
+
+                              ref.read(isloadingprovider.notifier).state =
+                                  false;
+                            } else {
                               ref.read(isloadingprovider.notifier).state =
                                   false;
                             }

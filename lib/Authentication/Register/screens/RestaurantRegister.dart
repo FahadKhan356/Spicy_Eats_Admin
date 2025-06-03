@@ -4,6 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:spicy_eats_admin/Authentication/Register/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/widgets/RestaurantAddress.dart';
 
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
@@ -44,17 +45,10 @@ final accountownername = TextEditingController();
 final iban = TextEditingController();
 final password = TextEditingController();
 
-final GlobalKey<FormState> _form = GlobalKey<FormState>();
 Uint8List? idImage;
 File? image;
 
 class _RestaurantRegisterState extends State<RestaurantRegister> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
   @override
   void dispose() {
     // TODO: implement dispose
@@ -113,6 +107,7 @@ class Dekstoplayout extends ConsumerStatefulWidget {
 }
 
 class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
+  final GlobalKey<FormState> _dekstopKey = GlobalKey<FormState>();
   Future<void> handlePickImage() async {
     dynamic result = await pickImage();
 
@@ -136,27 +131,29 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
     }
   }
 
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authRepoProvider).checkAuthSteps(context, ref);
-    });
-    // TODO: implement initState
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     await ref.read(authRepoProvider).checkAuthSteps(context, ref);
+  //     ref.read(isloadingprovider.notifier).state = false;
+  //   });
+  //   // TODO: implement initState
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
     final authController = ref.read(authControllerProvider);
-    final isloader = ref.watch(isloadingprovider);
+    final isloading = ref.watch(isloadingprovider);
     final latitude = ref.watch(restaurantLatProvider);
     final longitude = ref.watch(restaurantLongProvider);
     final address = ref.watch(restaurantLocationSelectedProvider);
     final size = MediaQuery.of(context).size;
     final isImageSelected = ref.watch(isimage);
     final authStep = ref.watch(authStepsProvider);
+
     return Form(
-      key: _form,
+      key: _dekstopKey,
       child: Column(
         children: [
           SizedBox(
@@ -757,7 +754,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                         width: double.maxFinite,
                                         child: ElevatedButton(
                                           onPressed: () async {
-                                            if (_form.currentState!
+                                            if (_dekstopKey.currentState!
                                                     .validate() &&
                                                 idImage != null &&
                                                 latitude != null &&
@@ -820,6 +817,8 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                             backgroundColor: Colors.black,
                                           ),
                                           child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               const Text(
                                                 ' Get Started ',
@@ -830,7 +829,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                               const SizedBox(
                                                 width: 10,
                                               ),
-                                              isloader
+                                              isloading
                                                   ? const SizedBox(
                                                       height: 20,
                                                       width: 20,
@@ -874,26 +873,28 @@ class MobileLayout extends ConsumerStatefulWidget {
 }
 
 class _MobileLayoutState extends ConsumerState<MobileLayout> {
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authRepoProvider).checkAuthSteps(context, ref);
-    });
+  final GlobalKey<FormState> _mobileKey = GlobalKey<FormState>();
 
-    // TODO: implement initState
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     await ref.read(authRepoProvider).checkAuthSteps(context, ref);
+  //     ref.read(isloadingprovider.notifier).state = false;
+  //   });
+
+  //   // TODO: implement initState
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final isloader = ref.watch(isloadingprovider);
     final authController = ref.watch(authControllerProvider);
     final latitude = ref.watch(restaurantLatProvider);
     final longitude = ref.watch(restaurantLongProvider);
     final authStep = ref.watch(authStepsProvider);
     final address = ref.watch(restaurantLocationSelectedProvider);
     final size = MediaQuery.of(context).size;
-    bool isloading = ref.watch(isloadingprovider);
+    final isloading = ref.watch(isloadingprovider);
 
     File? image;
 
@@ -1069,6 +1070,24 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                         },
                                         child: const Text('log out')),
                                   ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  SizedBox(
+                                    height: 100,
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                        onPressed: () async {
+                                          // await supabaseClient.auth.signOut();
+                                          await Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      const ChoosePlanScreen()),
+                                              (root) => true);
+                                        },
+                                        child: const Text('choose plan')),
+                                  ),
                                   Text(
                                     'Register Your Restaurant',
                                     style: GoogleFonts.mina(
@@ -1086,7 +1105,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                     height: 10,
                                   ),
                                   Form(
-                                    key: _form,
+                                    key: _mobileKey,
                                     child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -1592,7 +1611,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                             width: double.maxFinite,
                                             child: ElevatedButton(
                                               onPressed: () async {
-                                                if (_form.currentState!
+                                                if (_mobileKey.currentState!
                                                         .validate() &&
                                                     idImage != null &&
                                                     latitude != null &&
@@ -1630,6 +1649,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                               lastname.text,
                                                           context: context,
                                                           image: idImage!);
+
                                                   ref
                                                       .read(isloadingprovider
                                                           .notifier)
@@ -1641,7 +1661,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                       backgroundColor:
                                                           Colors.black,
                                                       message:
-                                                          "Please Upload Authentic Identity Card Image");
+                                                          "Please Provide Cnic image");
                                                 } else if (latitude == null ||
                                                     address == null) {
                                                   showCustomSnackbar(
@@ -1676,7 +1696,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                   const SizedBox(
                                                     width: 10,
                                                   ),
-                                                  isloader
+                                                  isloading
                                                       ? const SizedBox(
                                                           height: 20,
                                                           width: 20,

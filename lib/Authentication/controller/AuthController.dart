@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 var restaurantLatProvider = StateProvider<double?>((ref) => null);
 var restaurantLongProvider = StateProvider<double?>((ref) => null);

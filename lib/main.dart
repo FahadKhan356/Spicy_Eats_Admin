@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Authentication/authCallBack.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/Routes.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
+import 'package:spicy_eats_admin/splashscreen.dart/SplashScreen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -99,12 +101,13 @@ class _MyAppState extends ConsumerState<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:
-          // AuthCallbackPage(),
-          supabaseClient.auth.currentSession != null &&
-                  supabaseClient.auth.currentUser != null
-              ? const RestaurantRegister()
-              : const LoginScreen(),
+      home: SplashScreen(),
+      //  ChoosePlanScreen(),
+
+      // supabaseClient.auth.currentSession != null &&
+      //         supabaseClient.auth.currentUser != null
+      //     ? const RestaurantRegister()
+      //     : const LoginScreen(),
       onGenerateRoute: generateRoute,
     );
   }

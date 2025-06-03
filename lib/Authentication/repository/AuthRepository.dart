@@ -2,11 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/model/Restaurantmodel.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
+import 'package:spicy_eats_admin/splashscreen.dart/SplashScreen.dart';
 import 'package:spicy_eats_admin/utils/UploadImageToSupabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -76,12 +78,12 @@ class AuthRepository {
           context: context,
           message: 'Sign In Successfully',
           backgroundColor: Colors.black);
+      Navigator.pushReplacementNamed(context, SplashScreen.routename);
     } catch (e) {
-      throw Exception(e);
-      // showCustomSnackbar(
-      //     context: context,
-      //     message: 'Sign in failed $e',
-      //     backgroundColor: Colors.black);
+      showCustomSnackbar(
+          context: context,
+          message: 'Sign in failed $e',
+          backgroundColor: Colors.black);
     }
   }
 
@@ -233,6 +235,8 @@ class AuthRepository {
           .from('users')
           .update({'Auth_steps': 2}).eq('email', user.currentUser!.email!);
 
+      await Navigator.pushNamedAndRemoveUntil(
+          context, ChoosePlanScreen.routename, (root) => true);
       showCustomSnackbar(
           context: context,
           message: 'Restaurant inserted successfully',
