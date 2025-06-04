@@ -451,15 +451,11 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                               onPressed: () async {
                                 if (_mobileSignupform.currentState!
                                     .validate()) {
-                                  await authController
-                                      .signUp(
-                                        context: context,
-                                        businessEmail:
-                                            widget.bussinessEmail.text,
-                                        password: widget.password.text,
-                                      )
-                                      .then((value) => Navigator.pushNamed(
-                                          context, LoginScreen.routename));
+                                  await authController.signUp(
+                                    context: context,
+                                    businessEmail: widget.bussinessEmail.text,
+                                    password: widget.password.text,
+                                  );
                                 }
                               },
                               style: ElevatedButton.styleFrom(

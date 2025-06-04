@@ -29,7 +29,7 @@ class AuthRepository {
       );
 
       if (authResponse.user?.id != null) {
-        await signout();
+        await signout(context);
         // Navigator.pushAndRemoveUntil(
         //     context,
         //     MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -235,11 +235,13 @@ class AuthRepository {
           .from('users')
           .update({'Auth_steps': 2}).eq('email', user.currentUser!.email!);
 
-      await Navigator.pushNamedAndRemoveUntil(
-          context, ChoosePlanScreen.routename, (root) => true);
+      await Navigator.pushReplacementNamed(
+        context,
+        ChoosePlanScreen.routename,
+      );
       showCustomSnackbar(
           context: context,
-          message: 'Restaurant inserted successfully',
+          message: 'Restaurant Details Stored Successfully',
           backgroundColor: Colors.black);
       print('Restaurant inserted successfully');
     } catch (e) {
@@ -253,9 +255,16 @@ class AuthRepository {
   }
 
 //sign out
-  Future<void> signout() async {
+  Future<void> signout(BuildContext context) async {
     try {
       await supabaseClient.auth.signOut();
+
+      showCustomSnackbar(
+        context: context,
+        message: 'Log out Successfully',
+        backgroundColor: Colors.black,
+      );
+      await Navigator.pushNamed(context, LoginScreen.routename);
     } catch (e) {
       debugPrint('Error in signout $e');
     }

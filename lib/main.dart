@@ -95,6 +95,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       navigatorKey: navigatorkey,
       title: 'Flutter Demo',
       theme: ThemeData(

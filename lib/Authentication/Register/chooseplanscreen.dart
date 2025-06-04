@@ -36,32 +36,100 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
     final isWide = MediaQuery.of(context).size.width > 600;
     final authStep = ref.watch(authStepsProvider);
     final size = MediaQuery.of(context).size;
+    final authrepo = ref.watch(authRepoProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        surfaceTintColor: Colors.black,
-        backgroundColor: Colors.black,
-        title: const Text(
-          "Uber Eats for Merchants",
-          style: TextStyle(color: Colors.white),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70),
+        child: Container(
+          color: Colors.black,
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: size.width > 150
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              "Spicy Eats",
+                              style: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  color: Colors.orange[700],
+                                  fontSize: size.width > 720 ? 20 : 15),
+                            ),
+                            Text(
+                              "Partner Portal",
+                              style: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  color: Colors.white,
+                                  fontSize: size.width > 720 ? 15 : 10),
+                            ),
+                          ],
+                        ),
+                        size.width > 300
+                            ? const Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.location_on,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Flexible(
+                                        child: Text(
+                                          'New alfa bridge, Newyork - NL',
+                                          style: TextStyle(
+                                              overflow: TextOverflow.ellipsis,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(),
+                        InkWell(
+                          onTap: () async {
+                            await authrepo.signout(context);
+                          },
+                          child: Row(children: [
+                            Icon(
+                              Icons.logout,
+                              color: Colors.white,
+                            ),
+                            size.width < 370
+                                ? SizedBox()
+                                : Text(
+                                    'Log out',
+                                    style: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        color: Colors.white),
+                                  ),
+                          ]),
+                        ),
+                      ],
+                    )
+                  : SizedBox()),
         ),
-        actions: const [
-          Padding(
-              padding: EdgeInsets.only(right: 20),
-              child: Icon(Icons.help_outline))
-        ],
       ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
-            constraints:
-                BoxConstraints(maxWidth: isWide ? 600 : double.maxFinite),
+            constraints: BoxConstraints(maxWidth: double.maxFinite),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: 80,
+                  height: 100,
                   // color: Colors.red,
                   width: double.infinity,
                   child: Center(
@@ -180,15 +248,7 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 100,
-                  width: double.infinity,
-                  child: ElevatedButton(
-                      onPressed: () async {
-                        await supabaseClient.auth.signOut();
-                      },
-                      child: const Text('log out')),
-                ),
+
                 // Step Indicator
 
                 const SizedBox(height: 32),

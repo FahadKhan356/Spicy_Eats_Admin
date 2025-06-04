@@ -21,12 +21,12 @@ import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 
 var isimage = StateProvider<bool>((ref) => true);
 
-class RestaurantRegister extends StatefulWidget {
+class RestaurantRegister extends ConsumerStatefulWidget {
   static const String routename = '/Register';
   const RestaurantRegister({super.key});
 
   @override
-  State<RestaurantRegister> createState() => _RestaurantRegisterState();
+  ConsumerState<RestaurantRegister> createState() => _RestaurantRegisterState();
 }
 
 final TextEditingController addressController = TextEditingController();
@@ -48,7 +48,7 @@ final password = TextEditingController();
 Uint8List? idImage;
 File? image;
 
-class _RestaurantRegisterState extends State<RestaurantRegister> {
+class _RestaurantRegisterState extends ConsumerState<RestaurantRegister> {
   @override
   void dispose() {
     // TODO: implement dispose
@@ -68,7 +68,51 @@ class _RestaurantRegisterState extends State<RestaurantRegister> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final authepo = ref.watch(authRepoProvider);
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Column(
+          children: [
+            Text(
+              "Spicy Eats",
+              style: TextStyle(
+                  color: Colors.white, fontSize: size.width > 720 ? 20 : 15),
+            ),
+            Text(
+              "Partner Portal",
+              style: TextStyle(
+                  color: Colors.white, fontSize: size.width > 720 ? 15 : 10),
+            ),
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: InkWell(
+              onTap: () async {
+                await authepo.signout(context);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.logout,
+                    color: Colors.white,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    'Log out',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
       body: LayoutBuilder(builder: (context, constrain) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
@@ -130,16 +174,6 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
       });
     }
   }
-
-  // @override
-  // void initState() {
-  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
-  //     await ref.read(authRepoProvider).checkAuthSteps(context, ref);
-  //     ref.read(isloadingprovider.notifier).state = false;
-  //   });
-  //   // TODO: implement initState
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -821,7 +855,7 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                                 MainAxisAlignment.center,
                                             children: [
                                               const Text(
-                                                ' Get Started ',
+                                                'Save',
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.white),
@@ -900,15 +934,19 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
 
     Future<void> handlePickImage() async {
       dynamic result = await pickImage();
-
-      if (result is Uint8List) {
-        setState(() {
-          idImage = result;
-        });
-      } else if (result is File) {
-        setState(() {
-          image = result;
-        });
+      if (result != null || result is Uint8List) {
+        int maxSizeInBytes = 2 * 1024 * 1025;
+        if (result.length > maxSizeInBytes) {
+          showCustomSnackbar(
+              backgroundColor: Colors.black,
+              context: context,
+              message:
+                  'Image too large (max ${maxSizeInBytes ~/ (1024 * 1024)}MB)');
+        } else {
+          setState(() {
+            idImage = result;
+          });
+        }
       }
     }
 
@@ -1061,32 +1099,8 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                    height: 100,
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                        onPressed: () async {
-                                          await supabaseClient.auth.signOut();
-                                        },
-                                        child: const Text('log out')),
-                                  ),
                                   const SizedBox(
                                     height: 20,
-                                  ),
-                                  SizedBox(
-                                    height: 100,
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                        onPressed: () async {
-                                          // await supabaseClient.auth.signOut();
-                                          await Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      const ChoosePlanScreen()),
-                                              (root) => true);
-                                        },
-                                        child: const Text('choose plan')),
                                   ),
                                   Text(
                                     'Register Your Restaurant',
@@ -1687,7 +1701,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                     MainAxisAlignment.center,
                                                 children: [
                                                   const Text(
-                                                    ' Get Started ',
+                                                    'Save',
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,

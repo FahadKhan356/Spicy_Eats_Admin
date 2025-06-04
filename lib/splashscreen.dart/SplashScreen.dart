@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
+import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   static const String routename = '/SplashScreen';
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => decideNavigation());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(authRepoProvider).checkAuthSteps(context, ref);
+      decideNavigation();
+    });
   }
 
   Future<void> decideNavigation() async {
