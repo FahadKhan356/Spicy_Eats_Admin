@@ -125,7 +125,7 @@ class Dekstoplayout extends ConsumerStatefulWidget {
 
   final BoxConstraints constraint;
 
-  Dekstoplayout({
+  const Dekstoplayout({
     super.key,
     required this.constraint,
     required this.bussinessEmail,
@@ -331,7 +331,7 @@ class MobileLayout extends ConsumerStatefulWidget {
   final TextEditingController password;
   final BoxConstraints constraint;
 
-  MobileLayout({
+  const MobileLayout({
     super.key,
     required this.constraint,
     required this.bussinessEmail,

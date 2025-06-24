@@ -74,11 +74,13 @@ class _RestaurantRegisterState extends ConsumerState<RestaurantRegister> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               "Spicy Eats",
               style: TextStyle(
-                  color: Colors.white, fontSize: size.width > 720 ? 20 : 15),
+                  color: Colors.orange[700],
+                  fontSize: size.width > 720 ? 20 : 15),
             ),
             Text(
               "Partner Portal",
@@ -89,12 +91,12 @@ class _RestaurantRegisterState extends ConsumerState<RestaurantRegister> {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10),
+            padding: const EdgeInsets.only(right: 10),
             child: InkWell(
               onTap: () async {
                 await authepo.signout(context);
               },
-              child: Row(
+              child: const Row(
                 children: [
                   Icon(
                     Icons.logout,
@@ -1571,7 +1573,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                                         ),
                                                       ),
                                                     )
-                                                  : !kIsWeb && image == null
+                                                  : !kIsWeb
                                                       ? Positioned(
                                                           top: 0,
                                                           left: 0,

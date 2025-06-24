@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 
 var restaurantLatProvider = StateProvider<double?>((ref) => null);
@@ -64,6 +63,7 @@ class AuthController {
     required WidgetRef ref,
   }) async {
     await authRepository.registerRestaurant(
+        ref: ref,
         businessEmail: businessEmail,
         bussinessName: bussinessName,
         firstmiddleName: firstmiddleName,
@@ -77,5 +77,22 @@ class AuthController {
         lastName: lastName,
         context: context,
         image: image);
+  }
+
+  Future<void> storePlan({
+    required context,
+    required deliveryCommission,
+    required usesPlatformDelivery,
+    required offersPickup,
+    required pickUpCommission,
+    required userid,
+  }) async {
+    await authRepository.storePlan(
+        context: context,
+        deliveryCommission: deliveryCommission,
+        usesPlatformDelivery: usesPlatformDelivery,
+        offersPickup: offersPickup,
+        pickUpCommission: pickUpCommission,
+        userid: userid);
   }
 }

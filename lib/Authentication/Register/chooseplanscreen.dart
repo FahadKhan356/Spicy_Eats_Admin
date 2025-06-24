@@ -15,17 +15,20 @@ class ChoosePlanScreen extends ConsumerStatefulWidget {
 }
 
 class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
-  int platformDelivery = 30;
-  int ownDelivery = 14;
-
-  int deliveryOption = 30;
+  int platformDeliveryCommission = 30;
+  int ownDeliveryCommission = 14;
   bool pickupEnabled = false;
+  int pickupCommision = 14;
+  bool usesPlatformDelivery = true;
+  int deliveryOption = 30;
+  final userid = supabaseClient.auth.currentUser!.id;
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(authRepoProvider).checkAuthSteps(context, ref);
       ref.read(isloadingprovider.notifier).state = false;
+      await ref.read(authRepoProvider).fetchaddress(ref);
     });
     // TODO: implement initState
     super.initState();
@@ -33,14 +36,16 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width > 600;
     final authStep = ref.watch(authStepsProvider);
     final size = MediaQuery.of(context).size;
     final authrepo = ref.watch(authRepoProvider);
+    final authController = ref.watch(authControllerProvider);
+    final address = ref.watch(restaurantAddressProvider);
+    final isloader = ref.watch(isloadingprovider);
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70),
+        preferredSize: const Size.fromHeight(70),
         child: Container(
           color: Colors.black,
           child: Padding(
@@ -69,28 +74,39 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                           ],
                         ),
                         size.width > 300
-                            ? const Expanded(
+                            ? Expanded(
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(
+                                      const Icon(
                                         Icons.location_on,
                                         color: Colors.white,
                                         size: 18,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 10,
                                       ),
-                                      Flexible(
-                                        child: Text(
-                                          'New alfa bridge, Newyork - NL',
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis,
-                                              color: Colors.white),
-                                        ),
-                                      ),
+                                      address != null
+                                          ? Flexible(
+                                              child: Text(
+                                                ' $address',
+                                                style: const TextStyle(
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    color: Colors.white),
+                                              ),
+                                            )
+                                          : const Center(
+                                              child: SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                              ),
+                                            ))
                                     ],
                                   ),
                                 ),
@@ -101,13 +117,13 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                             await authrepo.signout(context);
                           },
                           child: Row(children: [
-                            Icon(
+                            const Icon(
                               Icons.logout,
                               color: Colors.white,
                             ),
                             size.width < 370
-                                ? SizedBox()
-                                : Text(
+                                ? const SizedBox()
+                                : const Text(
                                     'Log out',
                                     style: TextStyle(
                                         overflow: TextOverflow.ellipsis,
@@ -117,14 +133,14 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                         ),
                       ],
                     )
-                  : SizedBox()),
+                  : const SizedBox()),
         ),
       ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: double.maxFinite),
+            constraints: const BoxConstraints(maxWidth: double.maxFinite),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -272,12 +288,14 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                                 fontWeight: FontWeight.bold, fontSize: 18)),
                         const SizedBox(height: 12),
                         deliveryRadioTile(
-                          value: platformDelivery,
+                          isPlatformdelivery: true,
+                          value: platformDeliveryCommission,
                           title: 'Use delivery people on Uber',
                           subtitle: '30% fee per order',
                         ),
                         deliveryRadioTile(
-                          value: ownDelivery,
+                          isPlatformdelivery: false,
+                          value: ownDeliveryCommission,
                           title: 'Use your own delivery staff',
                           subtitle: '14% fee per order',
                         ),
@@ -296,7 +314,7 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Checkbox(
-                          side: BorderSide(color: Colors.black),
+                          side: const BorderSide(color: Colors.black),
                           activeColor: Colors.amber,
                           // focusColor: Colors.red,
                           checkColor: Colors.black,
@@ -313,15 +331,15 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                         const Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text("Pickup",
+                            children: [
+                              const Text("Pickup",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18)),
-                              SizedBox(height: 6),
-                              Text(
+                              const SizedBox(height: 6),
+                              const Text(
                                   "Let customers pick up their orders to get more sales at a lower cost."),
-                              Text("14% fee per order",
+                              const Text("14% fee per order",
                                   style: TextStyle(color: Colors.grey)),
                             ],
                           ),
@@ -336,7 +354,14 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                   "There’s a €400 activation fee per location typically paid after you fulfill your first few orders. ",
                   style: TextStyle(fontSize: 13),
                 ),
-                TextButton(onPressed: () {}, child: const Text("Learn More")),
+                usesPlatformDelivery
+                    ? TextButton(
+                        onPressed: () {},
+                        child: const Text(
+                          "Learn More",
+                          style: TextStyle(color: Colors.black),
+                        ))
+                    : SizedBox(),
 
                 const SizedBox(
                   height: 20,
@@ -346,7 +371,18 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                   width: double.maxFinite,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () async {},
+                    onPressed: () async {
+                      ref.read(isloadingprovider.notifier).state = true;
+
+                      await authController.storePlan(
+                          context: context,
+                          deliveryCommission: deliveryOption,
+                          usesPlatformDelivery: usesPlatformDelivery,
+                          offersPickup: pickupEnabled,
+                          pickUpCommission: pickupCommision,
+                          userid: userid);
+                      ref.read(isloadingprovider.notifier).state = false;
+                    },
                     style: ElevatedButton.styleFrom(
                       surfaceTintColor: Colors.blue,
                       shape: RoundedRectangleBorder(
@@ -364,20 +400,11 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                         const SizedBox(
                           width: 10,
                         ),
-                        // isloading
-                        //     ? const SizedBox(
-                        //         height: 20,
-                        //         width: 20,
-                        //         child:
-                        //             CircularProgressIndicator(
-                        //           padding:
-                        //               EdgeInsets.all(
-                        //                   2),
-                        //           strokeWidth: 3,
-                        //           color: Colors.white,
-                        //         ),
-                        //       )
-                        //     : const SizedBox(),
+                        isloader
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const SizedBox(),
                       ],
                     ),
                   ),
@@ -394,12 +421,18 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
     required int value,
     required String title,
     required String subtitle,
+    required isPlatformdelivery,
   }) {
     return RadioListTile<int>(
-      fillColor: WidgetStatePropertyAll(Colors.black),
+      fillColor: const WidgetStatePropertyAll(Colors.black),
       value: value,
       groupValue: deliveryOption,
-      onChanged: (val) => setState(() => deliveryOption = val!),
+      onChanged: (val) {
+        setState(() {
+          deliveryOption = val!;
+          usesPlatformDelivery = isPlatformdelivery;
+        });
+      },
       title: Text(title),
       subtitle: Text(subtitle),
     );
@@ -411,7 +444,7 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
         CircleAvatar(
           radius: 12,
           backgroundColor: isActive ? Colors.black : Colors.grey.shade300,
-          child: Icon(Icons.check, color: Colors.white, size: 16),
+          child: const Icon(Icons.check, color: Colors.white, size: 16),
         ),
         const SizedBox(height: 6),
         Text(label,

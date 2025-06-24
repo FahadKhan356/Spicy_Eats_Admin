@@ -77,7 +77,7 @@ class DekstopLayout extends ConsumerStatefulWidget {
   final TextEditingController emailcontroller;
   final TextEditingController passwordcontroller;
 
-  DekstopLayout(
+  const DekstopLayout(
       {super.key,
       required this.emailcontroller,
       required this.passwordcontroller});
@@ -386,7 +386,7 @@ class MobileLayout extends ConsumerStatefulWidget {
   final TextEditingController passwordcontroller;
 
   final BoxConstraints constraint;
-  MobileLayout(
+  const MobileLayout(
       {super.key,
       required this.constraint,
       required this.emailcontroller,

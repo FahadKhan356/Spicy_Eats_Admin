@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/model/Restaurantmodel.dart';
-import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
-import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:spicy_eats_admin/splashscreen.dart/SplashScreen.dart';
@@ -14,6 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 var authStepsProvider = StateProvider<int?>((ref) => null);
+final restaurantAddressProvider = StateProvider<String?>((ref) => null);
 var authRepoProvider = Provider((ref) => AuthRepository());
 
 class AuthRepository {
@@ -93,13 +92,6 @@ class AuthRepository {
       required BuildContext context,
       required String password}) async {
     try {
-      // final existinguser = await supabaseClient
-      //     .from('users')
-      //     .select('id')
-      //     .eq('id', user.id)
-      //     .maybeSingle();
-
-      // if (existinguser == null) {
       await supabaseClient.from('users').insert({
         'id': user.id,
         'email': user.email,
@@ -164,20 +156,17 @@ class AuthRepository {
     try {
       final userid = supabaseClient.auth.currentUser?.id;
 
-      if (userid == null) {
-        showCustomSnackbar(context: context, message: 'Errro: user id in null');
-        return;
-      }
-
-      final response = await supabaseClient
-          .from('users')
-          .select('Auth_steps')
-          .eq('id', userid)
-          .maybeSingle();
-      if (response != null || response!['Auth_steps'] != null) {
-        ref.read(authStepsProvider.notifier).state = response['Auth_steps'];
-      } else {
-        throw Exception('Auth_steps not found');
+      if (userid != null) {
+        final response = await supabaseClient
+            .from('users')
+            .select('Auth_steps')
+            .eq('id', userid)
+            .maybeSingle();
+        if (response != null || response!['Auth_steps'] != null) {
+          ref.read(authStepsProvider.notifier).state = response['Auth_steps'];
+        } else {
+          throw Exception('Auth_steps not found');
+        }
       }
     } catch (e) {
       showCustomSnackbar(
@@ -189,6 +178,7 @@ class AuthRepository {
 
 //register restaurant
   Future<void> registerRestaurant({
+    required WidgetRef ref,
     required businessEmail,
     required bussinessName,
     required firstmiddleName,
@@ -246,11 +236,6 @@ class AuthRepository {
       print('Restaurant inserted successfully');
     } catch (e) {
       throw Exception(e);
-      // showCustomSnackbar(
-      //     context: context,
-      //     message: 'Error in Resgister Restaurant $e',
-      //     backgroundColor: Colors.black);
-      // debugPrint('Error in Resgister Restaurant $e');
     }
   }
 
@@ -267,6 +252,52 @@ class AuthRepository {
       await Navigator.pushNamed(context, LoginScreen.routename);
     } catch (e) {
       debugPrint('Error in signout $e');
+    }
+  }
+
+//fetch address for choose plan screen
+  Future<void> fetchaddress(WidgetRef ref) async {
+    try {
+      final String userid = supabaseClient.auth.currentUser!.id;
+      final response = await supabaseClient
+          .from('restaurants')
+          .select()
+          .eq('user_id', userid)
+          .single();
+      if (response.isNotEmpty) {
+        ref.read(restaurantAddressProvider.notifier).state =
+            response['address'];
+        debugPrint(
+            'restaurant address : ${ref.watch(restaurantAddressProvider)}');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+//store choose plan details
+
+  Future<void> storePlan({
+    required context,
+    required deliveryCommission,
+    required usesPlatformDelivery,
+    required offersPickup,
+    required pickUpCommission,
+    required userid,
+  }) async {
+    try {
+      await supabaseClient.from('restaurants').update({
+        'delivery_commission': deliveryCommission,
+        'uses_platform_delivery': usesPlatformDelivery,
+        'offers_pickup': offersPickup,
+        'pickup_commission': offersPickup ? pickUpCommission : null,
+      }).eq('user_id', userid);
+      showCustomSnackbar(
+          context: context,
+          message: 'Successfully Done',
+          backgroundColor: Colors.black);
+    } catch (e) {
+      throw Exception(e);
     }
   }
 }

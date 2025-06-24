@@ -25,12 +25,10 @@ Future<String?> uploadImageToSupabase(BuildContext context, Uint8List image,
     //       message: 'Error: image upload failed ${}',
     //       backgroundColor: Colors.black);
     // }
-    if (response != null) {
-      final String imageurl =
-          supabaseClient.storage.from(bucketname).getPublicUrl(path);
-      debugPrint(' Image url - $imageurl');
-      return imageurl;
-    }
+    final String imageurl =
+        supabaseClient.storage.from(bucketname).getPublicUrl(path);
+    debugPrint(' Image url - $imageurl');
+    return imageurl;
   } catch (e) {
     throw Exception(e);
     // showCustomSnackbar(
@@ -38,4 +36,5 @@ Future<String?> uploadImageToSupabase(BuildContext context, Uint8List image,
     //     message: 'Error: File upload failed ',
     //     backgroundColor: Colors.black);
   }
+  return null;
 }
