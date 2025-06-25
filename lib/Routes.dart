@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
-import 'package:spicy_eats_admin/Authentication/Register/chooseplanscreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Authentication/Signup/screen/SignupScreen.dart';
 import 'package:spicy_eats_admin/Authentication/authCallBack.dart';
@@ -21,6 +22,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case ChoosePlanScreen.routename:
       return MaterialPageRoute(builder: (_) => const ChoosePlanScreen());
 
+    //Approve screen
+    case Approve.routename:
+      return MaterialPageRoute(builder: (_) => const Approve());
     //splashscreen
     case SplashScreen.routename:
       return MaterialPageRoute(builder: (_) => const SplashScreen());

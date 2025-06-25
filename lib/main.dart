@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
 import 'package:spicy_eats_admin/Authentication/authCallBack.dart';
 import 'package:spicy_eats_admin/Routes.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
@@ -13,7 +14,6 @@ void main() async {
     url: supabseURL,
     anonKey: supabaseKEY,
   );
-  // Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
 
   final uri = Uri.base;
   final hasOAuthParams = uri.queryParameters.containsKey('code') ||

@@ -2,7 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
-import 'package:spicy_eats_admin/Authentication/Register/chooseplanscreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/model/Restaurantmodel.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
@@ -292,6 +293,11 @@ class AuthRepository {
         'offers_pickup': offersPickup,
         'pickup_commission': offersPickup ? pickUpCommission : null,
       }).eq('user_id', userid);
+
+      await supabaseClient.from('users').update({'Auth_steps': 3}).eq(
+          'email', supabaseClient.auth.currentUser!.email!);
+
+      Navigator.pushReplacementNamed(context, Approve.routename);
       showCustomSnackbar(
           context: context,
           message: 'Successfully Done',

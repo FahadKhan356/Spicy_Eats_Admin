@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
-import 'package:spicy_eats_admin/Authentication/Register/chooseplanscreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
@@ -20,8 +21,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authRepoProvider).checkAuthSteps(context, ref);
-      decideNavigation();
+      if (mounted) {
+        ref.read(authRepoProvider).checkAuthSteps(context, ref);
+        decideNavigation();
+      }
     });
   }
 
@@ -30,7 +33,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final user = supabaseClient.auth.currentUser;
 
     if (session == null || user == null) {
-      Navigator.pushReplacementNamed(context, LoginScreen.routename);
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, LoginScreen.routename);
+      }
+
       return;
     }
 
@@ -41,11 +47,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         .single();
 
     final step = data['Auth_steps'] ?? 0;
-
+    if (!mounted) return;
     if (step == 1) {
       Navigator.pushReplacementNamed(context, RestaurantRegister.routename);
     } else if (step == 2) {
       Navigator.pushReplacementNamed(context, ChoosePlanScreen.routename);
+    } else if (step == 3) {
+      Navigator.pushReplacementNamed(context, Approve.routename);
     } else {
       // fallback, or show error
       Navigator.pushReplacementNamed(context, LoginScreen.routename);

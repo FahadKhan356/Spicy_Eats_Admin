@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
@@ -366,7 +367,15 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-
+                SizedBox(
+                  width: 100,
+                  height: 50,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, Approve.routename);
+                      },
+                      child: Text('Approve')),
+                ),
                 SizedBox(
                   width: double.maxFinite,
                   height: 50,

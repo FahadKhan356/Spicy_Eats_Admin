@@ -4,7 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:spicy_eats_admin/Authentication/Register/chooseplanscreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/widgets/RestaurantAddress.dart';
 
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
