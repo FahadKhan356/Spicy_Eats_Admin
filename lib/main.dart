@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
 import 'package:spicy_eats_admin/Authentication/authCallBack.dart';
+import 'package:spicy_eats_admin/Dashboard/Dashboard.dart';
 import 'package:spicy_eats_admin/Routes.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:spicy_eats_admin/splashscreen.dart/SplashScreen.dart';
@@ -59,7 +60,8 @@ class _MyAppState extends ConsumerState<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const SplashScreen(),
+      home: Dashboard(),
+      // const SplashScreen(),
       onGenerateRoute: generateRoute,
     );
   }

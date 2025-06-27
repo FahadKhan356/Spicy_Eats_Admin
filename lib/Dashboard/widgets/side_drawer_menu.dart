@@ -17,8 +17,9 @@ class _SideDrawerMenuState extends State<SideDrawerMenu> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Drawer(
+      //   surfaceTintColor: MyAppColor.mainPrimary,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      child: SizedBox(
+      child: Container(
         // height: SizeConfig.screenheight,
         // height: 100,
 
@@ -28,11 +29,19 @@ class _SideDrawerMenuState extends State<SideDrawerMenu> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
+                margin: EdgeInsets.all(10),
+                // color: Colors.white,
                 padding: const EdgeInsets.only(top: 20),
                 child: SizedBox(
-                  height: 30,
-                  width: 25,
-                  child: SvgPicture.asset('lib/assets/three_color.svg'),
+                  height: 80,
+                  width: double.maxFinite,
+                  child: Image.asset(
+                    'lib/assets/SpicyEats.png',
+                  ),
+                  //  SvgPicture.asset(
+                  //   'lib/assets/three_color.svg',
+                  //   theme: SvgTheme(currentColor: Colors.white),
+                  // ),
                 ),
               ),
               ...List.generate(
@@ -46,23 +55,31 @@ class _SideDrawerMenuState extends State<SideDrawerMenu> {
                         },
                         child: Container(
                           margin: const EdgeInsets.only(left: 10),
-                          // color: Colors.red,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 20),
-                                child: SvgPicture.asset(
-                                  menuicons[index],
-                                  color: selectedindex == index
-                                      ? Colors.black
-                                      : MyAppColor.iconGray,
-                                  width: 30,
-                                  height: Responsive.isDesktop(context)
-                                      ? size.width * 0.02
-                                      : size.width * 0.04,
-                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 20, horizontal: 10),
+                                    child: Image.asset(
+                                      menuicons[index],
+                                      color: selectedindex == index
+                                          ? Colors.black
+                                          : MyAppColor.iconGray,
+                                      width: 60,
+                                      height: Responsive.isDesktop(context)
+                                          ? size.width * 0.02
+                                          : size.width * 0.04,
+                                    ),
+                                  ),
+                                  Text(
+                                    menuTitles[index],
+                                  ),
+                                ],
                               ),
                               Container(
                                 width: 3,

@@ -1,8 +1,15 @@
 List<String> menuicons = [
-  "lib/assets/home.svg",
-  "lib/assets/pie-chart.svg",
-  "lib/assets/clipboard.svg",
-  "lib/assets/credit-card.svg",
-  "lib/assets/trophy.svg",
-  "lib/assets/invoice.svg",
+  "lib/assets/Dashboard.png",
+  "lib/assets/Menu.png",
+  "lib/assets/Dishes.png",
+  "lib/assets/Orders.png",
+  "lib/assets/Promotion.png",
+];
+
+List<String> menuTitles = [
+  'DashBoard',
+  'Menu',
+  'Dishes',
+  'Orders',
+  'Promotions',
 ];

@@ -13,22 +13,32 @@ class InfoCardModel {
 final List<InfoCardModel> infoCardData = [
   InfoCardModel(
     icon: 'lib/assets/credit-card.svg',
-    label: 'Transfer via \nCard number',
+    label: 'Total; Sales',
     amount: '\$1200',
   ),
   InfoCardModel(
     icon: 'lib/assets/transfer.svg',
-    label: 'Transfer via \nOnline Banks',
+    label: 'Total Orders',
     amount: '\$150',
   ),
   InfoCardModel(
     icon: 'lib/assets/bank.svg',
-    label: 'Transfer \nSame Bank',
+    label: 'Food Items',
     amount: '\$1500',
   ),
   InfoCardModel(
     icon: 'lib/assets/doc.svg',
-    label: 'Transfer to \nOther Bank',
+    label: 'Reviews',
+    amount: '\$1500',
+  ),
+  InfoCardModel(
+    icon: 'lib/assets/doc.svg',
+    label: 'Visitors',
+    amount: '\$1500',
+  ),
+  InfoCardModel(
+    icon: 'lib/assets/doc.svg',
+    label: 'Cancelled Orders',
     amount: '\$1500',
   ),
 ];

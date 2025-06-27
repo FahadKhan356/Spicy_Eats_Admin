@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 
 class Responsive extends StatelessWidget {
   //widget to show mobile screen (320px - 767px)
-  Widget mobile;
+  final Widget mobile;
 
   //optional widget to show tablet screen (768px - 1024px)
-  Widget tablet;
+  final Widget tablet;
 
   //widget to show dekstop screen (1025px - above px)
-  Widget dekstop;
+  final Widget dekstop;
 
   Responsive(
       {super.key,
@@ -23,7 +23,7 @@ class Responsive extends StatelessWidget {
 
   static bool isTablet(BuildContext context) =>
       MediaQuery.of(context).size.width < 1024 &&
-      MediaQuery.of(context).size.width >= 768;
+      MediaQuery.of(context).size.width >= 767;
 
   static bool isDesktop(BuildContext context) =>
       MediaQuery.of(context).size.width >= 1025;

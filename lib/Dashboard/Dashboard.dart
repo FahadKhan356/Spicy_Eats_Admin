@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/Dashboard/model.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/CustomBox.dart';
@@ -15,12 +16,26 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomTitle = {
+      0: "Jan",
+      20: "Feb",
+      30: "March",
+      40: "April",
+      50: "Jan",
+      60: "Feb",
+      70: "March",
+      80: "April",
+      90: "Jan",
+      100: "Feb",
+      110: "March",
+      120: "April",
+    };
     SizeConfig().init(context);
     final size = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: MyAppColor.primaryBg,
         key: drawerkey,
-        drawer: const SizedBox(width: 100, child: SideDrawerMenu()),
+        drawer: const SizedBox(width: 200, child: SideDrawerMenu()),
         appBar: !Responsive.isDesktop(context)
             ? AppBar(
                 elevation: 0,
@@ -37,24 +52,27 @@ class Dashboard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (Responsive.isDesktop(context))
-                const Expanded(flex: 1, child: SideDrawerMenu()),
+                const Expanded(flex: 2, child: SideDrawerMenu()),
               Expanded(
                   flex: 10,
                   child: SafeArea(
                     child: SingleChildScrollView(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const HeaderPart(),
                           SizedBox(
                             height: (size.width / 100) * 4,
                           ),
-                          SizedBox(
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            color: Colors.black12,
                             width: SizeConfig.screenwidth,
                             child: Wrap(
                               // direction: Axis.horizontal,
-                              spacing: 20,
+                              spacing: 30,
                               runSpacing: 20,
-                              alignment: WrapAlignment.spaceEvenly,
+                              alignment: WrapAlignment.center,
                               children: infoCardData
                                   .map((e) => CustomBox(infoCardModel: e))
                                   .toList(),
@@ -63,10 +81,12 @@ class Dashboard extends StatelessWidget {
                           const SizedBox(
                             height: 10,
                           ),
-                          const SizedBox(
+                          Container(
+                            color: Colors.black12,
                             height: 200,
+                            width: 800,
                             child: BarChartRepresentation(),
-                          )
+                          ),
                         ],
                       ),
                     ),

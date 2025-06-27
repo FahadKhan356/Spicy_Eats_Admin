@@ -8,4 +8,5 @@ class MyAppColor {
   static const primaryBg = Color(0xFFF5F5FD);
   static const secondaryBg = Color(0xFFCCCCFB);
   static const barBg = Color(0xFFCA3E3C); // Fixed from 0xffca3sec (invalid)
+  static const mainPrimary = Color.fromARGB(255, 3, 3, 3);
 }
