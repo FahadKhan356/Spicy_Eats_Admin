@@ -9,21 +9,26 @@ class BarChartRepresentation extends StatelessWidget {
   Widget build(BuildContext context) {
     return BarChart(
       BarChartData(
+        minY: 0,
+        maxY: 100,
+        // Or adjust based on your data max value2. Temporarily REMOVE interval from SideTitles
         barGroups: _generateBarGroups(context),
         borderData: FlBorderData(show: false),
-        alignment: BarChartAlignment.spaceBetween,
+        alignment: BarChartAlignment.center,
         gridData: const FlGridData(
+          drawVerticalLine: true,
           drawHorizontalLine: true,
-          horizontalInterval: 30,
+          // horizontalInterval: 30,
         ),
         titlesData: FlTitlesData(
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 40,
-              interval: 30,
+              // interval: 30,
               getTitlesWidget: (value, meta) {
-                switch (value.toInt()) {
+                final val = value.toDouble().round();
+                switch (val) {
                   case 0:
                     return const Text('0',
                         style: TextStyle(fontSize: 12, color: Colors.grey));
@@ -47,7 +52,9 @@ class BarChartRepresentation extends StatelessWidget {
               showTitles: true,
               reservedSize: 40,
               getTitlesWidget: (value, meta) {
-                final months = [
+                final index = value.toDouble().round();
+
+                List<String?> months = [
                   'JAN',
                   'FEB',
                   'MAR',
@@ -55,14 +62,9 @@ class BarChartRepresentation extends StatelessWidget {
                   'MAY',
                   'JUN',
                   'JUL',
-                  'AUG',
-                  'SEP',
-                  'OCT',
-                  'NOV',
-                  'DEC'
                 ];
-                if (value.toInt() >= 0 && value.toInt() < months.length) {
-                  return Text(months[value.toInt()],
+                if (index >= 0 && index < months.length) {
+                  return Text(months[index] ?? '',
                       style: const TextStyle(fontSize: 12, color: Colors.grey));
                 }
                 return const SizedBox.shrink();
@@ -77,7 +79,7 @@ class BarChartRepresentation extends StatelessWidget {
   }
 
   List<BarChartGroupData> _generateBarGroups(BuildContext context) {
-    final List<double> values = [
+    final List<double>? values = [
       20,
       35,
       50,
@@ -85,25 +87,20 @@ class BarChartRepresentation extends StatelessWidget {
       60,
       40,
       25,
-      15,
-      70,
-      90,
-      70,
-      60
     ];
-    return List.generate(values.length, (index) {
+    return List.generate(values!.length, (index) {
       return BarChartGroupData(
         x: index,
-        barsSpace: 4,
+        barsSpace: 2,
         barRods: [
           BarChartRodData(
             toY: values[index],
             color: Colors.black,
-            width: Responsive.isDesktop(context) ? 40 : 10,
+            width: Responsive.isDesktop(context) ? 30 : 10,
             borderRadius: BorderRadius.zero,
             backDrawRodData: BackgroundBarChartRodData(
               show: true,
-              toY: 90,
+              toY: 100,
               color: Colors.white,
             ),
           ),

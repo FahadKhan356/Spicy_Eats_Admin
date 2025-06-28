@@ -16,19 +16,27 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void showdate() async {
+      await showDateRangePicker(
+          context: context,
+          firstDate: DateTime(2024, 1),
+          lastDate: DateTime(2025, 12),
+          builder: (context, child) {
+            return Center(
+              child: SizedBox(
+                width: 500,
+                height: 400,
+                child: child,
+              ),
+            );
+          });
+    }
+
     final bottomTitle = {
       0: "Jan",
       20: "Feb",
       30: "March",
       40: "April",
-      50: "Jan",
-      60: "Feb",
-      70: "March",
-      80: "April",
-      90: "Jan",
-      100: "Feb",
-      110: "March",
-      120: "April",
     };
     SizeConfig().init(context);
     final size = MediaQuery.of(context).size;
@@ -83,9 +91,25 @@ class Dashboard extends StatelessWidget {
                           ),
                           Container(
                             color: Colors.black12,
-                            height: 200,
+                            height: 300,
                             width: 800,
-                            child: BarChartRepresentation(),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  width: 100,
+                                  height: 30,
+                                  child: ElevatedButton(
+                                      onPressed: showdate, child: Text('date')),
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const SizedBox(
+                                    height: 250,
+                                    width: 800,
+                                    child: BarChartRepresentation()),
+                              ],
+                            ),
                           ),
                         ],
                       ),

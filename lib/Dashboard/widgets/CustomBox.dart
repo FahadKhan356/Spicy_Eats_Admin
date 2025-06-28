@@ -16,10 +16,10 @@ class CustomBox extends StatelessWidget {
     SizeConfig().init(context);
     return Container(
       constraints: BoxConstraints(
-        minWidth: Responsive.isDesktop(context)
-            ? size.width / 8
-            : SizeConfig.screenwidth / 2 - 40,
-      ),
+          minWidth: Responsive.isDesktop(context)
+              ? size.width / 8
+              : SizeConfig.screenwidth / 2 - 40,
+          minHeight: 100),
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(color: Colors.black12, spreadRadius: 1, blurRadius: 8)
