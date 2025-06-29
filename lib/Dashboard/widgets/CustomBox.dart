@@ -17,7 +17,7 @@ class CustomBox extends StatelessWidget {
     return Container(
       constraints: BoxConstraints(
           minWidth: Responsive.isDesktop(context)
-              ? size.width / 8
+              ? size.width / 9
               : SizeConfig.screenwidth / 2 - 40,
           minHeight: 100),
       decoration: BoxDecoration(
@@ -52,7 +52,8 @@ class CustomBox extends StatelessWidget {
                       infoCardModel.label,
                       style: const TextStyle(
                         height: 1.3,
-                        fontSize: 16,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
                         color: MyAppColor.mainPrimary,
                       ),
                     ),
@@ -71,14 +72,14 @@ class CustomBox extends StatelessWidget {
                         children: const [
                           Icon(
                             Icons.arrow_upward,
-                            size: 14,
+                            size: 12,
                             color: Colors.white,
                           ),
                           SizedBox(width: 2),
                           Text(
                             '+12%',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 10,
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
                             ),
@@ -94,7 +95,7 @@ class CustomBox extends StatelessWidget {
                 child: Text(
                   infoCardModel.amount,
                   style: const TextStyle(
-                      height: 1.3, fontSize: 16, color: MyAppColor.mainPrimary),
+                      height: 1.3, fontSize: 10, color: MyAppColor.mainPrimary),
                 ),
               ),
 
@@ -103,7 +104,7 @@ class CustomBox extends StatelessWidget {
               ),
               SizedBox(
                 width: Responsive.isDesktop(context)
-                    ? size.width / 8
+                    ? size.width / 9
                     : SizeConfig.screenwidth / 2 - 40,
                 child: AspectRatio(
                     aspectRatio: 16 / 6,

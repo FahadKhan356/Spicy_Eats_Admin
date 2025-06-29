@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/Dashboard/model.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/CustomBox.dart';
+import 'package:spicy_eats_admin/Dashboard/widgets/FilterButtonDashboard.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/barchart.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/headerPart.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/side_drawer_menu.dart';
@@ -16,27 +17,19 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void showdate() async {
-      await showDateRangePicker(
-          context: context,
-          firstDate: DateTime(2024, 1),
-          lastDate: DateTime(2025, 12),
-          builder: (context, child) {
-            return Center(
-              child: SizedBox(
-                width: 500,
-                height: 400,
-                child: child,
-              ),
-            );
-          });
-    }
-
     final bottomTitle = {
       0: "Jan",
       20: "Feb",
       30: "March",
       40: "April",
+      50: "Jan",
+      60: "Feb",
+      70: "March",
+      80: "April",
+      90: "Jan",
+      100: "Feb",
+      110: "March",
+      120: "April",
     };
     SizeConfig().init(context);
     final size = MediaQuery.of(context).size;
@@ -67,20 +60,21 @@ class Dashboard extends StatelessWidget {
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const HeaderPart(),
                           SizedBox(
                             height: (size.width / 100) * 4,
                           ),
                           Container(
-                            padding: EdgeInsets.all(10),
-                            color: Colors.black12,
+                            padding: const EdgeInsets.all(10),
+                            color: Colors.white,
                             width: SizeConfig.screenwidth,
                             child: Wrap(
                               // direction: Axis.horizontal,
                               spacing: 30,
                               runSpacing: 20,
-                              alignment: WrapAlignment.center,
+                              alignment: WrapAlignment.start,
                               children: infoCardData
                                   .map((e) => CustomBox(infoCardModel: e))
                                   .toList(),
@@ -89,28 +83,154 @@ class Dashboard extends StatelessWidget {
                           const SizedBox(
                             height: 10,
                           ),
-                          Container(
-                            color: Colors.black12,
-                            height: 300,
-                            width: 800,
-                            child: Column(
+                          Center(
+                            child: Wrap(
+                              direction: Axis.horizontal,
+                              spacing: 10,
+                              runAlignment: WrapAlignment.center,
+                              alignment: WrapAlignment.center,
                               children: [
-                                SizedBox(
-                                  width: 100,
-                                  height: 30,
-                                  child: ElevatedButton(
-                                      onPressed: showdate, child: Text('date')),
+                                Container(
+                                  constraints: BoxConstraints(
+                                    maxHeight: Responsive.isDesktop(context)
+                                        ? 310
+                                        : Responsive.isTablet(context)
+                                            ? 310
+                                            : 310,
+                                    maxWidth: Responsive.isDesktop(context)
+                                        ? 500
+                                        : Responsive.isTablet(context)
+                                            ? 400
+                                            : double.maxFinite,
+                                  ),
+                                  color: Colors.white,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Filterbuttondashboard(),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Container(
+                                          constraints: BoxConstraints(
+                                            maxHeight: Responsive.isDesktop(
+                                                    context)
+                                                ? 250
+                                                : Responsive.isTablet(context)
+                                                    ? 250
+                                                    : 250,
+                                            maxWidth: Responsive.isDesktop(
+                                                    context)
+                                                ? 500
+                                                : Responsive.isTablet(context)
+                                                    ? 400
+                                                    : double.maxFinite,
+                                          ),
+                                          child: BarChartRepresentation()),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(
-                                  height: 20,
+                                Container(
+                                  constraints: BoxConstraints(
+                                    maxHeight: Responsive.isDesktop(context)
+                                        ? 310
+                                        : Responsive.isTablet(context)
+                                            ? 310
+                                            : 310,
+                                    maxWidth: Responsive.isDesktop(context)
+                                        ? 500
+                                        : Responsive.isTablet(context)
+                                            ? 400
+                                            : double.maxFinite,
+                                  ),
+                                  color: Colors.white,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Filterbuttondashboard(),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Container(
+                                          constraints: BoxConstraints(
+                                            maxHeight: Responsive.isDesktop(
+                                                    context)
+                                                ? 250
+                                                : Responsive.isTablet(context)
+                                                    ? 250
+                                                    : 250,
+                                            maxWidth: Responsive.isDesktop(
+                                                    context)
+                                                ? 500
+                                                : Responsive.isTablet(context)
+                                                    ? 400
+                                                    : double.maxFinite,
+                                          ),
+                                          child: BarChartRepresentation()),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(
-                                    height: 250,
-                                    width: 800,
-                                    child: BarChartRepresentation()),
                               ],
                             ),
                           ),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 20,
+                            children: List.generate(
+                              10,
+                              (index) => Container(
+                                constraints: BoxConstraints(
+                                  maxHeight:
+                                      Responsive.isDesktop(context) ? 150 : 100,
+                                  maxWidth:
+                                      Responsive.isDesktop(context) ? 350 : 250,
+                                ),
+                                color: Colors.red,
+                                child: Column(
+                                  children: [
+                                    const Row(
+                                      children: [
+                                        Text(
+                                          'ORDER ID - 752',
+                                          style: TextStyle(fontSize: 10),
+                                        ),
+                                        Text(
+                                          'ORDER DATE - May 11,2020 . 05:56 PM',
+                                          style: TextStyle(fontSize: 10),
+                                        )
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            child: Image.asset(
+                                              'lib/assets/registerbg3.jpg',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        const Text(
+                                          'Tacipapas x 7 more',
+                                          style: TextStyle(fontSize: 10),
+                                        )
+                                      ],
+                                    ),
+                                    const Text(
+                                      'Payment-Online (Stripe)',
+                                      style: TextStyle(fontSize: 10),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ).toList(),
+                          )
                         ],
                       ),
                     ),

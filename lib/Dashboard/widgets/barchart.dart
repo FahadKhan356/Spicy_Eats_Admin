@@ -16,14 +16,14 @@ class BarChartRepresentation extends StatelessWidget {
         borderData: FlBorderData(show: false),
         alignment: BarChartAlignment.center,
         gridData: const FlGridData(
-          drawVerticalLine: true,
-          drawHorizontalLine: true,
+          drawVerticalLine: false,
+          drawHorizontalLine: false,
           // horizontalInterval: 30,
         ),
         titlesData: FlTitlesData(
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
-              showTitles: true,
+              showTitles: false,
               reservedSize: 40,
               // interval: 30,
               getTitlesWidget: (value, meta) {
@@ -32,6 +32,7 @@ class BarChartRepresentation extends StatelessWidget {
                   case 0:
                     return const Text('0',
                         style: TextStyle(fontSize: 12, color: Colors.grey));
+
                   case 30:
                     return const Text('10k',
                         style: TextStyle(fontSize: 12, color: Colors.grey));
@@ -73,8 +74,8 @@ class BarChartRepresentation extends StatelessWidget {
           ),
         ),
       ),
-      swapAnimationDuration: const Duration(milliseconds: 150),
-      swapAnimationCurve: Curves.linear,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.linear,
     );
   }
 
@@ -96,7 +97,7 @@ class BarChartRepresentation extends StatelessWidget {
           BarChartRodData(
             toY: values[index],
             color: Colors.black,
-            width: Responsive.isDesktop(context) ? 30 : 10,
+            width: Responsive.isDesktop(context) ? 20 : 10,
             borderRadius: BorderRadius.zero,
             backDrawRodData: BackgroundBarChartRodData(
               show: true,
