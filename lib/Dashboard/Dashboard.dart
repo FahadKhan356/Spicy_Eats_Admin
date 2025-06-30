@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/Dashboard/model.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/CustomBox.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/FilterButtonDashboard.dart';
+import 'package:spicy_eats_admin/Dashboard/widgets/Order_reject_confirmbtn.dart';
+import 'package:spicy_eats_admin/Dashboard/widgets/RecentOrderWidget.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/barchart.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/headerPart.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/side_drawer_menu.dart';
@@ -127,7 +129,8 @@ class Dashboard extends StatelessWidget {
                                                     ? 400
                                                     : double.maxFinite,
                                           ),
-                                          child: BarChartRepresentation()),
+                                          child:
+                                              const BarChartRepresentation()),
                                     ],
                                   ),
                                 ),
@@ -168,69 +171,31 @@ class Dashboard extends StatelessWidget {
                                                     ? 400
                                                     : double.maxFinite,
                                           ),
-                                          child: BarChartRepresentation()),
+                                          child:
+                                              const BarChartRepresentation()),
                                     ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          Wrap(
-                            spacing: 10,
-                            runSpacing: 20,
-                            children: List.generate(
-                              10,
-                              (index) => Container(
-                                constraints: BoxConstraints(
-                                  maxHeight:
-                                      Responsive.isDesktop(context) ? 150 : 100,
-                                  maxWidth:
-                                      Responsive.isDesktop(context) ? 350 : 250,
-                                ),
-                                color: Colors.red,
-                                child: Column(
-                                  children: [
-                                    const Row(
-                                      children: [
-                                        Text(
-                                          'ORDER ID - 752',
-                                          style: TextStyle(fontSize: 10),
-                                        ),
-                                        Text(
-                                          'ORDER DATE - May 11,2020 . 05:56 PM',
-                                          style: TextStyle(fontSize: 10),
-                                        )
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          child: Container(
-                                            height: 30,
-                                            width: 30,
-                                            child: Image.asset(
-                                              'lib/assets/registerbg3.jpg',
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        const Text(
-                                          'Tacipapas x 7 more',
-                                          style: TextStyle(fontSize: 10),
-                                        )
-                                      ],
-                                    ),
-                                    const Text(
-                                      'Payment-Online (Stripe)',
-                                      style: TextStyle(fontSize: 10),
-                                    )
-                                  ],
-                                ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            color: Colors.white,
+                            child: Center(
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 10,
+                                runSpacing: 20,
+                                children: List.generate(10,
+                                        (index) => const Recentorderwidget())
+                                    .toList(),
                               ),
-                            ).toList(),
-                          )
+                            ),
+                          ),
                         ],
                       ),
                     ),
