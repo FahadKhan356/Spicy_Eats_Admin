@@ -49,6 +49,7 @@ dependencies:
   riverpod: ^2.6.1
   timeline_tile_plus: ^0.0.3
   google_sign_in: ^6.3.0
+  go_router: ^16.2.1
 
 
 

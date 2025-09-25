@@ -113,7 +113,7 @@ class _DekstopLayoutState extends ConsumerState<DekstopLayout> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 5),
                             child: Image.asset(
-                              'lib/assets/SpicyeatsLogo-removebg.png',
+                              'lib/assets/SpicyEats.png',
                               height: 60,
                             ),
                           ),
@@ -422,7 +422,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                     children: [
                       Center(
                         child: Image.asset(
-                          'lib/assets/SpicyeatsLogo-removebg.png',
+                          'lib/assets/SpicyEats.png',
                           height: 50,
                         ),
                       ),

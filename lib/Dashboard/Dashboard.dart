@@ -1,21 +1,40 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Dashboard/model.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/CustomBox.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/FilterButtonDashboard.dart';
-import 'package:spicy_eats_admin/Dashboard/widgets/Order_reject_confirmbtn.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/RecentOrderWidget.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/barchart.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/headerPart.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/side_drawer_menu.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/config/size_config.dart';
+import 'package:spicy_eats_admin/config/supabaseconfig.dart';
+import 'package:spicy_eats_admin/menu/Repo/MenuManagerRepo.dart';
+import 'package:spicy_eats_admin/menu/controller/MenuManagerController.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 
-class Dashboard extends StatelessWidget {
-  Dashboard({super.key});
+class Dashboard extends ConsumerStatefulWidget {
+  static const String routename = '/Dashboard';
+  const Dashboard({super.key});
 
-  GlobalKey<ScaffoldState> drawerkey = GlobalKey<ScaffoldState>();
+  @override
+  ConsumerState<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends ConsumerState<Dashboard> {
+  final GlobalKey<ScaffoldState> drawerkey = GlobalKey<ScaffoldState>();
+
+  Future<void> initialDataFetch() async {
+    await ref.read(menuManagerController).fetchRestaurantData();
+  }
+
+  @override
+  void initState() {
+    initialDataFetch();
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +57,7 @@ class Dashboard extends StatelessWidget {
     return Scaffold(
         backgroundColor: MyAppColor.primaryBg,
         key: drawerkey,
-        drawer: const SizedBox(width: 200, child: SideDrawerMenu()),
+        // drawer: const SizedBox(width: 200, child: SideDrawerMenu()),
         appBar: !Responsive.isDesktop(context)
             ? AppBar(
                 elevation: 0,
@@ -54,8 +73,8 @@ class Dashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (Responsive.isDesktop(context))
-                const Expanded(flex: 2, child: SideDrawerMenu()),
+              // if (Responsive.isDesktop(context))
+              //   const Expanded(flex: 2, child: SideDrawerMenu()),
               Expanded(
                   flex: 10,
                   child: SafeArea(

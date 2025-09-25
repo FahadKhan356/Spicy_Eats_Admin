@@ -1,0 +1,48 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spicy_eats_admin/menu/model/CategoryItem.dart';
+import 'package:spicy_eats_admin/menu/Repo/MenuManagerRepo.dart';
+import 'package:spicy_eats_admin/menu/model/CategoryModel.dart';
+
+final menuManagerController = Provider((ref) {
+  final repo = ref.read(menuManagerRepoProvider);
+  return MenuManagerController(repo: repo);
+});
+
+class MenuManagerController {
+
+  MenuManagerController({required this.repo});
+  MenuManagerRepo repo;
+
+  Future<void> fetchRestaurantData() async {
+    await repo.fetchRestaurantData();
+  }
+
+Future<List<CategoryModel>?>fetchCategories({required String restId})async{
+  final categories=await repo.fetchCategories(restId: restId);
+  return categories;
+}
+ Future<List<CategoryItemModel>?> fetchCategoriesItems({required String categoryId})async{
+  final items= await repo.fetchCategoryitems(categoryId:categoryId);
+  return items;
+ }
+
+Future<void>setInOutStock({required bool isAvailble, required int dishId, required context})async{
+   await repo.setInOutStock(isAvailble: isAvailble, dishId: dishId, context: context);
+}
+
+//Menu Screen Real-Time Stats functions
+Stream<List<Map<String,dynamic>>>listenDishStream(){
+  return repo.listenDishStream();
+}
+
+
+
+ int streamAvailableItems({required  List<Map<String,dynamic>> snapshot, required String restUid}){
+   return repo.streamAvailableItems(snapshot: snapshot, restUid: restUid);
+}
+
+ int streamTotalItems({required  List<Map<String,dynamic>> snapshot, required String restUid}){
+  return repo.streamTotalItems(snapshot: snapshot, restUid: restUid);
+ }
+
+}

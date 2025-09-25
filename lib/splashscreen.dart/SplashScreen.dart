@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
-import 'package:spicy_eats_admin/Authentication/Register/screens/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
-import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
+import 'package:spicy_eats_admin/Dashboard/Dashboard.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -15,16 +15,15 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
+
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        ref.read(authRepoProvider).checkAuthSteps(context, ref);
-        decideNavigation();
-      }
+    // Run after first frame
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+      decideNavigation();
     });
   }
 
@@ -33,10 +32,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final user = supabaseClient.auth.currentUser;
 
     if (session == null || user == null) {
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, LoginScreen.routename);
-      }
-
+      if (!mounted) return;
+      context.go(LoginScreen.routename);
       return;
     }
 
@@ -44,19 +41,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         .from('users')
         .select('Auth_steps')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
-    final step = data['Auth_steps'] ?? 0;
     if (!mounted) return;
-    if (step == 1) {
-      Navigator.pushReplacementNamed(context, RestaurantRegister.routename);
-    } else if (step == 2) {
-      Navigator.pushReplacementNamed(context, ChoosePlanScreen.routename);
-    } else if (step == 3) {
-      Navigator.pushReplacementNamed(context, Approve.routename);
-    } else {
-      // fallback, or show error
-      Navigator.pushReplacementNamed(context, LoginScreen.routename);
+
+    final step = data?['Auth_steps'] ?? 0;
+
+    switch (step) {
+      case 1:
+        context.go(RestaurantRegister.routename);
+        break;
+      case 2:
+        context.go(Dashboard.routename);
+        break;
+      case 3:
+        context.go(Approve.routename);
+        break;
+      default:
+        context.go(Dashboard.routename);
     }
   }
 
@@ -64,9 +66,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-          child: CircularProgressIndicator(
-        color: Colors.black,
-      )),
+        child: CircularProgressIndicator(color: Colors.black),
+      ),
     );
   }
 }
+

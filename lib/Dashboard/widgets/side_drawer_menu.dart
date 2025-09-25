@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
@@ -10,11 +11,18 @@ class SideDrawerMenu extends StatefulWidget {
   @override
   State<SideDrawerMenu> createState() => _SideDrawerMenuState();
 }
+ void onRoute(String route, BuildContext context){
+  context.go(route);
+}
+
 
 class _SideDrawerMenuState extends State<SideDrawerMenu> {
   int selectedindex = 0;
+  bool isSelected=false;
   @override
   Widget build(BuildContext context) {
+
+
     final size = MediaQuery.of(context).size;
     return Drawer(
       //   surfaceTintColor: MyAppColor.mainPrimary,
@@ -45,13 +53,20 @@ class _SideDrawerMenuState extends State<SideDrawerMenu> {
                 ),
               ),
               ...List.generate(
-                  menuicons.length,
+                  menuTitles.length,
                   (index) => InkWell(
                         hoverColor: Colors.white70,
                         onTap: () {
+                          
                           setState(() {
                             selectedindex = index;
+                               onRoute(menuTitles[selectedindex]['route'],context);
+                            // isSelected = GoRouterState.of(context).uri.toString() == menuTitles[selectedindex]['route'];
                           });
+                           
+                        context.go( menuTitles[selectedindex]['route'],);
+                     
+                        
                         },
                         child: Container(
                           margin: const EdgeInsets.only(left: 10),
@@ -77,7 +92,7 @@ class _SideDrawerMenuState extends State<SideDrawerMenu> {
                                     ),
                                   ),
                                   Text(
-                                    menuTitles[index],
+                                    menuTitles[index]['title'],
                                   ),
                                 ],
                               ),
@@ -91,7 +106,8 @@ class _SideDrawerMenuState extends State<SideDrawerMenu> {
                             ],
                           ),
                         ),
-                      ))
+                      )
+                      )
             ],
           ),
         ),

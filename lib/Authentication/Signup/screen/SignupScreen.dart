@@ -44,7 +44,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       appBar: AppBar(
         surfaceTintColor: Colors.white,
         leading: Image.asset(
-          'lib/assets/SpicyeatsLogo-removebg.png',
+          'lib/assets/SpicyEats.png',
           width: 40,
           height: 40,
         ),

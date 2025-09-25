@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/chooseplanscreen.dart';
@@ -78,7 +79,8 @@ class AuthRepository {
           context: context,
           message: 'Sign In Successfully',
           backgroundColor: Colors.black);
-      Navigator.pushReplacementNamed(context, SplashScreen.routename);
+      // Navigator.pushReplacementNamed(context, SplashScreen.routename);
+      context.go(SplashScreen.routename);
     } catch (e) {
       showCustomSnackbar(
           context: context,
