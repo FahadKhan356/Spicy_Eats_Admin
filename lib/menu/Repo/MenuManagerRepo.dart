@@ -140,4 +140,22 @@ return supabaseClient
   }
 
 
+double toalAvgPrice({required List<Map<String,dynamic>> snapshot}){
+    final dishes= snapshot;
+    double avgPrice=0;
+
+if (dishes.isNotEmpty) {
+  final totalPrice = dishes.fold<double>(0, (sum, dish) {
+    return sum + (dish['dish_price'] as num).toDouble();
+  });
+   avgPrice = totalPrice / dishes.length;
+  print("Average Price: $avgPrice");
+   return avgPrice;
+  
+} else {
+  print("No items available");
+}
+return 0;
+}
+
 }

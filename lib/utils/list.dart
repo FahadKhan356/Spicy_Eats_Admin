@@ -1,7 +1,6 @@
-import 'package:spicy_eats_admin/Authentication/Signup/screen/SignupScreen.dart';
 import 'package:spicy_eats_admin/Dashboard/Dashboard.dart';
 import 'package:spicy_eats_admin/dummyMenu/ExpandableCategoryMenu.dart';
-import 'package:spicy_eats_admin/menu/Menu.dart' hide MenuScreen;
+import 'package:spicy_eats_admin/menu/screen/MenuScreen.dart';
 
 List<String> menuicons = [
   "lib/assets/Dashboard.png",
@@ -13,8 +12,6 @@ List<String> menuicons = [
 
 List<Map<String,dynamic>> menuTitles = [
   {'title': 'Dashboard', 'route':Dashboard.routename},
- 
-
      {'title': 'Menu', 'route':MenuManagerScreen.routename,},
     {'title': 'Dishes', 'route':MenuScreen.routename},
      {'title': 'Orders', 'route':'/menu'},

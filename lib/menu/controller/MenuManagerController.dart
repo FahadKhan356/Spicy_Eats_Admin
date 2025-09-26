@@ -45,4 +45,10 @@ Stream<List<Map<String,dynamic>>>listenDishStream(){
   return repo.streamTotalItems(snapshot: snapshot, restUid: restUid);
  }
 
+
+double totalAvgPrice({required List<Map<String,dynamic>> snapshot}){
+
+ return repo.toalAvgPrice(snapshot: snapshot);
+}
+
 }

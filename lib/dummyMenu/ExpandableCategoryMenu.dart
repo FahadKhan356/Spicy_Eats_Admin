@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spicy_eats_admin/menu/Menu.dart';
+import 'package:spicy_eats_admin/menu/screen/MenuScreen.dart';
 import 'package:spicy_eats_admin/menu/model/CategoryItem.dart';
 import 'package:spicy_eats_admin/menu/Repo/MenuManagerRepo.dart';
 import 'package:spicy_eats_admin/menu/controller/MenuManagerController.dart';

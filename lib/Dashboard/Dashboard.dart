@@ -9,10 +9,10 @@ import 'package:spicy_eats_admin/Dashboard/widgets/headerPart.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/side_drawer_menu.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/config/size_config.dart';
-import 'package:spicy_eats_admin/config/supabaseconfig.dart';
-import 'package:spicy_eats_admin/menu/Repo/MenuManagerRepo.dart';
 import 'package:spicy_eats_admin/menu/controller/MenuManagerController.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
+
+  final GlobalKey<ScaffoldState> drawerkey = GlobalKey<ScaffoldState>();
 
 class Dashboard extends ConsumerStatefulWidget {
   static const String routename = '/Dashboard';
@@ -23,7 +23,7 @@ class Dashboard extends ConsumerStatefulWidget {
 }
 
 class _DashboardState extends ConsumerState<Dashboard> {
-  final GlobalKey<ScaffoldState> drawerkey = GlobalKey<ScaffoldState>();
+
 
   Future<void> initialDataFetch() async {
     await ref.read(menuManagerController).fetchRestaurantData();
@@ -56,18 +56,7 @@ class _DashboardState extends ConsumerState<Dashboard> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: MyAppColor.primaryBg,
-        key: drawerkey,
-        // drawer: const SizedBox(width: 200, child: SideDrawerMenu()),
-        appBar: !Responsive.isDesktop(context)
-            ? AppBar(
-                elevation: 0,
-                leading: IconButton(
-                    onPressed: () {
-                      drawerkey.currentState!.openDrawer();
-                    },
-                    icon: const Icon(Icons.menu)),
-              )
-            : const PreferredSize(preferredSize: Size.zero, child: SizedBox()),
+      
         body: SafeArea(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,

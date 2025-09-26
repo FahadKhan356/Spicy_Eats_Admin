@@ -6,7 +6,7 @@ void showCustomSnackbar({
   required String message,
   Color? backgroundColor,
   Duration duration = const Duration(seconds: 3),
-  double elevation = 6.0,
+  double elevation = 2.0,
   IconData? icon,
   bool? showFromTop,
 }) {
@@ -23,7 +23,7 @@ void showCustomSnackbar({
             )
           : null,
       behavior: SnackBarBehavior.floating,
-      elevation: elevation,
+      elevation: 0,
       backgroundColor: Colors.transparent,
       duration: duration,
       content: FloatingSnackbarContent(
@@ -48,13 +48,13 @@ class FloatingSnackbarContent extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        // boxShadow: const [
+        //   BoxShadow(
+        //     color: Colors.black12,
+        //     blurRadius: 10,
+        //     offset: Offset(1, 1),
+        //   ),
+        // ],
       ),
       child: Row(
         children: [

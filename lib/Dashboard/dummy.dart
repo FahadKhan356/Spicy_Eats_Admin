@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:spicy_eats_admin/Dashboard/Dashboard.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/side_drawer_menu.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
-import 'package:spicy_eats_admin/menu/Menu.dart';
+import 'package:spicy_eats_admin/menu/screen/MenuScreen.dart';
 class DashboardLayout extends StatefulWidget {
   final Widget child;
   const DashboardLayout({super.key, required this.child});

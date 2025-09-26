@@ -11,7 +11,7 @@ import 'package:spicy_eats_admin/Routes.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:spicy_eats_admin/dummyMenu/ExpandableCategoryMenu.dart';
-import 'package:spicy_eats_admin/menu/Menu.dart' hide MenuScreen;
+import 'package:spicy_eats_admin/menu/screen/MenuScreen.dart' hide MenuScreen;
 import 'package:spicy_eats_admin/menu/adddishform.dart';
 import 'package:spicy_eats_admin/menu/model/CategoryModel.dart';
 import 'package:spicy_eats_admin/splashscreen.dart/SplashScreen.dart';
@@ -85,16 +85,37 @@ class _MyAppState extends ConsumerState<MyApp> {
             ),
         ShellRoute(
           builder: (context, state, child) {
+            final GlobalKey<ScaffoldState> scaffoldKey=GlobalKey<ScaffoldState>();
             // return const SplashScreen();
-            return Row(
+            return Scaffold(
+              key: scaffoldKey,
+              drawer:const SizedBox(width: 200, child: SideDrawerMenu()) ,
+              appBar: Responsive.isMobile(context)? AppBar(
+                backgroundColor: Colors.white,
+                leading: IconButton(onPressed: (){
+                  scaffoldKey.currentState!.openDrawer();
+                },icon: const Icon(Icons.menu),)
+              ): const PreferredSize(preferredSize: Size.zero, child: SizedBox()),
+           body: Row(
               children: [
                 Responsive.isDesktop(context)
                     ? const SideDrawerMenu()
-                    : SizedBox(), // always stays
+                    : const SizedBox(), // always stays
                 Expanded(
                     child: RepaintBoundary(child: child)), // only this swaps
               ],
+            )
+           
             );
+            // return Row(
+            //   children: [
+            //     Responsive.isDesktop(context)
+            //         ? const SideDrawerMenu()
+            //         : SizedBox(), // always stays
+            //     Expanded(
+            //         child: RepaintBoundary(child: child)), // only this swaps
+            //   ],
+            // );
           },
           routes: [
              GoRoute(
@@ -132,11 +153,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-       
-      // home:
-      //  Dashboard(),
-      // // const SplashScreen(),
-      // onGenerateRoute: generateRoute,
+     
      useMaterial3: true,
       ),
     );
