@@ -95,7 +95,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 leading: IconButton(onPressed: (){
                   scaffoldKey.currentState!.openDrawer();
                 },icon: const Icon(Icons.menu),)
-              ): const PreferredSize(preferredSize: Size.zero, child: SizedBox()),
+              ) : const PreferredSize(preferredSize: Size.zero, child: SizedBox()),
            body: Row(
               children: [
                 Responsive.isDesktop(context)
@@ -107,22 +107,14 @@ class _MyAppState extends ConsumerState<MyApp> {
             )
            
             );
-            // return Row(
-            //   children: [
-            //     Responsive.isDesktop(context)
-            //         ? const SideDrawerMenu()
-            //         : SizedBox(), // always stays
-            //     Expanded(
-            //         child: RepaintBoundary(child: child)), // only this swaps
-            //   ],
-            // );
+           
           },
           routes: [
              GoRoute(
-              path: MenuScreen.routename,
+              path:  MenuManagerScreen.routename, // MenuScreen.routename,
               builder: (context, state) =>
                   // const Center(child: Text("Dashboard Page", style: TextStyle(fontSize: 30))),
-                MenuScreen(),
+                const MenuManagerScreen(),
             ),
             GoRoute(
               path: Dashboard.routename,

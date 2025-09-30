@@ -20,7 +20,7 @@ class MenuContent extends ConsumerWidget {
       loadCategoryItems: (categoryId) =>
           _loadCategoryItems(categoryId: categoryId, ref: ref),
       onItemEdit: (item) => _showEditDialog(context, item),
-      onItemDelete: (item) => _showDeleteDialog(context, item),
+      onItemDelete: (item) => _showDeleteDialog(context, item,ref),
       onItemToggle: (item, isAvailable) =>
           _toggleItemAvailability(item, isAvailable),
     );
@@ -36,7 +36,7 @@ class MenuContent extends ConsumerWidget {
 
   Future<List<CategoryItemModel>?> _loadCategoryItems(
       {required String categoryId, required WidgetRef ref}) async {
-    await Future.delayed(const Duration(milliseconds: 800));
+    // await Future.delayed(const Duration(milliseconds: 800));
     final list = await ref
         .read(menuManagerController)
         .fetchCategoriesItems(categoryId: categoryId);
@@ -47,7 +47,8 @@ class MenuContent extends ConsumerWidget {
     print('Edit item: ${item.dish_name}');
   }
 
-  void _showDeleteDialog(BuildContext context, CategoryItemModel item) {
+  void _showDeleteDialog(BuildContext context, CategoryItemModel item,WidgetRef ref)async {
+       await ref.read(menuManagerController).deleteDish(context: context, dishId: item.id!);
     print('Delete item: ${item.dish_name}');
   }
 

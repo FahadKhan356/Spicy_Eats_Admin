@@ -17,7 +17,9 @@ Widget buildStatCard(String label, String value, Color color, context) {
           children: [
             Text(
               value,
+              maxLines: 1,
               style: TextStyle(
+                
                   overflow: TextOverflow.clip,
                 fontSize: Responsive.isDesktop(context)? size.width * 0.016 : Responsive.isTablet(context)?size.width * 0.025 : Responsive.isMobile(context)? size.width * 0.035 : 20,
                 fontWeight: FontWeight.bold,

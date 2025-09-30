@@ -3,11 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
 
-Widget addDishTextField({required String labeltext,required TextEditingController controller, String? Function(String?)? validator,int? maxLines, TextInputType? keyboardType}){
+Widget addDishTextField({required String labeltext, String? hintText,required TextEditingController controller, String? Function(String?)? validator,int? maxLines, TextInputType? keyboardType}){
   return TextFormField(
+    
     maxLines: maxLines,
     keyboardType: keyboardType,
                        decoration: InputDecoration(
+                        hintText: hintText ?? '',
+                        hintStyle: const TextStyle(color: Colors.black, fontSize: 10, overflow: TextOverflow.ellipsis),
         
           filled: true,
           fillColor: MyAppColor.textfieldFillColor,

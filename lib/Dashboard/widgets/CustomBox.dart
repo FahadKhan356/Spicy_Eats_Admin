@@ -16,7 +16,8 @@ class CustomBox extends StatelessWidget {
     SizeConfig().init(context);
     return Container(
       constraints: BoxConstraints(
-          minWidth: Responsive.isDesktop(context)
+          minWidth:
+           Responsive.isDesktop(context)
               ? size.width / 9
               : SizeConfig.screenwidth / 2 - 40,
           minHeight: 100),

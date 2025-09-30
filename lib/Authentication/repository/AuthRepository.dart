@@ -84,7 +84,7 @@ class AuthRepository {
     } catch (e) {
       showCustomSnackbar(
           context: context,
-          message: 'Sign in failed $e',
+          message: 'Sign in failed',
           backgroundColor: Colors.black);
     }
   }

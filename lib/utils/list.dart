@@ -13,7 +13,7 @@ List<String> menuicons = [
 List<Map<String,dynamic>> menuTitles = [
   {'title': 'Dashboard', 'route':Dashboard.routename},
      {'title': 'Menu', 'route':MenuManagerScreen.routename,},
-    {'title': 'Dishes', 'route':MenuScreen.routename},
+    {'title': 'Dishes', 'route':MenuManagerScreen.routename},
      {'title': 'Orders', 'route':'/menu'},
       {'title': 'Promotions', 'route':'/menu'},
 
