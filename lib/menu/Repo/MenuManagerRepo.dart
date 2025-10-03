@@ -6,6 +6,8 @@ import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:spicy_eats_admin/menu/model/CategoryItem.dart';
 import 'package:spicy_eats_admin/menu/model/CategoryModel.dart';
+import 'package:spicy_eats_admin/menu/model/DishModel.dart';
+import 'package:spicy_eats_admin/menu/model/DishPreview.dart';
 import 'package:spicy_eats_admin/menu/model/RestaurantModel.dart';
 import 'package:spicy_eats_admin/utils/UploadImageToSupabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -257,4 +259,51 @@ Future<List<Map<String,dynamic>>>deleteDish ({required context,required int dish
   return [];
 }
   
+
+//Load preload dishes for search and others use
+Future<void> preLoadDishes({required context})async{
+    final restData = ref.watch(restaurantProvider);
+
+  try{
+final res = await supabaseClient.from('dishes').select('id , dish_name , dish_price , dish_imageurl, category_id').eq('rest_uid', restData!.restuid!);
+  if (res.isNotEmpty) {
+    ref.read(dishesPreviewList.notifier).state = res.map<DishPreview>((e) => DishPreview.fromJson(e)).toList();
+  }
+
+  }catch(e){
+    debugPrint(e.toString());
+    showCustomSnackbar(context: context, message: 'Erorr: Failed to load Data for dishes',backgroundColor: Colors.black);
+  }
+
 }
+
+//for searching dish
+List<DishPreview> searchDishes({required String? query}){
+final dishes = ref.watch(dishesPreviewList);
+return dishes.where((dish)=>dish.dihsName.toLowerCase().contains(query!.toLowerCase())).toList();
+
+
+}
+
+Future<DishModel> getSearchedDish({required int dishId})async{
+
+
+if(cachedDishPreview.containsKey(dishId)){
+   return cachedDishPreview[dishId]!;
+
+}
+
+final dish = await supabaseClient.from('dishes').select('*').eq('id', dishId).single().then(DishModel.fromJson);
+cachedDishPreview[dishId]=dish;
+
+return dish;
+}
+
+
+
+
+}
+ Map<int,DishModel> cachedDishPreview={};
+
+final dishesPreviewList=StateProvider<List<DishPreview>>((ref)=>[]);
+final seacrhedDishesProvider=StateProvider<List<DishPreview>>((ref)=>[]);
