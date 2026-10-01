@@ -44,18 +44,26 @@ class _ExpandableCategoryMenuState extends ConsumerState<ExpandableCategoryMenu>
   @override
   void initState() {
     super.initState();
-    _loadCategories(ref);
+    // Defer to the next frame. `_loadCategories` updates Riverpod state and
+    // Riverpod refuses provider updates while the widget tree is building
+    // ("Tried to modify a provider while the widget tree was building").
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _loadCategories(ref);
+    });
   }
 
   Future<void> _loadCategories(WidgetRef ref) async {
     try {
-      final loadedCategories = await widget.loadCategories();
+      final loadedCategories = await widget.loadCategories() ?? const [];
+      if (!mounted) return;
       setState(() {
-        categories = loadedCategories!;
+        categories = loadedCategories;
         isLoadingCategories = false;
       });
-      ref.read(categoriesProvider.notifier).state=loadedCategories;
+      ref.read(categoriesProvider.notifier).state = loadedCategories;
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoadingCategories = false);
       _showError('Failed to load categories: $e');
     }
@@ -84,20 +92,20 @@ class _ExpandableCategoryMenuState extends ConsumerState<ExpandableCategoryMenu>
     setState(() => loadingStates[categoryId] = true);
 
     try {
-      final items = await widget.loadCategoryItems(categoryId);
-      setState(() {
-        ref.read(categoryItemsProvider.notifier).state[categoryId] = items!;
-        loadingStates[categoryId] = false;
-     debugPrint('Inside load category');
-     
-      });
+      final items = await widget.loadCategoryItems(categoryId) ?? const [];
+      ref.read(categoryItemsProvider.notifier).state = {
+        ...ref.read(categoryItemsProvider),
+        categoryId: items,
+      };
+      if (mounted) setState(() => loadingStates[categoryId] = false);
     } catch (e) {
-      setState(() => loadingStates[categoryId] = false);
-      _showError('Failed to load items : $e');
+      if (mounted) setState(() => loadingStates[categoryId] = false);
+      _showError('Failed to load items: $e');
     }
   }
 
   void _showError(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );

@@ -11,9 +11,10 @@ import 'package:spicy_eats_admin/menu/model/DishPreview.dart';
 import 'package:spicy_eats_admin/menu/model/RestaurantModel.dart';
 import 'package:spicy_eats_admin/utils/UploadImageToSupabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 final menuManagerRepoProvider = Provider((ref) => MenuManagerRepo(ref: ref));
 final restaurantProvider = StateProvider<RestaurantModel?>((ref) => null);
+final restaurantErrorProvider = StateProvider<String?>((ref) => null);
+final restaurantLoadingProvider = StateProvider<bool>((ref) => true);
 final loadingProvider = StateProvider((ref) => false);
 
 class MenuManagerRepo {
@@ -21,27 +22,52 @@ class MenuManagerRepo {
   Ref ref;
 
   Future<void> fetchRestaurantData() async {
-    final userId = supabaseClient.auth.currentUser;
-    if (userId == null) return;
+    final user = supabaseClient.auth.currentUser;
+    if (user == null) return;
+
+    // Same guard as `fetchCategories`: provider writes must never happen in
+    // the same synchronous frame as a widget build.
+    await Future<void>.delayed(Duration.zero);
+
+    ref.read(restaurantErrorProvider.notifier).state = null;
+    ref.read(restaurantLoadingProvider.notifier).state = true;
+
     try {
       final response = await supabaseClient
           .from('restaurants')
           .select()
-          .eq('user_id', userId.id)
+          .eq('user_id', user.id)
           .maybeSingle();
 
-      if (response != null) {
-        final data = RestaurantModel.fromJson(response);
-        ref.read(restaurantProvider.notifier).state = data;
-        debugPrint('Restaurant fetched: ${data.restaurantName}');
+      if (response == null) {
+        ref.read(restaurantErrorProvider.notifier).state =
+            'No restaurant is linked to this account yet. Finish registration '
+            'or ask an admin to link it.';
+        return;
       }
+
+      final data = RestaurantModel.fromJson(response);
+      if (data.restuid == null || data.restuid!.isEmpty) {
+        ref.read(restaurantErrorProvider.notifier).state =
+            'This restaurant record has no rest_uid, so its menu cannot load.';
+        return;
+      }
+
+      ref.read(restaurantProvider.notifier).state = data;
+      debugPrint('Restaurant fetched: ${data.restaurantName}');
     } catch (e) {
-      debugPrint('Failed to Fecth Restaurant Data $e');
+      debugPrint('Failed to fetch restaurant data: $e');
+      ref.read(restaurantErrorProvider.notifier).state = '$e';
+    } finally {
+      ref.read(restaurantLoadingProvider.notifier).state = false;
     }
-    return;
   }
 
   Future<List<CategoryModel>?> fetchCategories({required restId}) async {
+    // Yield once before touching any provider. Callers may run this from
+    // `initState`/`build`, and Riverpod throws "Tried to modify a provider
+    // while the widget tree was building" for synchronous updates.
+    await Future<void>.delayed(Duration.zero);
     ref.read(loadingProvider.notifier).state = true;
     try {
       final response = await supabaseClient
@@ -164,125 +190,198 @@ class MenuManagerRepo {
       required String dishPrice,
       required String dishDisPrice,
       required Uint8List dishImage,
-  
       required CategoryModel category,
-      String? varTitle,
       required bool isVeg,
-      List<Map<String,dynamic>>? variations,
+      List<Map<String, dynamic>>? variations,
       }) async {
     try {
-    // int? variationId;
-    int? dishId;
-    const bucketName='Dish_Images';
-    final userId= supabaseClient.auth.currentUser!.id;
-    final path= '/$userId/$bucketName/${DateTime.now().millisecondsSinceEpoch}';
+      final userId = supabaseClient.auth.currentUser!.id;
+      final path = '$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
+      final imgUrl = await uploadImageToSupabase(
+        dishImage,
+        dishImagesBucket,
+        path,
+      );
 
-    String? imgUrl = await uploadImageToSupabase(context, dishImage, bucketName, path);
-    
+      final inserted = await supabaseClient.from('dishes').insert({
+        'rest_uid': restUid,
+        'dish_description': dishDisc,
+        'dish_price': double.tryParse(dishPrice) ?? 0,
+        'dish_imageurl': imgUrl,
+        'dish_name': dishName,
+        'category_id': category.categoryId,
+        'dish_discount': double.tryParse(dishDisPrice) ?? 0,
+        'isVeg': isVeg,
+        'isAvailable': true,
+      }).select('id').single();
 
-    final dish = await supabaseClient.from('dishes').insert({
-   'rest_uid': restUid,
-   'dish_description': dishDisc,
-   'dish_price': dishPrice,
-   'dish_imageurl': imgUrl,
-   'dish_name': dishName,
-   'category_id':category.categoryId,
-   'dish_discount': dishDisPrice,
-   'frequentlyid': null,
-   'isVeg': isVeg,
-   'isAvailable':true,
+      final dishId = (inserted['id'] as num).toInt();
 
+      await saveVariations(
+        dishId: dishId,
+        variations: variations ?? const [],
+      );
 
-    }).select('id');
+      ref.read(dishesPreviewList.notifier).state = [
+        ...ref.read(dishesPreviewList),
+      ];
 
-    if(dish.isNotEmpty){
-
-      final dishData = dish.first;
-     dishId= dishData['id'];
+      showCustomSnackbar(
+          context: context,
+          message: 'Dish Added Successfully',
+          backgroundColor: Colors.black);
+    } on PostgrestException catch (e) {
+      showCustomSnackbar(
+          context: context,
+          message: 'Could not save dish: ${e.message}',
+          backgroundColor: Colors.red);
+      rethrow;
+    } catch (e) {
+      showCustomSnackbar(
+          context: context, message: 'Failed to upload: $e',
+          backgroundColor: Colors.red);
+      rethrow;
     }
-if (variations != null && variations.isNotEmpty) {
-  for (int i = 0; i < variations.length; i++) {
-    final res = await supabaseClient
-        .from('titleVariations')
-        .insert({
-          'title': variations[i]['title'],
-          'isRequired': variations[i]['required'],
-          'subtitle': variations[i]['subtitleMaxSelect'],
-          'maxSeleted': variations[i]['maxSelect'],
-          'dishid': dishId,
-        })
-        .select('id'); // fetch only the id
+  }
 
-    if (res.isNotEmpty) {
-      final variationId = res.first['id'];
+  Future<void> saveVariations({
+    required int dishId,
+    required List<Map<String, dynamic>> variations,
+  }) async {
+    if (variations.isEmpty) return;
 
-      // Prepare all options in one go
-      final options = (variations[i]['options'] as List)
+    for (final variation in variations) {
+      final res = await supabaseClient.from('titleVariations').insert({
+        'title': variation['title'],
+        'isRequired': variation['required'] ?? false,
+        'subtitle': variation['subtitleMaxSelect'],
+        'maxSeleted': int.tryParse('${variation['maxSelect']}') ?? 1,
+        'dishid': dishId,
+      }).select('id').single();
+
+      final variationId = (res['id'] as num).toInt();
+      final options = (variation['options'] as List? ?? const [])
+          .whereType<Map>()
           .map((opt) => {
                 'variation_id': variationId,
                 'variation_name': opt['name'],
-                'variation_price': opt['price'],
+                'variation_price': opt['price'] ?? 0,
               })
           .toList();
 
-      // Batch insert
       if (options.isNotEmpty) {
         await supabaseClient.from('variations').insert(options);
       }
     }
   }
-}
 
-showCustomSnackbar(context: context, message: 'Dish Added Successfully',backgroundColor: Colors.black);
+  Future<void> updateDish({
+    required context,
+    required int dishId,
+    required String dishName,
+    required String dishDisc,
+    required String dishPrice,
+    required String dishDisPrice,
+    required CategoryModel category,
+    required bool isVeg,
+    Uint8List? dishImage,
+  }) async {
+    try {
+      final payload = <String, dynamic>{
+        'dish_name': dishName,
+        'dish_description': dishDisc,
+        'dish_price': double.tryParse(dishPrice) ?? 0,
+        'dish_discount': double.tryParse(dishDisPrice) ?? 0,
+        'category_id': category.categoryId,
+        'isVeg': isVeg,
+      };
 
-    } on PostgrestException catch (e) {
+      if (dishImage != null) {
+        final userId = supabaseClient.auth.currentUser!.id;
+        final imgUrl = await uploadImageToSupabase(
+          dishImage,
+          dishImagesBucket,
+          '$userId/$dishId-${DateTime.now().millisecondsSinceEpoch}.jpg',
+        );
+        payload['dish_imageurl'] = imgUrl;
+      }
+
+      await supabaseClient
+          .from('dishes')
+          .update(payload)
+          .eq('id', dishId);
+
       showCustomSnackbar(
-          context: context, message: 'Failed Upload Unexpected Error:$e',backgroundColor: Colors.black);
-          debugPrint('erorr in loading dish ...$e');
+          context: context,
+          message: 'Dish Updated',
+          backgroundColor: Colors.black);
     } catch (e) {
-      showCustomSnackbar(context: context, message: 'Failed to upload :$e',backgroundColor: Colors.black);
-        debugPrint('erorr in loading dish ...$e');
+      showCustomSnackbar(
+          context: context, message: 'Failed to update dish: $e',
+          backgroundColor: Colors.red);
+      rethrow;
     }
   }
 
-Future<List<Map<String,dynamic>>>deleteDish ({required context,required int dishId})async{
-  try{
-   final res = await supabaseClient.from('dishes').delete().eq('id', dishId).select();
-   if(res.isNotEmpty){
-     debugPrint('Error: Failed To Delete Dish');
-  return res;
-   }
-  }catch(e){
+Future<bool> deleteDish({required int dishId}) async {
+  try {
+    final res = await supabaseClient
+        .from('dishes')
+        .delete()
+        .eq('id', dishId)
+        .select();
+    return res.isNotEmpty;
+  } catch (e) {
     debugPrint('Error: Failed To Delete Dish $e');
+    return false;
   }
-  return [];
 }
   
 
 //Load preload dishes for search and others use
-Future<void> preLoadDishes({required context})async{
-    final restData = ref.watch(restaurantProvider);
-
-  try{
-final res = await supabaseClient.from('dishes').select('id , dish_name , dish_price , dish_imageurl, category_id').eq('rest_uid', restData!.restuid!);
-  if (res.isNotEmpty) {
-    ref.read(dishesPreviewList.notifier).state = res.map<DishPreview>((e) => DishPreview.fromJson(e)).toList();
+Future<void> preLoadDishes({required context}) async {
+  final restUid = ref.read(restaurantProvider)?.restuid;
+  if (restUid == null || restUid.isEmpty) {
+    ref.read(dishesPreviewList.notifier).state = [];
+    return;
   }
 
-  }catch(e){
-    debugPrint(e.toString());
-    showCustomSnackbar(context: context, message: 'Erorr: Failed to load Data for dishes',backgroundColor: Colors.black);
-  }
+  try {
+    final res = await supabaseClient
+        .from('dishes')
+        .select(
+            'id, dish_name, dish_price, dish_imageurl, category_id, isAvailable')
+        .eq('rest_uid', restUid);
 
+    ref.read(dishesPreviewList.notifier).state =
+        res.map<DishPreview>((e) => DishPreview.fromJson(e)).toList();
+  } catch (e) {
+    debugPrint('preLoadDishes failed: $e');
+    if (context.mounted) {
+      showCustomSnackbar(
+          context: context,
+          message: 'Error: Failed to load dishes',
+          backgroundColor: Colors.black);
+    }
+  }
 }
 
 //for searching dish
-List<DishPreview> searchDishes({required String? query}){
-final dishes = ref.watch(dishesPreviewList);
-return dishes.where((dish)=>dish.dihsName.toLowerCase().contains(query!.toLowerCase())).toList();
+List<DishPreview> searchDishes({required String? query, String? filter}) {
+  final term = (query ?? '').trim().toLowerCase();
+  final dishes = ref.watch(dishesPreviewList);
 
-
+  return dishes.where((dish) {
+    final matchesTerm =
+        term.isEmpty || dish.dihsName.toLowerCase().contains(term);
+    final matchesFilter = switch (filter) {
+      'Available' => dish.isAvailable,
+      'Unavailable' => !dish.isAvailable,
+      _ => true,
+    };
+    return matchesTerm && matchesFilter;
+  }).toList();
 }
 
 Future<DishModel> getSearchedDish({required int dishId})async{
