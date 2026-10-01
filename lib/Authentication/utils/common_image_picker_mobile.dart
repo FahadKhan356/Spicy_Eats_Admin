@@ -1,7 +1,8 @@
-import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:image_picker/image_picker.dart';
 
-Future<File?> pickImage() async {
+Future<Uint8List?> pickImage() async {
   final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-  return pickedFile != null ? File(pickedFile.path) : null;
+  return pickedFile?.readAsBytes();
 }

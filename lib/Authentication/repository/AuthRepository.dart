@@ -60,20 +60,21 @@ class AuthRepository {
           .signInWithPassword(email: email, password: password);
 
       if (res.user != null) {
-        await supabaseClient
+        final existing = await supabaseClient
             .from('users')
-            .update({
-              'id': res.user!.id,
-              'email': res.user!.email,
-              'password': password,
-              'Role': 'restaurant-admin',
-              'status': 'pending',
-              'Auth_steps': 1,
-            })
+            .select('Auth_steps')
             .eq('id', res.user!.id)
-            .isFilter('Auth_steps', null);
+            .maybeSingle();
 
-        debugPrint('user auth steps updated ...${res.user!.email}');
+        if (existing == null) {
+          await supabaseClient.from('users').insert({
+            'id': res.user!.id,
+            'email': res.user!.email,
+            'Role': 'restaurant-admin',
+            'status': 'pending',
+            'Auth_steps': 1,
+          });
+        }
       }
       showCustomSnackbar(
           context: context,
@@ -90,29 +91,27 @@ class AuthRepository {
   }
 
 //store user data to user table
-  Future<void> storeNewUserData(
-      {required User user,
-      required BuildContext context,
-      required String password}) async {
+  Future<void> storeNewUserData({
+    required User user,
+    required BuildContext context}) async {
     try {
       await supabaseClient.from('users').insert({
         'id': user.id,
         'email': user.email,
-        'password': password,
         'Role': 'restaurant-admin',
         'status': 'pending',
         'Auth_steps': 1,
       }).eq('id', user.id);
-      // }
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showCustomSnackbar(
-            context: context, message: 'User stored and login successfully');
+        if (context.mounted) {
+          showCustomSnackbar(
+              context: context, message: 'User stored and login successfully');
+        }
       });
     } catch (e) {
-      throw Exception(e);
-      // debugPrint('failed to signup and store user data 1 $e');
+      rethrow;
     }
-    debugPrint('done sign up');
   }
 
   Future<void> signInWithGoogleUniversal(BuildContext context) async {
@@ -200,11 +199,11 @@ class AuthRepository {
     final user = supabaseClient.auth;
 
     try {
-      String? imageurl = await uploadImageToSupabase(
-          context,
-          image,
-          "Restaurant_Registeration",
-          '${supabaseClient.auth.currentUser!.email}/Owner_id/id.png');
+      final imageurl = await uploadImageToSupabase(
+        image,
+        'Restaurant_Registeration',
+        '${user.currentUser!.id}/owner_id.png',
+      );
 
       final restaurant = Restaurant(
         iban: iban,
@@ -219,7 +218,7 @@ class AuthRepository {
         businessEmail: businessEmail,
         idFirstMiddleName: firstmiddleName,
         idLastName: lastName,
-        idPhotoUrl: imageurl!,
+        idPhotoUrl: imageurl,
       );
 
       await supabaseClient.from('restaurants').insert(restaurant.toMap());
@@ -228,17 +227,15 @@ class AuthRepository {
           .from('users')
           .update({'Auth_steps': 2}).eq('email', user.currentUser!.email!);
 
-      await Navigator.pushReplacementNamed(
-        context,
-        ChoosePlanScreen.routename,
-      );
+      if (context.mounted) {
+        context.go(ChoosePlanScreen.routename);
+      }
       showCustomSnackbar(
           context: context,
           message: 'Restaurant Details Stored Successfully',
           backgroundColor: Colors.black);
-      print('Restaurant inserted successfully');
     } catch (e) {
-      throw Exception(e);
+      rethrow;
     }
   }
 
@@ -246,13 +243,9 @@ class AuthRepository {
   Future<void> signout(BuildContext context) async {
     try {
       await supabaseClient.auth.signOut();
-
-      showCustomSnackbar(
-        context: context,
-        message: 'Log out Successfully',
-        backgroundColor: Colors.black,
-      );
-      await Navigator.pushNamed(context, LoginScreen.routename);
+      if (context.mounted) {
+        context.go(LoginScreen.routename);
+      }
     } catch (e) {
       debugPrint('Error in signout $e');
     }
@@ -299,13 +292,15 @@ class AuthRepository {
       await supabaseClient.from('users').update({'Auth_steps': 3}).eq(
           'email', supabaseClient.auth.currentUser!.email!);
 
-      Navigator.pushReplacementNamed(context, Approve.routename);
+      if (context.mounted) {
+        context.go(Approve.routename);
+      }
       showCustomSnackbar(
           context: context,
           message: 'Successfully Done',
           backgroundColor: Colors.black);
     } catch (e) {
-      throw Exception(e);
+      rethrow;
     }
   }
 }

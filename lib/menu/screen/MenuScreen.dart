@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:spicy_eats_admin/menu/Repo/MenuManagerRepo.dart';
-import 'package:spicy_eats_admin/menu/adddishform.dart';
-
 import 'package:spicy_eats_admin/menu/model/CategoryModel.dart';
 import 'package:spicy_eats_admin/menu/model/DishModel.dart';
+import 'package:spicy_eats_admin/menu/widgets/AddDishPanel.dart';
 import 'package:spicy_eats_admin/menu/widgets/BuildHeader.dart';
 import 'package:spicy_eats_admin/menu/widgets/BuildMenuContent.dart';
 
@@ -14,156 +13,134 @@ final showAddsScreenProvider = StateProvider<bool>((ref) => false);
 
 class MenuManagerScreen extends ConsumerStatefulWidget {
   static const String routename = '/menu';
+
   const MenuManagerScreen({super.key});
 
- 
- 
- 
   @override
-  // ignore: library_private_types_in_public_api
-  _MenuManagerScreenState createState() => _MenuManagerScreenState();
+  ConsumerState<MenuManagerScreen> createState() => _MenuManagerScreenState();
 }
 
-
-
-
 class _MenuManagerScreenState extends ConsumerState<MenuManagerScreen> {
-
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      ref.read(menuManagerRepoProvider).preLoadDishes(context: context,);
-    });
-    // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _preLoad());
   }
 
+  Future<void> _preLoad() async {
+    if (!mounted) return;
+    try {
+      await ref.read(menuManagerRepoProvider).preLoadDishes(context: context);
+    } catch (_) {}
+  }
 
-
-  bool isLoading = false;
-  List<CategoryModel> categories = [];
-  int length = 0;
-  int availbleItems = 0;
-  int unAvailableitems = 0;
-    void showDishDetail(int dishId, WidgetRef ref,context) {
-    // Show loading while fetching details
-    showDialog(
+  void _showDishDetail(int dishId) {
+    showDialog<void>(
       context: context,
-      builder: (context) => FutureBuilder<DishModel>(
+      builder: (dialogContext) => FutureBuilder<DishModel>(
         future: ref.read(menuManagerRepoProvider).getSearchedDish(dishId: dishId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
-          
-          if (snapshot.hasError) {
-            return AlertDialog(title: Text('Error loading dish'));
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const AlertDialog(title: Text('Could not load this dish'));
           }
-          
           return DishDetailDialog(dish: snapshot.data!);
         },
       ),
-    );}
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    
-
- final searchResults = ref.watch(seacrhedDishesProvider);
-
     final showAddScreen = ref.watch(showAddsScreenProvider);
-    final size = MediaQuery.of(context).size;
-    final restData = ref.watch(restaurantProvider);
+    final searchResults = ref.watch(seacrhedDishesProvider);
+    final restaurant = ref.watch(restaurantProvider);
+    final restaurantError = ref.watch(restaurantErrorProvider);
+
+    if (restaurant == null) {
+      return Scaffold(
+        backgroundColor: Colors.grey[50],
+        body: Center(
+          child: restaurantError != null
+              ? Padding(
+                  padding: const EdgeInsets.all(28),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.storefront_outlined,
+                            size: 44, color: Colors.red),
+                        const SizedBox(height: 14),
+                        const Text(
+                          'Menu unavailable',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          restaurantError,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontSize: 12, color: Colors.black54),
+                        ),
+                        const SizedBox(height: 18),
+                        FilledButton(
+                          onPressed: () => ref
+                              .read(menuManagerRepoProvider)
+                              .fetchRestaurantData(),
+                          style: FilledButton.styleFrom(
+                              backgroundColor: Colors.black),
+                          child: const Text('Try again'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : const CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Stack(
+        child: Stack(
+          children: [
+            ListView(
               children: [
-                SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints:
-                        BoxConstraints(minHeight: constraints.maxHeight),
-                    child: Positioned(
-                      child: Stack(
-                        children:[ Column(
-                          children: [
-                            Positioned(
-                              top:0,
-                              bottom: size.height * 0.21,
-                              left: 0,
-                              right: 0,
-                              child: BuildHeader(restData:  restData!)),
-                            isLoading
-                                ? const Center(child: CircularProgressIndicator())
-                                : buildMenuContent(length: length, ref: ref),
-                          ],
-                        ),
-                        ],
-                      ),
-                    ),
-                  ),
+                BuildHeader(
+                  restData: restaurant,
+                  onDishTapped: _showDishDetail,
                 ),
-                 Positioned(
-                   top:size.height * 0.27,
-                   right: 0,
-                   left: 0,
-        child: Container(
-          
-          color: Colors.white,
-       
-         child: ListView.builder(
-          shrinkWrap: true,
-               physics: NeverScrollableScrollPhysics(),
-          itemCount: searchResults.length,
-          itemBuilder: (context, index) {
-            final dishPreview = searchResults[index];
-          
-            return DishPreviewTile(
-              dish: dishPreview,
-              onTap: ()=>  showDishDetail(dishPreview.id, ref,context),
-            );
-          },
-             ),),
-      ),
-                showAddScreen
-                    ? Positioned(
-                        right: 0,
-                        bottom: 0,
-                        top: 0,
-                        left: constraints.maxWidth > 700
-                            ? size.width * 0.4
-                            : constraints.maxWidth < 700 &&
-                                    constraints.maxWidth > 500
-                                ? size.width * 0.4
-                                : 0,
-                        child: AnimatedContainer(
-                            decoration: const BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black12,
-                                    offset: Offset(1, 1),
-                                    spreadRadius: 2,
-                                    blurRadius: 5)
-                              ],
-                            ),
-                            duration: const Duration(milliseconds: 600),
-                            curve: Curves.bounceInOut,
-                            width: 500,
-                            child:
-                      
-
-                                AddDishForm(
-                              categories: ref.read(categoriesProvider),
-                            )
-                           
-                            ),
-                      )
-                    :const SizedBox(),
+                buildMenuContent(length: searchResults.length, ref: ref),
               ],
-            );
-          },
+            ),
+            if (showAddScreen)
+              Positioned(
+                top: 0,
+                bottom: 0,
+                right: 0,
+                left: MediaQuery.of(context).size.width > 1100
+                    ? MediaQuery.of(context).size.width * 0.45
+                    : 0,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 12,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: const AddDishPanel(),
+                ),
+              ),
+          ],
         ),
       ),
     );

@@ -1,27 +1,29 @@
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
-import 'package:spicy_eats_admin/config/supabaseconfig.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<String?> uploadImageToSupabase(BuildContext context, Uint8List image,
-    String bucketname, String path) async {
-  try {
-    // final String imageurl;
-   
-        await supabaseClient.storage.from(bucketname).updateBinary(path, image,
-            fileOptions: const FileOptions(
-              contentType: 'image/png',
-              upsert: false,
-            ));
-  
-    final String imageurl =
-        supabaseClient.storage.from(bucketname).getPublicUrl(path);
-    debugPrint(' Image url - $imageurl');
-    return imageurl;
-  } catch (e) {
-    throw Exception(e);
-  
-  }
- 
+import 'package:spicy_eats_admin/config/supabaseconfig.dart';
+
+Future<String> uploadImageToSupabase(
+  Uint8List image,
+  String bucketName,
+  String path, {
+  String contentType = 'image/jpeg',
+}) async {
+  final cleanPath = path.startsWith('/') ? path.substring(1) : path;
+
+  await supabaseClient.storage
+      .from(bucketName)
+      .uploadBinary(
+        cleanPath,
+        image,
+        fileOptions: FileOptions(
+          contentType: contentType,
+          upsert: true,
+          cacheControl: '3600',
+        ),
+      );
+
+  return supabaseClient.storage.from(bucketName).getPublicUrl(cleanPath);
 }

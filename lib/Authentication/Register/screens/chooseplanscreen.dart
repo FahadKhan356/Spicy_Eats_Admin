@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
@@ -371,9 +372,7 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                   width: 100,
                   height: 50,
                   child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, Approve.routename);
-                      },
+                      onPressed: () => context.go(Approve.routename),
                       child: Text('Approve')),
                 ),
                 SizedBox(

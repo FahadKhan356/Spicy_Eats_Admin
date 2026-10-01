@@ -3,120 +3,79 @@ import 'dart:typed_data';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
-import 'package:spicy_eats_admin/Authentication/utils/common_image_picker_web.dart';
 
+import 'package:spicy_eats_admin/Authentication/utils/comon_image_picker.dart';
+import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/dummyMenu/CategoryItemTile.dart';
 import 'package:spicy_eats_admin/dummyMenu/ExpandableCategoryMenu.dart';
 import 'package:spicy_eats_admin/menu/Repo/MenuManagerRepo.dart';
 import 'package:spicy_eats_admin/menu/controller/MenuManagerController.dart';
-import 'package:spicy_eats_admin/menu/model/CategoryItem.dart';
-import 'package:spicy_eats_admin/menu/screen/MenuScreen.dart';
 import 'package:spicy_eats_admin/menu/model/CategoryModel.dart';
+import 'package:spicy_eats_admin/menu/screen/MenuScreen.dart';
 import 'package:spicy_eats_admin/menu/widgets/AddDishTextField.dart';
 import 'package:spicy_eats_admin/menu/widgets/ElevatedCustomButton.dart';
 import 'package:spicy_eats_admin/menu/widgets/ImageBulletPoints.dart';
 
 class AddDishForm extends ConsumerStatefulWidget {
-  static const String routename = '/add-dish';
-  final List<CategoryModel>? categories;
-  // final function(String )
+  final List<CategoryModel> categories;
 
-
-  // ignore: use_super_parameters
-  AddDishForm({Key? key, required this.categories}) : super(key: key);
+  const AddDishForm({super.key, required this.categories});
 
   @override
   ConsumerState<AddDishForm> createState() => _AddDishFormState();
 }
 
 class _AddDishFormState extends ConsumerState<AddDishForm> {
-  String? editImgUrl;
-  CategoryModel? editCategory;
-  bool? editIsVeg;
-  
-  final _formKey = GlobalKey<FormState>();
-Future<void>refreshCategoryData(String categoryId)async{ 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final list=await ref.read(menuManagerController).fetchCategoriesItems(categoryId: categoryId);
-      final current = ref.read(categoryItemsProvider);
-ref.read(categoryItemsProvider.notifier).state = {
-  ...current,
-  categoryId: list!,
-};
-  
-  // ref.read(categoryItemsProvider.notifier).state[categoryId]=list!;
-}
-CategoryItemModel? editCategoryItem;
-
-@override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_){
-   final cateogoryitem=ref.read(editedCategoryItemProvider);
-   if(cateogoryitem!=null){
-    editCategoryItem=cateogoryitem;
-    editImgUrl=cateogoryitem.dish_imageurl;
-    _dishNameCtrl.text=cateogoryitem.dish_name!;
-    _dishDescCtrl.text=cateogoryitem.dish_description!;
-    _priceCtrl.text=cateogoryitem.dish_price.toString();
-    _discountCtrl.text=cateogoryitem.dish_discount.toString();
-    _category=widget.categories!.firstWhere((e)=>e.categoryId==cateogoryitem.category_id);
-    _isVeg=cateogoryitem.isVeg!;
-    setState(() {
-      
-    });
-    debugPrint('check categories: ${widget.categories?.length}');
-
-   }
-
-    });
-    // TODO: implement initState
-    super.initState();
-  }
-
-  // Dish fields
-   TextEditingController _dishNameCtrl = TextEditingController();
-   TextEditingController _dishDescCtrl = TextEditingController();
-   TextEditingController _priceCtrl = TextEditingController();
-  TextEditingController _maxSelectCtrl = TextEditingController();
-   TextEditingController _discountCtrl = TextEditingController();
-   TextEditingController _subtitleSelectCtrl = TextEditingController();
-  CategoryModel? _category;
-  bool _isVeg = false;
-
-  // Variations store (saved)
-  final List<Map<String, dynamic>> _variations = [];
-
-  // Variation being created (temp)
-  bool _showVariationForm = false;
+  final TextEditingController _dishNameCtrl = TextEditingController();
+  final TextEditingController _dishDescCtrl = TextEditingController();
+  final TextEditingController _priceCtrl = TextEditingController();
+  final TextEditingController _discountCtrl = TextEditingController();
+  final TextEditingController _maxSelectCtrl = TextEditingController();
+  final TextEditingController _subtitleSelectCtrl = TextEditingController();
   final TextEditingController _variationTitleCtrl = TextEditingController();
-  bool _variationRequired = false;
-
-  // Temp options for current variation
   final TextEditingController _optNameCtrl = TextEditingController();
   final TextEditingController _optPriceCtrl = TextEditingController();
+
+  final List<Map<String, dynamic>> _variations = [];
   final List<Map<String, dynamic>> _tempOptions = [];
 
-  // Example categories (replace with your real list)
-  Uint8List? idImage;
-  Future<void> handlePickImage() async {
-    var result = await pickImage();
+  CategoryModel? _category;
+  bool _isVeg = true;
+  bool _showVariationForm = false;
+  bool _variationRequired = false;
+  bool _isEditing = false;
+  int? _editingDishId;
+  String? _editImgUrl;
+  Uint8List? _image;
 
-    if (result != null) {
-      debugPrint("image is not empty ");
-      const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
-      if (result.length > maxSizeInBytes) {
-        showCustomSnackbar(
-            context: context,
-            message:
-                'Image too large (max ${maxSizeInBytes ~/ (1024 * 1024)}MB)');
-      } else {
-        setState(() {
-          idImage = result;
-        });
-      }
-    }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadEditingItem());
+  }
+
+  void _loadEditingItem() {
+    final item = ref.read(editedCategoryItemProvider);
+    if (item == null) return;
+
+    _isEditing = true;
+    _editingDishId = item.id;
+    _editImgUrl = item.dish_imageurl;
+    _dishNameCtrl.text = item.dish_name ?? '';
+    _dishDescCtrl.text = item.dish_description ?? '';
+    _priceCtrl.text = '${item.dish_price ?? ''}';
+    _discountCtrl.text = '${item.dish_discount ?? ''}';
+    _isVeg = item.isVeg ?? false;
+
+    final match = widget.categories
+        .where((c) => c.categoryId == item.category_id)
+        .toList();
+    if (match.isNotEmpty) _category = match.first;
+
+    setState(() {});
   }
 
   @override
@@ -125,66 +84,68 @@ CategoryItemModel? editCategoryItem;
     _dishDescCtrl.dispose();
     _priceCtrl.dispose();
     _discountCtrl.dispose();
+    _maxSelectCtrl.dispose();
+    _subtitleSelectCtrl.dispose();
     _variationTitleCtrl.dispose();
     _optNameCtrl.dispose();
     _optPriceCtrl.dispose();
-    _maxSelectCtrl.dispose();
-    _subtitleSelectCtrl.dispose();
     super.dispose();
   }
 
-  void _addOptionToTemp() {
-    if (_formKey.currentState!.validate()) {
-      final name = _optNameCtrl.text.trim();
-      final priceText = _optPriceCtrl.text.trim();
-      if (name.isEmpty || priceText.isEmpty) {
-        showCustomSnackbar(
-            context: context,
-            message: 'Option name and price are required',
-            backgroundColor: Colors.black);
+  Future<void> _handlePickImage() async {
+    final Uint8List? bytes = await _pickBytes();
+    if (bytes == null || !mounted) return;
 
-        return;
-      }
-      final price = double.tryParse(priceText);
-      if (price == null) {
-        showCustomSnackbar(
-            context: context,
-            message: 'Invalid option price',
-            backgroundColor: Colors.black);
+    const maxSizeInBytes = 2 * 1024 * 1024;
+    if (bytes.length > maxSizeInBytes) {
+      showCustomSnackbar(
+        context: context,
+        message: 'Image too large (max 2MB)',
+        backgroundColor: Colors.red,
+      );
+      return;
+    }
+    setState(() => _image = bytes);
+  }
 
-        return;
-      }
-
-      setState(() {
-        _tempOptions.add({'name': name, 'price': price});
-        _optNameCtrl.clear();
-        _optPriceCtrl.clear();
-      });
+  Future<Uint8List?> _pickBytes() async {
+    try {
+      return await pickImage();
+    } catch (e) {
+      debugPrint('Image pick failed: $e');
+      return null;
     }
   }
 
-  void _removeTempOption(int index) {
-    setState(() => _tempOptions.removeAt(index));
+  void _addOptionToTemp() {
+    final name = _optNameCtrl.text.trim();
+    final priceText = _optPriceCtrl.text.trim();
+    if (name.isEmpty || priceText.isEmpty) {
+      _warn('Option name and price are required');
+      return;
+    }
+    final price = double.tryParse(priceText);
+    if (price == null) {
+      _warn('Invalid option price');
+      return;
+    }
+    setState(() {
+      _tempOptions.add({'name': name, 'price': price});
+      _optNameCtrl.clear();
+      _optPriceCtrl.clear();
+    });
   }
 
   void _saveVariation() {
     final title = _variationTitleCtrl.text.trim();
-    final maxSelectNo = _maxSelectCtrl.text.trim();
-    final subtitleMaxSelect = _subtitleSelectCtrl.text.trim();
-    if (title.isEmpty || maxSelectNo.isEmpty || subtitleMaxSelect.isEmpty) {
-      showCustomSnackbar(
-          context: context,
-          message: 'Required fields are not filled',
-          backgroundColor: Colors.black);
-
+    if (title.isEmpty ||
+        _maxSelectCtrl.text.trim().isEmpty ||
+        _subtitleSelectCtrl.text.trim().isEmpty) {
+      _warn('Fill in every variation field');
       return;
     }
     if (_tempOptions.isEmpty) {
-      showCustomSnackbar(
-          context: context,
-          message: 'Add at least one option',
-          backgroundColor: Colors.black);
-
+      _warn('Add at least one option');
       return;
     }
     setState(() {
@@ -195,7 +156,6 @@ CategoryItemModel? editCategoryItem;
         'maxSelect': _maxSelectCtrl.text.trim(),
         'subtitleMaxSelect': _subtitleSelectCtrl.text.trim(),
       });
-      // Clear temp variation
       _variationTitleCtrl.clear();
       _variationRequired = false;
       _tempOptions.clear();
@@ -204,630 +164,601 @@ CategoryItemModel? editCategoryItem;
       _subtitleSelectCtrl.clear();
     });
     showCustomSnackbar(
-        context: context,
-        message: 'Variation saved',
-        backgroundColor: Colors.black);
+      context: context,
+      message: 'Variation saved',
+      backgroundColor: Colors.black,
+    );
   }
 
-  Widget _responsiveField({required Widget child, required bool isMobile}) {
-    return SizedBox(
-      width: isMobile ? double.infinity : 300,
-      child: child,
+  void _warn(String message) {
+    showCustomSnackbar(
+      context: context,
+      message: message,
+      backgroundColor: Colors.red,
     );
+  }
+
+  Future<void> _saveDish() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    final category = _category;
+    if (category == null) {
+      _warn('Select a category');
+      return;
+    }
+    if (_image == null && _editImgUrl == null) {
+      _warn('Please upload a dish image');
+      return;
+    }
+    if (_isEditing && _editingDishId != null && _image == null) {
+      _warn('Re-upload the image to save changes to an existing dish');
+      return;
+    }
+
+    final restUid = ref.read(restaurantProvider)?.restuid;
+    if (restUid == null || restUid.isEmpty) {
+      _warn('Could not resolve your restaurant');
+      return;
+    }
+
+    ref.read(isloadingprovider.notifier).state = true;
+    try {
+      final controller = ref.read(menuManagerControllerProvider);
+
+      if (_isEditing && _editingDishId != null) {
+        await controller.updateDish(
+          context: context,
+          dishId: _editingDishId!,
+          dishName: _dishNameCtrl.text.trim(),
+          dishDisc: _dishDescCtrl.text.trim(),
+          dishPrice: _priceCtrl.text.trim(),
+          dishDisPrice: _discountCtrl.text.trim(),
+          category: category,
+          isVeg: _isVeg,
+          dishImage: _image,
+        );
+        await _reloadCategory(category.categoryId);
+      } else {
+        await controller.addDish(
+          context: context,
+          restUid: restUid,
+          dishName: _dishNameCtrl.text.trim(),
+          dishDisc: _dishDescCtrl.text.trim(),
+          dishPrice: _priceCtrl.text.trim(),
+          dishDisPrice: _discountCtrl.text.trim(),
+          dishImage: _image!,
+          category: category,
+          isVeg: _isVeg,
+          variations: _variations,
+        );
+        await _reloadCategory(category.categoryId);
+      }
+
+      ref.read(editedCategoryItemProvider.notifier).state = null;
+      await ref.read(menuManagerRepoProvider).preLoadDishes(context: context);
+      if (!mounted) return;
+      ref.read(showAddsScreenProvider.notifier).state = false;
+    } catch (_) {
+    } finally {
+      if (mounted) ref.read(isloadingprovider.notifier).state = false;
+    }
+  }
+
+  Future<void> _reloadCategory(String categoryId) async {
+    final items = await ref
+        .read(menuManagerControllerProvider)
+        .fetchCategoriesItems(categoryId: categoryId);
+    if (!mounted) return;
+    ref.read(categoryItemsProvider.notifier).state = {
+      ...ref.read(categoryItemsProvider),
+      categoryId: items ?? const [],
+    };
+  }
+
+  void _reset() {
+    setState(() {
+      _image = null;
+      _editImgUrl = null;
+      _editingDishId = null;
+      _isEditing = false;
+      _dishNameCtrl.clear();
+      _dishDescCtrl.clear();
+      _priceCtrl.clear();
+      _discountCtrl.clear();
+      _category = null;
+      _isVeg = true;
+      _variations.clear();
+      _tempOptions.clear();
+      _showVariationForm = false;
+      _variationTitleCtrl.clear();
+      _optNameCtrl.clear();
+      _optPriceCtrl.clear();
+      _maxSelectCtrl.clear();
+      _subtitleSelectCtrl.clear();
+    });
+    ref.read(editedCategoryItemProvider.notifier).state = null;
   }
 
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(isloadingprovider);
-    final restData = ref.watch(restaurantProvider);
-    final menuController =  ref.watch(menuManagerController);
-    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: LayoutBuilder(builder: (context, constraints) {
-        final bool isMobile = constraints.maxWidth < 600;
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 600;
+          final fieldWidth = isMobile ? double.infinity : 280.0;
 
-        return isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.black26,
-                  color: Colors.black,
-                ),
-              )
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              ref.read(showAddsScreenProvider.notifier).state =
-                                  false;
-                            },
-                            icon: const Icon(Icons.cancel)),
-                        // Header
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Add Dish',
-                                style: TextStyle(
-                                    fontSize: 22, fontWeight: FontWeight.bold)),
-                            elevatedCustomButton(
-                              onpress: () {
-                                // Clear everything to start fresh
-                                setState(() {
-                                  idImage = null;
-                                  _dishNameCtrl.clear();
-                                  _dishDescCtrl.clear();
-                                  _priceCtrl.clear();
-                                  _discountCtrl.clear();
-                                  _category = null;
-                                  _isVeg = true;
-                                  _variations.clear();
-                                  _showVariationForm = false;
-                                  _variationTitleCtrl.clear();
-                                  _tempOptions.clear();
-                                  _optNameCtrl.clear();
-                                  _optPriceCtrl.clear();
-                                  _subtitleSelectCtrl.clear();
-                                  _subtitleSelectCtrl.clear();
-                                  _maxSelectCtrl.clear();
-                                });
-                              },
-                              icon: const Icon(Icons.refresh),
-                              label: const Text(
-                                'Reset',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
+          if (isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.black26,
+                color: Colors.black,
+              ),
+            );
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        tooltip: 'Close',
+                        onPressed: () {
+                          ref.read(editedCategoryItemProvider.notifier).state =
+                              null;
+                          ref.read(showAddsScreenProvider.notifier).state = false;
+                        },
+                        icon: const Icon(Icons.close),
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          _isEditing ? 'Edit Dish' : 'Add Dish',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 12),
-
-                        // Dish fields (wrap to avoid overflow)
-                        Wrap(spacing: 16, runSpacing: 12, children: [
-                          _responsiveField(
-                            isMobile: isMobile,
-                            child: addDishTextField(
-                              labeltext: 'Dish name',
-                              controller: _dishNameCtrl,
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? 'Required'
-                                  : null,
-                            ),
-                          ),
-                          _responsiveField(
-                            isMobile: isMobile,
-                            child: addDishTextField(
-                                labeltext: 'Discription',
-                                controller: _dishDescCtrl,
-                                validator: (v) =>
-                                    (v == null || v.trim().isEmpty)
-                                        ? 'Required'
-                                        : null,
-                                maxLines: 2),
-                          ),
-                          _responsiveField(
-                            isMobile: isMobile,
-                            child: addDishTextField(
-                                labeltext: 'Price',
-                                controller: _priceCtrl,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                validator: (v) {
-                                  final no = double.tryParse(v ?? '');
-                                  if (v == null || v.isEmpty) {
-                                    return 'Required';
-                                  } else if (no == null) {
-                                    return 'Please enter a valid datatype !';
-                                  }
-                                  return null;
-                                }),
-                          ),
-                          _responsiveField(
-                            isMobile: isMobile,
-                            child: addDishTextField(
-                                labeltext: 'Discount Price',
-                                controller: _discountCtrl,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                validator: (v) {
-                                  final no = double.tryParse(v ?? '');
-                                  if (v == null || v.isEmpty) {
-                                    return 'Required';
-                                  } else if (no == null) {
-                                    return 'Please enter a valid datatype !';
-                                  }
-                                  return null;
-                                }),
-                          ),
-                        ]),
-
-                        const SizedBox(height: 12),
-                        Stack(
-                          children: [
-                            Container(
-                                constraints: const BoxConstraints(
-                                  maxHeight: 200,
-                                  minHeight: 100,
-                                  maxWidth: double.maxFinite,
-                                ),
-                                child: DottedBorder(
-                                  color: Colors.grey,
-                                  strokeWidth: 3,
-                                  dashPattern: const [12, 8],
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 3,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Container(
-                                              child: idImage != null
-                                                  ? Image.memory(idImage!) :
-                                                  editImgUrl!=null? Image.network(editImgUrl!)
-                                                  : Image.asset(
-                                                      'lib/assets/DishFormatPic.jpg')),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 7,
-                                        child: Padding(
-                                          padding: const EdgeInsetsGeometry
-                                              .symmetric(
-                                              horizontal: 10, vertical: 10),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const SizedBox(height: 8),
-                                              elevatedCustomButton(
-                                                  onpress: () =>
-                                                      handlePickImage(),
-                                                  label: const Text(
-                                                    'Upload image',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  icon:
-                                                      const Icon(Icons.upload),
-                                                  bheight: 30,
-                                                  bwidth: 200),
-                                              const SizedBox(height: 8),
-                                              imageBulletPoints(
-                                                  text:
-                                                      "Upload a clear, high-quality photo (no blur)."),
-                                              imageBulletPoints(
-                                                  text:
-                                                      "Use good lighting and avoid background clutter."),
-                                              imageBulletPoints(
-                                                  text:
-                                                      "Square format (1:1) works best."),
-                                              imageBulletPoints(
-                                                  text:
-                                                      "Maximum file size: 2MB."),
-                                              imageBulletPoints(
-                                                  text:
-                                                      " Only JPG or PNG images allowed."),
-                                            ],
-                                          ),
-                                        ),
-                                        // child: idImage!=null || idImage!.isNotEmpty? Container(child: Image.memory(idImage!,fit: BoxFit.cover,),) : Container(child: Icon(Icons.image),)   )
-                                      )
-                                    ],
-                                  ),
-                                )),
-                          ],
+                      ),
+                      elevatedCustomButton(
+                        onpress: _reset,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text(
+                          'Reset',
+                          style: TextStyle(color: Colors.white),
                         ),
-
-                        const SizedBox(height: 12),
-
-                        // Category and veg
-                        Row(children: [
-                          Expanded(
-                            child: DropdownButtonFormField<CategoryModel>(
-                              isExpanded: true,
-                              decoration: const InputDecoration(
-                                  filled: true,
-                                  fillColor: Color.fromRGBO(245, 245, 245, 1),
-                                  labelText: 'Category',
-                                  labelStyle: TextStyle(
-                                      overflow: TextOverflow.ellipsis),
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10)))),
-                              initialValue:_category,
-                              items:widget.categories
-                                  ?.map((val) => DropdownMenuItem(
-                                      value: val,
-                                      child: Text(val.categoryName)))
-                                  .toList(), //_categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                              onChanged: (v) => setState(() => _category = v),
-                              validator: (v) =>
-                                  (v == null || v.categoryName.isEmpty)
-                                      ? 'Select category'
-                                      : null,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 12,
+                    children: [
+                      _field(
+                        width: fieldWidth,
+                        child: addDishTextField(
+                          labeltext: 'Dish name',
+                          controller: _dishNameCtrl,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Required'
+                              : null,
+                        ),
+                      ),
+                      _field(
+                        width: fieldWidth,
+                        child: addDishTextField(
+                          labeltext: 'Description',
+                          controller: _dishDescCtrl,
+                          maxLines: 2,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Required'
+                              : null,
+                        ),
+                      ),
+                      _field(
+                        width: fieldWidth,
+                        child: addDishTextField(
+                          labeltext: 'Price',
+                          controller: _priceCtrl,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          validator: _numberValidator,
+                        ),
+                      ),
+                      _field(
+                        width: fieldWidth,
+                        child: addDishTextField(
+                          labeltext: 'Discounted price',
+                          controller: _discountCtrl,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          validator: _numberValidator,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _imagePicker(),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<CategoryModel>(
+                          isExpanded: true,
+                          initialValue: _category,
+                          decoration: const InputDecoration(
+                            labelText: 'Category',
+                            labelStyle: TextStyle(
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Row(children: [
-                            const Text('Veg'),
-                            const SizedBox(width: 8),
-                            Switch(
-                                trackOutlineColor:
-                                    WidgetStateProperty.all(Colors.black),
-                                inactiveTrackColor: Colors.black12,
-                                activeThumbColor: Colors.black,
-                                inactiveThumbColor: Colors.white,
-                                activeTrackColor: Colors.black12,
-                                value:  _isVeg,
-                                onChanged: (v) => setState(() => _isVeg = v)),
-                          ]),
-                        ]),
-
-                        const SizedBox(height: 20),
-                        const Divider(),
-
-                        // Variation toggle
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Variations',
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w600)),
-                            Switch(
-                                trackOutlineColor:
-                                    WidgetStateProperty.all(Colors.black),
-                                inactiveTrackColor: Colors.black12,
-                                activeThumbColor: Colors.black,
-                                inactiveThumbColor: Colors.white,
-                                activeTrackColor: Colors.black12,
-                                value: _showVariationForm,
-                                onChanged: (v) => setState(
-                                      () => _showVariationForm =
-                                          !_showVariationForm,
-                                    )),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Variation form (temp)
-                        if (_showVariationForm)
-                          Card(
-                            surfaceTintColor: Colors.white,
-                            color: Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Text('Required'),
-                                        const SizedBox(width: 8),
-                                        Switch(
-                                          trackOutlineColor:
-                                              WidgetStateProperty.all(
-                                                  Colors.black),
-                                          inactiveTrackColor: Colors.black12,
-                                          activeThumbColor: Colors.black,
-                                          inactiveThumbColor: Colors.white,
-                                          activeTrackColor: Colors.black12,
-                                          value: _variationRequired,
-                                          onChanged: (v) => setState(
-                                              () => _variationRequired = v),
-                                        ),
-                                      ],
+                          items: widget.categories
+                              .map((c) => DropdownMenuItem(
+                                    value: c,
+                                    child: Text(
+                                      c.categoryName,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    // Title + required
-                                    Wrap(
-                                        spacing: 12,
-                                        runSpacing: 12,
-                                        children: [
-                                          SizedBox(
-                                            width: isMobile
-                                                ? double.infinity
-                                                : 360,
-                                            child: addDishTextField(
-                                              labeltext:
-                                                  'Variation Title (e.g. Sauces)',
-                                              controller: _variationTitleCtrl,
-                                              validator: (v) => (v == null ||
-                                                      v.trim().isEmpty)
-                                                  ? 'Required'
-                                                  : null,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 10),
-                                        ]),
-
-                                    const SizedBox(height: 12),
-
-                                    // Add Option row
-                                    Wrap(
-                                        spacing: 12,
-                                        runSpacing: 12,
-                                        children: [
-                                          SizedBox(
-                                            width: isMobile
-                                                ? double.infinity
-                                                : 260,
-                                            child: addDishTextField(
-                                              validator: (v) => (v == null ||
-                                                      v.trim().isEmpty)
-                                                  ? 'Required'
-                                                  : null,
-                                              labeltext: 'Option Name',
-                                              controller: _optNameCtrl,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                              width: isMobile
-                                                  ? double.infinity
-                                                  : 160,
-                                              child: addDishTextField(
-                                                validator: (v) {
-                                                  final opPrice =
-                                                      int.tryParse(v ?? '');
-                                                  if (v == null || v.isEmpty) {
-                                                    return 'Required';
-                                                  } else if (opPrice == null) {
-                                                    return 'Pease enter a valid datatype!';
-                                                  }
-                                                  return null;
-                                                },
-                                                labeltext: 'Option Price',
-                                                controller: _optPriceCtrl,
-                                                keyboardType:
-                                                    const TextInputType
-                                                        .numberWithOptions(
-                                                        decimal: true),
-                                              )),
-                                          SizedBox(
-                                              width: isMobile
-                                                  ? double.maxFinite
-                                                  : 160,
-                                              child: addDishTextField(
-                                                validator: (v) {
-                                                  final maxSelect =
-                                                      int.tryParse(v ?? '');
-                                                  if (v == null || v.isEmpty) {
-                                                    return 'Required';
-                                                  } else if (maxSelect ==
-                                                      null) {
-                                                    return 'Pease enter a valid datatype!';
-                                                  }
-                                                  return null;
-                                                },
-                                                labeltext: 'Max Option Select',
-                                                controller: _maxSelectCtrl,
-                                                keyboardType:
-                                                    const TextInputType
-                                                        .numberWithOptions(
-                                                        decimal: true),
-                                              )),
-                                          SizedBox(
-                                              width: isMobile
-                                                  ? double.maxFinite
-                                                  : 160,
-                                              child: addDishTextField(
-                                                validator: (v) => (v == null ||
-                                                        v.trim().isEmpty)
-                                                    ? 'Required'
-                                                    : null,
-                                                labeltext:
-                                                    'Subtitle Max Select',
-                                                hintText:
-                                                    'ie:- Select just one, pick any 2',
-                                                controller: _subtitleSelectCtrl,
-                                                keyboardType:
-                                                    const TextInputType
-                                                        .numberWithOptions(
-                                                        decimal: true),
-                                              )),
-                                          Wrap(
-                                            spacing: 20,
-                                            runSpacing: 20,
-                                            children: [
-                                              // ConstrainedBox(
-                                              // constraints: BoxConstraints.tightFor(width: isMobile ? double.infinity : 130, height: 48),
-                                              // child:
-                                              Expanded(
-                                                child: elevatedCustomButton(
-                                                  icon: const Icon(
-                                                      Icons.add_circle_outline),
-                                                  label: const Text(
-                                                    'Add Option',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  onpress: _addOptionToTemp,
-                                                ),
-                                              ),
-                                              // ),
-                                              Expanded(
-                                                child: elevatedCustomButton(
-                                                  onpress: _saveVariation,
-                                                  label: const Text(
-                                                    'Save Variation',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ]),
-
-                                    const SizedBox(height: 10),
-
-                                    // Show temp options
-                                    if (_tempOptions.isNotEmpty)
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text('Options:',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600)),
-                                          const SizedBox(height: 6),
-                                          ..._tempOptions
-                                              .asMap()
-                                              .entries
-                                              .map((entry) {
-                                            final idx = entry.key;
-                                            final opt = entry.value;
-                                            return ConstrainedBox(
-                                              constraints: const BoxConstraints(
-                                                  minWidth: double.infinity),
-                                              child: ListTile(
-                                                dense: true,
-                                                contentPadding: EdgeInsets.zero,
-                                                title: Text(opt['name']),
-                                                subtitle: Text(
-                                                    'Price: ${opt['price'].toStringAsFixed(2)}'),
-                                                trailing: IconButton(
-                                                  icon: const Icon(
-                                                      Icons.delete_outline),
-                                                  onPressed: () =>
-                                                      _removeTempOption(idx),
-                                                  tooltip: 'Remove option',
-                                                ),
-                                              ),
-                                            );
-                                          }),
-                                        ],
-                                      ),
-
-                                    const SizedBox(height: 12),
-
-                                    // Save / Cancel variation
-                                  ]),
-                            ),
-                          ),
-
-                        const SizedBox(height: 18),
-
-                        // Saved variations list (cards)
-                        if (_variations.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Saved Variations',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600)),
-                              const SizedBox(height: 8),
-                              ..._variations.map((v) {
-                                return ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                      minWidth: double.infinity),
-                                  child: Card(
-                                    margin:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(v['title'],
-                                                      style: const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                  Text(v['required']
-                                                      ? 'Required'
-                                                      : 'Optional'),
-                                                ]),
-                                            const SizedBox(height: 8),
-                                            ...List<Map<String, dynamic>>.from(
-                                                    v['options'])
-                                                .map((o) {
-                                              return ConstrainedBox(
-                                                constraints:
-                                                    const BoxConstraints(
-                                                        minWidth:
-                                                            double.infinity),
-                                                child: ListTile(
-                                                  dense: true,
-                                                  contentPadding:
-                                                      EdgeInsets.zero,
-                                                  title: Text(o['name']),
-                                                  trailing: Text(o['price']
-                                                      .toStringAsFixed(2)),
-                                                ),
-                                              );
-                                            }),
-                                          ]),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ],
-                          ),
-
-                        const SizedBox(height: 20),
-                        elevatedCustomButton(
-                          label: const Text(
-                            'Save Dish',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          icon: const Icon(Icons.save),
-                          onpress: () async {
-                            if (!_formKey.currentState!.validate()) {
-                              return;
-                            }
-                            if (idImage == null || idImage!.isEmpty) {
-                              showCustomSnackbar(
-                                  context: context,
-                                  message: 'No Image is selected ',
-                                  backgroundColor: Colors.black);
-                            }
-                            ref.read(isloadingprovider.notifier).state = true;
-                            await menuController.addDish(
-                                context: context,
-                                restUid: restData!.restuid!,
-                                dishName: _dishNameCtrl.text.trim(),
-                                dishDisc: _dishDescCtrl.text.trim(),
-                                dishPrice: _priceCtrl.text.trim(),
-                                dishDisPrice: _discountCtrl.text.trim(),
-                                dishImage: idImage!,
-                                category: _category!,
-                                isVeg: _isVeg,
-                                variations: _variations);
-
-                            await refreshCategoryData(_category!.categoryId);
-                            debugPrint('item delete from ${_category!.categoryId}');
-                            ref.read(showAddsScreenProvider.notifier).state =
-                                false;
-                            ref.read(isloadingprovider.notifier).state = false;
-                          },
+                                  ))
+                              .toList(),
+                          onChanged: (v) => setState(() => _category = v),
+                          validator: (v) =>
+                              v == null ? 'Select a category' : null,
                         ),
-                        // Save dish button
+                      ),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Veg'),
+                          Switch(
+                            trackOutlineColor:
+                                WidgetStateProperty.all(Colors.black),
+                            inactiveTrackColor: Colors.black12,
+                            activeThumbColor: Colors.black,
+                            inactiveThumbColor: Colors.white,
+                            activeTrackColor: Colors.black12,
+                            value: _isVeg,
+                            onChanged: (v) => setState(() => _isVeg = v),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Variations',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Switch(
+                        trackOutlineColor:
+                            WidgetStateProperty.all(Colors.black),
+                        inactiveTrackColor: Colors.black12,
+                        activeThumbColor: Colors.black,
+                        inactiveThumbColor: Colors.white,
+                        activeTrackColor: Colors.black12,
+                        value: _showVariationForm,
+                        onChanged: (v) => setState(() => _showVariationForm = v),
+                      ),
+                    ],
+                  ),
+                  if (_showVariationForm) ...[
+                    const SizedBox(height: 12),
+                    _variationForm(isMobile),
+                  ],
+                  if (_variations.isNotEmpty) ...[
+                    const SizedBox(height: 18),
+                    _savedVariations(),
+                  ],
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: elevatedCustomButton(
+                      label: Text(
+                        _isEditing ? 'Update Dish' : 'Save Dish',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      icon: Icon(_isEditing ? Icons.save : Icons.add),
+                      onpress: _saveDish,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
-                        const SizedBox(height: 30),
-                      ]),
+  Widget _field({required double width, required Widget child}) {
+    return SizedBox(width: width, child: child);
+  }
+
+  String? _numberValidator(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Required';
+    if (double.tryParse(v.trim()) == null) return 'Enter a valid number';
+    return null;
+  }
+
+  Widget _imagePicker() {
+    return DottedBorder(
+      color: Colors.grey,
+      strokeWidth: 2,
+      dashPattern: const [10, 6],
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 96,
+              height: 96,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: _imagePreview(),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  elevatedCustomButton(
+                    onpress: _handlePickImage,
+                    label: const Text(
+                      'Upload image',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    icon: const Icon(Icons.upload),
+                    bheight: 32,
+                    bwidth: 160,
+                  ),
+                  const SizedBox(height: 8),
+                  imageBulletPoints(
+                      text: 'Upload a clear, high-quality photo.'),
+                  imageBulletPoints(
+                      text: 'Square format (1:1) works best.'),
+                  imageBulletPoints(text: 'Maximum file size: 2MB.'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _imagePreview() {
+    if (_image != null) return Image.memory(_image!, fit: BoxFit.cover);
+    if (_editImgUrl != null && _editImgUrl!.isNotEmpty) {
+      return Image.network(
+        _editImgUrl!,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const _Placeholder(),
+      );
+    }
+    return const _Placeholder();
+  }
+
+  Widget _variationForm(bool isMobile) {
+    final wide = isMobile ? double.infinity : 300.0;
+    final narrow = isMobile ? double.infinity : 150.0;
+
+    return Card(
+      color: Colors.white,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Required'),
+                const SizedBox(width: 8),
+                Switch(
+                  trackOutlineColor: WidgetStateProperty.all(Colors.black),
+                  inactiveTrackColor: Colors.black12,
+                  activeThumbColor: Colors.black,
+                  inactiveThumbColor: Colors.white,
+                  activeTrackColor: Colors.black12,
+                  value: _variationRequired,
+                  onChanged: (v) => setState(() => _variationRequired = v),
                 ),
-              );
-      }),
+              ],
+            ),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                _field(
+                  width: wide,
+                  child: addDishTextField(
+                    labeltext: 'Variation title (e.g. Sauces)',
+                    controller: _variationTitleCtrl,
+                  ),
+                ),
+                _field(
+                  width: narrow,
+                  child: addDishTextField(
+                    labeltext: 'Option name',
+                    controller: _optNameCtrl,
+                  ),
+                ),
+                _field(
+                  width: narrow,
+                  child: addDishTextField(
+                    labeltext: 'Option price',
+                    controller: _optPriceCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    validator: _numberValidator,
+                  ),
+                ),
+                _field(
+                  width: narrow,
+                  child: addDishTextField(
+                    labeltext: 'Max select',
+                    controller: _maxSelectCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    validator: _numberValidator,
+                  ),
+                ),
+                _field(
+                  width: isMobile ? double.infinity : 260,
+                  child: addDishTextField(
+                    labeltext: 'Subtitle hint',
+                    hintText: 'e.g. Select just one',
+                    controller: _subtitleSelectCtrl,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                elevatedCustomButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  label: const Text(
+                    'Add Option',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onpress: _addOptionToTemp,
+                ),
+                elevatedCustomButton(
+                  onpress: _saveVariation,
+                  label: const Text(
+                    'Save Variation',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            if (_tempOptions.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Text(
+                'Options',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 6),
+              for (var i = 0; i < _tempOptions.length; i++)
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('${_tempOptions[i]['name']}'),
+                  subtitle: Text(
+                      'Price: ${(_tempOptions[i]['price'] as double).toStringAsFixed(2)}'),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: () => setState(() => _tempOptions.removeAt(i)),
+                  ),
+                ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _savedVariations() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Saved variations',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        for (var i = 0; i < _variations.length; i++)
+          Card(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${_variations[i]['title']}',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            _variations[i]['required'] == true
+                                ? 'Required'
+                                : 'Optional',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, size: 18),
+                            onPressed: () =>
+                                setState(() => _variations.removeAt(i)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  for (final option in (_variations[i]['options'] as List))
+                    ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      title: Text('${option['name']}'),
+                      trailing: Text(
+                          '\$${(option['price'] as double).toStringAsFixed(2)}'),
+                    ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _Placeholder extends StatelessWidget {
+  const _Placeholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey[200],
+      child: const Icon(Icons.image_outlined, color: Colors.black45),
     );
   }
 }

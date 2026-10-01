@@ -1,3 +1,5 @@
+import 'package:spicy_eats_admin/utils/json_coercion.dart';
+
 class DishModel{
   int? dishid;
   String? dish_name;
@@ -54,20 +56,19 @@ class DishModel{
 //fromjson
   factory DishModel.fromJson(Map<String, dynamic> json) {
     return DishModel(
-      dishid: json['id'] ?? 0,
-      dish_name: json['dish_name'] ?? '',
-      dish_price: json['dish_price'] ?? 0.0,
-      dish_discount: json['dish_discount'],
-      dish_description: json['dish_description'] ?? '',
-      dish_imageurl: json['dish_imageurl'] ?? '',
-      dish_schedule_meal: json['dish_schedule_meal'] ?? '',
-      cusine: json['cusine'] ?? '',
-      category_id: json['category_id'] ?? '',
-      isVariation: json['isVariation'] ?? false,
-      restuid: json['rest_uid'] ?? '',
-      frequentlyid: json['frequentlyid'] ?? 0,
-      id: json['id'] ?? 0,
-      isVeg: json['isVeg'],
+      dishid: asIntOrNull(json['id']),
+      dish_name: asString(json['dish_name']),
+      dish_price: asDoubleOrNull(json['dish_price']),
+      dish_discount: asDoubleOrNull(json['dish_discount']),
+      dish_description: asString(json['dish_description']),
+      dish_imageurl: asString(json['dish_imageurl']),
+      cusine: asString(json['cusine']),
+      category_id: asStringOrNull(json['category_id']),
+      isVariation: asBool(json['isVariation']),
+      restuid: asStringOrNull(json['rest_uid']),
+      frequentlyid: asIntOrNull(json['frequentlyid']),
+      id: asIntOrNull(json['id']),
+      isVeg: asBool(json['isVeg']),
     );
   }
 }

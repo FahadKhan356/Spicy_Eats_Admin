@@ -1,3 +1,4 @@
+import 'package:spicy_eats_admin/utils/json_coercion.dart';
 
 class CategoryModel {
 
@@ -17,11 +18,11 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      categoryId: json['category_id'] ?? '',
-      createdAt: DateTime.parse(json['created_at'] ?? ''),
-      categoryName: json['category_name'] ?? '',
-      restUid: json['rest_uid'] ?? '',
-      categoryDescription: json['category_description'] ?? '',
+      categoryId: asString(json['category_id']),
+      createdAt: asDateTime(json['created_at']),
+      categoryName: asString(json['category_name']),
+      restUid: asString(json['rest_uid']),
+      categoryDescription: asString(json['category_description']),
     );
   }
 

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Authentication/Signup/screen/SignupScreen.dart';
-import 'package:spicy_eats_admin/Authentication/authCallBack.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
-import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
@@ -218,8 +216,7 @@ class _DekstopLayoutState extends ConsumerState<DekstopLayout> {
                                   ],
                                 ),
                                 InkWell(
-                                  onTap: () => Navigator.pushNamed(
-                                      context, SignUpScreen.routename),
+                                  onTap: () => context.go(SignUpScreen.routename),
                                   child: const Align(
                                     alignment: Alignment.centerRight,
                                     child: Text(
@@ -566,8 +563,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                         height: 10,
                       ),
                       InkWell(
-                        onTap: () => Navigator.pushNamed(
-                            context, SignUpScreen.routename),
+                        onTap: () => context.go(SignUpScreen.routename),
                         child: const Align(
                           alignment: Alignment.centerRight,
                           child: Text(
@@ -657,8 +653,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                   context: context,
                                   message: 'Error: $e');
                             }
-                            Navigator.pushNamed(
-                                context, AuthCallbackPage.routename);
+                            return;
                           },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(

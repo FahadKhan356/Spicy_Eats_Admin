@@ -4,7 +4,6 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:spicy_eats_admin/Authentication/Register/screens/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/widgets/RestaurantAddress.dart';
 
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
@@ -17,7 +16,6 @@ import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 
 var isimage = StateProvider<bool>((ref) => true);
 
@@ -185,7 +183,6 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
     final longitude = ref.watch(restaurantLongProvider);
     final address = ref.watch(restaurantLocationSelectedProvider);
     final size = MediaQuery.of(context).size;
-    final isImageSelected = ref.watch(isimage);
     final authStep = ref.watch(authStepsProvider);
 
     return Form(

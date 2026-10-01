@@ -45,7 +45,7 @@ Future<void> showDeleteConfirmationDialog(BuildContext context,WidgetRef ref,int
     // Prevents the dialog from being dismissed by tapping outside
     barrierDismissible: false, 
     builder: (BuildContext dialogContext) {
-      return ref.watch(isloadingprovider)?const Center(child: CircularProgressIndicator(backgroundColor: Colors.black26,color: Colors.black,),) : AlertDialog(
+      return ref.read(isloadingprovider)?const Center(child: CircularProgressIndicator(backgroundColor: Colors.black26,color: Colors.black,),) : AlertDialog(
         backgroundColor: Colors.white,
 
         title: const Text('Confirm Deletion'),
@@ -68,21 +68,29 @@ Future<void> showDeleteConfirmationDialog(BuildContext context,WidgetRef ref,int
           
             child: const Text('Delete', style: TextStyle(color: Colors.red)), 
             onPressed: () async{
+               final dishId = widget.item.id;
+               if (dishId == null) {
+                 Navigator.of(dialogContext).pop(false);
+                 return;
+               }
+
                final success = await ref
-                              .read(menuManagerController)
-                              .deleteDish(
-                                  dishId: widget.item.dishid!, context: null);
+                              .read(menuManagerControllerProvider)
+                              .deleteDish(dishId: dishId);
 
                           if (!mounted) return;
 
-                          if (success.isNotEmpty) {
+                          if (success) {
                             showCustomSnackbar(
                               context: context,
                               message: "Dish deleted permanently",
                               backgroundColor: Colors.black,
                             );
-                            widget.categoryItemTileloadCategoryItems(
-                                widget.item.category_id!);
+                            final categoryId = widget.item.category_id;
+                            if (categoryId != null) {
+                              widget.categoryItemTileloadCategoryItems(
+                                  categoryId);
+                            }
                           } else {
                             showCustomSnackbar(
                               context: context,
@@ -105,7 +113,7 @@ Future<void> showDeleteConfirmationDialog(BuildContext context,WidgetRef ref,int
 }
   @override
   Widget build(BuildContext context) {
-    final controller = ref.watch(menuManagerController);
+    final controller = ref.watch(menuManagerControllerProvider);
     return LayoutBuilder(builder: (context, constraints) {
       final isMobile = constraints.maxWidth < 790;
       return Container(
@@ -173,7 +181,7 @@ Future<void> showDeleteConfirmationDialog(BuildContext context,WidgetRef ref,int
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: widget.item.dish_imageurl!.isNotEmpty
+                        child: (widget.item.dish_imageurl ?? '').isNotEmpty
                             ? Image.network(
                                 widget.item.dish_imageurl!,
                                 width: 40,
@@ -187,7 +195,7 @@ Future<void> showDeleteConfirmationDialog(BuildContext context,WidgetRef ref,int
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
-                          widget.item.dish_name!,
+                          widget.item.dish_name ?? 'Untitled dish',
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -256,12 +264,16 @@ Future<void> showDeleteConfirmationDialog(BuildContext context,WidgetRef ref,int
                             if (value == null) return;
                             final isAvailable = value == 'In stock';
 
+                            final dishId = widget.item.id;
+                            if (dishId == null) return;
+
                             await controller.setInOutStock(
                               isAvailble: isAvailable,
-                              dishId: widget.item.id!,
+                              dishId: dishId,
                               context: context,
                             );
 
+                            if (!mounted) return;
                             setState(
                                 () => widget.item.isAvailable = isAvailable);
                           },
@@ -285,7 +297,9 @@ Future<void> showDeleteConfirmationDialog(BuildContext context,WidgetRef ref,int
                       ),
                       IconButton(
                         onPressed: () async {
-                          showDeleteConfirmationDialog(context,ref,widget.item.dishid!);
+                          final dishId = widget.item.id;
+                          if (dishId == null) return;
+                          showDeleteConfirmationDialog(context, ref, dishId);
                          
                         },
                         //  await ref.read(menuManagerController).deleteDish(context: context, dishId: widget.item.id!);

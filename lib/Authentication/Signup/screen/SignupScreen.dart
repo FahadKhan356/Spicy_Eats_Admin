@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
@@ -61,8 +62,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ? 80
                             : 10,
                 child: ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, LoginScreen.routename),
+                  onPressed: () => context.go(LoginScreen.routename),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
@@ -289,9 +289,12 @@ class _DekstoplayoutState extends ConsumerState<Dekstoplayout> {
                                                 password:
                                                     widget.confrimPassword.text,
                                               )
-                                              .then((value) =>
-                                                  Navigator.pushNamed(context,
-                                                      LoginScreen.routename));
+                                              .then((value) {
+                                                if (context.mounted) {
+                                                  context
+                                                      .go(LoginScreen.routename);
+                                                }
+                                              });
                                         }
                                       },
                                       style: ElevatedButton.styleFrom(

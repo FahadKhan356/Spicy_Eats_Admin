@@ -1,3 +1,5 @@
+import 'package:spicy_eats_admin/utils/json_coercion.dart';
+
 class RestaurantModel {
   String? restuid;
   String? restaurantName;
@@ -135,41 +137,32 @@ class RestaurantModel {
   }
 
   factory RestaurantModel.fromJson(Map<String, dynamic> json) {
-    Map<String, Map<String, dynamic>> openingHours = {};
-    if (json['openingHours'] != null) {
-      openingHours =
-          Map<String, Map<String, dynamic>>.from(json['openingHours']);
-    }
-
     return RestaurantModel(
-      restaurantName: json['restaurantName'] ?? '',
-      deliveryFee: json['deliveryFee'] ?? 0.0,
-      minTime: json['minTime'] ?? 0,
-      maxTime: json['maxTime'] ?? 0,
-      averageRatings: json['average_ratings'] ?? 0.0,
-      totalRatings: json['total_ratings'] ?? 0,
-      address: json['address'] ?? '',
-      phoneNumber: json['phoneNumber'] ?? 0,
-      deliveryArea: json['deliveryArea'] ?? 0.0,
-      postalCode: json['postalCode'] ?? '',
-      idNumber: json['idNumber'] ?? 0,
-      description: json['description'] ?? '',
-      lat: json['lat'] ?? 0.0,
-      long: json['long'] ?? 0.0,
-      email: json['businessEmail'] ?? '',
-      idFirstName: json['idFirstName'] ?? '',
-      idLastName: json['idLastName'] ?? '',
-      //userId: json['user_id'],
-      idPhotoUrl: json['idPhotoUrl'] ?? '',
-      paymentMethod: json['paymentMethod'] ?? '',
-      openingHours: openingHours,
-      restaurantImageUrl: json['restaurantImageUrl'] ?? '',
-      //json['openinHours'],
-      restuid: json['rest_uid'],
-      restaurantLogoImageUrl: json['restLogoUrl'],
-      platformfee: json['platformfee'] ?? 0.0,
-      cuisineIds:
-          json['cuisineIds'] != null ? List<int>.from(json['cuisineIds']) : [],
+      restaurantName: asString(json['restaurantName']),
+      deliveryFee: asDoubleOrNull(json['deliveryFee']),
+      minTime: asIntOrNull(json['minTime']),
+      maxTime: asIntOrNull(json['maxTime']),
+      averageRatings: asDoubleOrNull(json['average_ratings']),
+      totalRatings: asIntOrNull(json['total_ratings']),
+      address: asString(json['address']),
+      phoneNumber: asIntOrNull(json['phoneNumber']),
+      deliveryArea: asString(json['deliveryArea']),
+      postalCode: asString(json['postalCode']),
+      idNumber: asIntOrNull(json['idNumber']),
+      description: asString(json['description']),
+      lat: asDoubleOrNull(json['lat']),
+      long: asDoubleOrNull(json['long']),
+      email: asString(json['businessEmail']),
+      idFirstName: asString(json['idFirstMiddleName'] ?? json['idFirstName']),
+      idLastName: asString(json['idLastName']),
+      idPhotoUrl: asString(json['idPhotoUrl']),
+      paymentMethod: asString(json['paymentMethod']),
+      openingHours: asNestedDayMap(json['openingHours']),
+      restaurantImageUrl: asString(json['restaurantImageUrl']),
+      restuid: asStringOrNull(json['rest_uid']),
+      restaurantLogoImageUrl: asStringOrNull(json['restLogoUrl']),
+      platformfee: asDoubleOrNull(json['platformfee']),
+      cuisineIds: asIntList(json['cuisineIds']),
     );
   }
 }
