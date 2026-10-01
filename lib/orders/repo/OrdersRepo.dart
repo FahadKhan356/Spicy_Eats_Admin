@@ -63,11 +63,33 @@ class OrdersRepo {
     }).toList();
   }
 
-  Future<void> updateStatus({required int orderId, required String status}) async {
+  Future<void> updateStatus({
+    required int orderId,
+    required String status,
+    String? cancelledReason,
+  }) async {
+    final payload = <String, dynamic>{
+      'status': status,
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+    if (cancelledReason != null) {
+      payload['cancelled_reason'] = cancelledReason;
+    }
     await supabaseClient
         .from('orders')
-        .update({'status': status})
+        .update(payload)
         .eq('id', orderId);
+  }
+
+  Future<void> cancelOrder({
+    required int orderId,
+    required String reason,
+  }) async {
+    await updateStatus(
+      orderId: orderId,
+      status: 'cancelled',
+      cancelledReason: reason,
+    );
   }
 }
 

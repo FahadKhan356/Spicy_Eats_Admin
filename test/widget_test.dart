@@ -55,6 +55,26 @@ void main() {
       expect(order.items, isEmpty);
       expect(order.itemCount, 0);
     });
+
+    test('parses cancelled_reason, updated_at, and all status flow labels', () {
+      final order = OrderModel.fromJson({
+        'id': 30,
+        'created_at': '2026-04-02T13:56:10.818465+00:00',
+        'updated_at': '2026-04-02T14:00:00.000000+00:00',
+        'status': 'cancelled',
+        'cancelled_reason': 'Customer not available',
+        'total_price': 16.55,
+        'orderedItems': [],
+      });
+
+      expect(order.cancelledReason, 'Customer not available');
+      expect(order.updatedAt, isNotNull);
+      expect(order.status, 'cancelled');
+
+      for (final s in orderStatusFlow) {
+        expect(orderStatusLabels.containsKey(s), isTrue);
+      }
+    });
   });
 
   group('navigation config', () {

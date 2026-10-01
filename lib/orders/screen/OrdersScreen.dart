@@ -59,11 +59,12 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                           itemCount: filtered.length,
                           separatorBuilder: (_, __) => const SizedBox(height: 10),
-                          itemBuilder: (context, index) => _OrderCard(
-                            order: filtered[index],
-                            onStatusChange: (status) =>
-                                _changeStatus(filtered[index], status),
-                          ),
+           itemBuilder: (context, index) => _OrderCard(
+              order: filtered[index],
+              onStatusChange: (status) =>
+                  _changeStatus(filtered[index], status),
+              onCancel: () => _cancelOrder(filtered[index]),
+            ),
                         ),
                 ),
               ],
@@ -106,11 +107,75 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
         message: 'Order #${order.id} marked $status',
         backgroundColor: Colors.black,
       );
-    } catch (e) {
+     } catch (e) {
       if (!mounted) return;
       showCustomSnackbar(
         context: context,
         message: 'Could not update order. Run the orders RLS migration.',
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
+  Future<void> _cancelOrder(OrderModel order) async {
+    final reasonCtrl = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cancel order?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Please provide a reason for cancellation:'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonCtrl,
+              decoration: const InputDecoration(
+                hintText: 'e.g. Customer not available',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Back'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Cancel order'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    final reason = reasonCtrl.text.trim();
+    final restUid = ref.read(restaurantProvider)?.restuid;
+    if (restUid == null) return;
+
+    try {
+      await ref.read(ordersRepoProvider).cancelOrder(
+            orderId: order.id,
+            reason: reason,
+          );
+      ref.invalidate(ordersProvider(restUid));
+      ref.invalidate(dashboardStatsProvider(restUid));
+      if (!mounted) return;
+      showCustomSnackbar(
+        context: context,
+        message: 'Order #${order.id} cancelled',
+        backgroundColor: Colors.black,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      showCustomSnackbar(
+        context: context,
+        message: 'Could not cancel order. Run the orders RLS migration.',
         backgroundColor: Colors.red,
       );
     }
@@ -227,8 +292,13 @@ class _Metric extends StatelessWidget {
 class _OrderCard extends StatelessWidget {
   final OrderModel order;
   final ValueChanged<String> onStatusChange;
+  final VoidCallback onCancel;
 
-  const _OrderCard({required this.order, required this.onStatusChange});
+  const _OrderCard({
+    required this.order,
+    required this.onStatusChange,
+    required this.onCancel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -327,30 +397,51 @@ class _OrderCard extends StatelessWidget {
             runSpacing: 8,
             children: [
               for (final status in orderStatusFlow)
-                if (order.status != status)
-                  OutlinedButton(
-                    onPressed: () => onStatusChange(status),
-                    style: OutlinedButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      side: BorderSide(
-                        color: status == 'cancelled' ? Colors.red : Colors.black,
+                status == order.status
+                    ? _SelectedStatusChip(status: status)
+                    : OutlinedButton(
+                        onPressed: () => onStatusChange(status),
+                        style: OutlinedButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          side: BorderSide(
+                            color: _colorFor(status),
+                          ),
+                        ),
+                        child: Text(
+                          orderStatusLabels[status] ?? status,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _colorFor(status),
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      orderStatusLabels[status] ?? status,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: status == 'cancelled' ? Colors.red : Colors.black,
-                      ),
-                    ),
-                  ),
             ],
           ),
+          if (order.status != 'cancelled' && order.status != 'completed' && order.status != 'rejected')
+            ...[
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: onCancel,
+                  icon: const Icon(Icons.delete_outline, size: 16, color: Colors.red),
+                  label: const Text(
+                    'Cancel order',
+                    style: TextStyle(fontSize: 12, color: Colors.red),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ),
+            ],
         ],
       ),
     );
   }
+
 
   String _formatDate(DateTime date) {
     final local = date.toLocal();
@@ -402,7 +493,44 @@ class _StatusChip extends StatelessWidget {
       ),
       child: Text(
         orderStatusLabels[status] ?? status,
-        style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          fontSize: 11,
+          color: color,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+class _SelectedStatusChip extends StatelessWidget {
+  final String status;
+
+  const _SelectedStatusChip({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _colorFor(status);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.check, size: 14, color: Colors.white),
+          const SizedBox(width: 4),
+          Text(
+            orderStatusLabels[status] ?? status,
+            style: const TextStyle(
+              fontSize: 11,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -432,7 +560,13 @@ Color _colorFor(String status) {
     case 'rejected':
       return Colors.red;
     case 'preparing':
+    case 'ready':
       return Colors.orange;
+    case 'accepted':
+      return Colors.blue;
+    case 'out_for_delivery':
+      return Colors.purple;
+    case 'pending':
     default:
       return Colors.blueGrey;
   }

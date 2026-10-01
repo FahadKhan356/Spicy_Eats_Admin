@@ -37,7 +37,9 @@ class OrderLine {
 class OrderModel {
   final int id;
   final DateTime createdAt;
+  final DateTime? updatedAt;
   final String status;
+  final String? cancelledReason;
   final double? totalPrice;
   final String payType;
   final String deliveredTo;
@@ -51,6 +53,8 @@ class OrderModel {
     required this.deliveredTo,
     required this.items,
     this.totalPrice,
+    this.updatedAt,
+    this.cancelledReason,
   });
 
   int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
@@ -61,7 +65,12 @@ class OrderModel {
       createdAt:
           DateTime.tryParse((json['created_at'] ?? '').toString()) ??
               DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'].toString())
+          : null,
       status: (json['status'] ?? 'unknown').toString(),
+      cancelledReason: (json['cancelled_reason'] ?? json['cancel_reason'])
+          ?.toString(),
       totalPrice: (json['total_price'] as num?)?.toDouble(),
       payType: (json['payType'] ?? '').toString(),
       deliveredTo: (json['deliveredTo'] ?? '').toString(),
@@ -87,11 +96,24 @@ class OrderModel {
   }
 }
 
-const orderStatusFlow = <String>['pending', 'preparing', 'delivered', 'cancelled'];
+const orderStatusFlow = <String>[
+  'pending',
+  'accepted',
+  'preparing',
+  'ready',
+  'out_for_delivery',
+  'delivered',
+  'cancelled',
+  'completed',
+  'rejected',
+];
 
 const orderStatusLabels = <String, String>{
   'pending': 'Pending',
+  'accepted': 'Accepted',
   'preparing': 'Preparing',
+  'ready': 'Ready',
+  'out_for_delivery': 'Out for delivery',
   'delivered': 'Delivered',
   'cancelled': 'Cancelled',
   'completed': 'Completed',
