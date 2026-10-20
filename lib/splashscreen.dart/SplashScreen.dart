@@ -25,13 +25,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _decideNavigation() async {
+    debugPrint('[_decideNavigation] started');
     if (!isLoggedIn) {
+      debugPrint('[_decideNavigation] not logged in, going to login');
       if (mounted) context.go(LoginScreen.routename);
       return;
     }
 
+    debugPrint('[_decideNavigation] logged in, checking auth step');
     try {
       final step = await readAuthStep();
+      debugPrint('[_decideNavigation] auth step = $step');
       if (!mounted) return;
 
       if (step == null) {
@@ -44,8 +48,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         return;
       }
 
-      context.go(landingForStep(step));
+      final target = landingForStep(step);
+      debugPrint('[_decideNavigation] navigating to $target');
+      context.go(target);
     } catch (e) {
+      debugPrint('[_decideNavigation] error: $e');
       if (!mounted) return;
       setState(() {
         _failed = true;

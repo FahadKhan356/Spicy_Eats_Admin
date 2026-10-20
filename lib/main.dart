@@ -10,10 +10,17 @@ import 'package:spicy_eats_admin/utils/reload_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
+  // Set up error boundaries BEFORE the zone / Supabase init so that any
+  // failure is visible instead of a silent white screen.
+  FlutterError.onError = (details) {
+    FlutterError.dumpErrorToConsole(details);
+  };
+  ErrorWidget.builder = (details) => ErrorCrashView(
+        message: details.exception.toString(),
+        stackTrace: details.stack,
+      );
+
   await runZonedGuarded(() async {
-    // The binding must be initialised inside the same zone that later calls
-    // `runApp`, otherwise Flutter reports "Zone mismatch" and zone-scoped
-    // error handling silently stops working.
     WidgetsFlutterBinding.ensureInitialized();
 
     var supabaseReady = false;
@@ -43,14 +50,6 @@ void main() async {
       listenToAuth();
     }
 
-    FlutterError.onError = (details) {
-      debugPrint('FlutterError: ${details.exceptionAsString()}');
-      debugPrint(details.stack.toString());
-    };
-
-    ErrorWidget.builder = (details) =>
-        ErrorCrashView(message: details.exception.toString());
-
     if (!supabaseReady) {
       runApp(
         const MaterialApp(
@@ -62,6 +61,7 @@ void main() async {
     }
 
     runApp(const ProviderScope(child: SpicyEatsAdminApp()));
+    debugPrint('[main] runApp called');
   }, (error, stack) {
     debugPrint('Uncaught zone error: $error');
     debugPrint(stack.toString());
@@ -234,30 +234,13 @@ class _SpicyEatsAdminAppState extends State<SpicyEatsAdminApp> {
   }
 }
 
-class ErrorBoundary extends StatefulWidget {
+class ErrorBoundary extends StatelessWidget {
   final Widget child;
 
   const ErrorBoundary({super.key, required this.child});
 
   @override
-  State<ErrorBoundary> createState() => _ErrorBoundaryState();
-}
-
-class _ErrorBoundaryState extends State<ErrorBoundary> {
-  @override
-  void initState() {
-    super.initState();
-    ErrorWidget.builder = (details) {
-      debugPrint('Widget build error: ${details.exception}');
-      return ErrorCrashView(
-        message: details.exception.toString(),
-        stackTrace: details.stack,
-      );
-    };
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return widget.child;
+    return child;
   }
 }

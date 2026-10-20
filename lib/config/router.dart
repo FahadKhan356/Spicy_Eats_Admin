@@ -33,6 +33,9 @@ void listenToAuth() {
   _authSub ??= supabaseClient.auth.onAuthStateChange.listen((_) {
     authRefresh.value++;
   });
+  // Session may have been restored during Supabase.initialize() (before this
+  // listener was attached). Fire once to make the router re-check redirect.
+  authRefresh.value++;
 }
 
 bool get isLoggedIn => supabaseClient.auth.currentSession != null;
