@@ -3,6 +3,7 @@ import 'package:spicy_eats_admin/menu/model/CategoryItem.dart';
 import 'package:spicy_eats_admin/menu/model/CategoryModel.dart';
 import 'package:spicy_eats_admin/menu/model/DishModel.dart';
 import 'package:spicy_eats_admin/menu/model/RestaurantModel.dart';
+import 'package:spicy_eats_admin/promotions/model/BannerPromotionModel.dart';
 import 'package:spicy_eats_admin/utils/json_coercion.dart';
 
 void main() {
@@ -160,4 +161,45 @@ void main() {
       expect(asDateTime('nope').year, greaterThan(2000));
     });
   });
+
+  group('BannerPromotionModel', () {
+    test('BannerPositionModel parses JSON correctly', () {
+      final pos = BannerPositionModel.fromJson({
+        'id': 'pos-123',
+        'name': 'Home Top Carousel',
+        'max_banners': 5,
+        'base_price': 2500,
+      });
+      expect(pos.id, 'pos-123');
+      expect(pos.name, 'Home Top Carousel');
+      expect(pos.maxBanners, 5);
+      expect(pos.basePrice, 2500.0);
+    });
+
+    test('BannerSlotModel parses JSON and computes status', () {
+      final slot = BannerSlotModel.fromJson({
+        'id': 'slot-1',
+        'position_id': 'pos-123',
+        'restaurant_id': 'rest-1',
+        'banner_title': 'Special 50% Off Deals',
+        'banner_image_url': 'https://example.com/banner.jpg',
+        'start_date': '2026-10-01',
+        'end_date': '2026-12-31',
+        'price': 2500,
+        'status': 'pending',
+        'banner_requests': [
+          {'payment_status': 'paid', 'approval_status': 'pending'}
+        ],
+        'banner_positions': {'name': 'Home Top Carousel'},
+      });
+
+      expect(slot.id, 'slot-1');
+      expect(slot.bannerTitle, 'Special 50% Off Deals');
+      expect(slot.positionName, 'Home Top Carousel');
+      expect(slot.isPending, isTrue);
+      expect(slot.statusLabel, 'Pending Approval');
+      expect(slot.paymentStatus, 'paid');
+    });
+  });
 }
+
