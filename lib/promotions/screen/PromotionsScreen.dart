@@ -750,7 +750,7 @@ class _ErrorCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.orange.shade50,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange.shade300!),
+        border: Border.all(color: Colors.orange.shade300),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
