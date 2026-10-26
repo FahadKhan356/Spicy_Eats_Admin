@@ -423,6 +423,8 @@ class _BannersTabView extends ConsumerWidget {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: _BannerSlotCard(
                   slot: slot,
+                  onApprove: () => _updateBannerStatus(context, ref, slot, 'approved'),
+                  onPause: () => _updateBannerStatus(context, ref, slot, 'pending'),
                   onDelete: () => _confirmDeleteBanner(context, ref, slot),
                 ),
               )),
@@ -439,6 +441,39 @@ class _BannersTabView extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _updateBannerStatus(
+    BuildContext context,
+    WidgetRef ref,
+    BannerSlotModel slot,
+    String newStatus,
+  ) async {
+    final restUid = ref.read(restaurantProvider)?.restuid;
+    if (restUid == null) return;
+
+    try {
+      await ref.read(bannerPromotionsControllerProvider.notifier).setStatus(
+            slot.id,
+            newStatus,
+            restUid,
+          );
+      if (!context.mounted) return;
+      showCustomSnackbar(
+        context: context,
+        message: newStatus == 'approved'
+            ? '${slot.bannerTitle} is now LIVE on customer app!'
+            : '${slot.bannerTitle} is now paused (Pending)',
+        backgroundColor: Colors.black,
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      showCustomSnackbar(
+        context: context,
+        message: 'Could not update status: $e',
+        backgroundColor: Colors.red,
+      );
+    }
   }
 
   Future<void> _confirmDeleteBanner(BuildContext context, WidgetRef ref, BannerSlotModel slot) async {
@@ -537,10 +572,14 @@ class _BannersTabView extends ConsumerWidget {
 
 class _BannerSlotCard extends StatelessWidget {
   final BannerSlotModel slot;
+  final VoidCallback onApprove;
+  final VoidCallback onPause;
   final VoidCallback onDelete;
 
   const _BannerSlotCard({
     required this.slot,
+    required this.onApprove,
+    required this.onPause,
     required this.onDelete,
   });
 
@@ -634,10 +673,34 @@ class _BannerSlotCard extends StatelessWidget {
                     ),
                     PopupMenuButton<String>(
                       onSelected: (v) {
+                        if (v == 'approve') onApprove();
+                        if (v == 'pause') onPause();
                         if (v == 'delete') onDelete();
                       },
-                      itemBuilder: (_) => const [
-                        PopupMenuItem(value: 'delete', child: Text('Cancel/Remove')),
+                      itemBuilder: (_) => [
+                        if (slot.isPending)
+                          const PopupMenuItem(
+                            value: 'approve',
+                            child: Row(
+                              children: [
+                                Icon(Icons.check_circle_outline, color: Colors.green, size: 16),
+                                SizedBox(width: 8),
+                                Text('Make Live (Approve)', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        if (slot.isActive)
+                          const PopupMenuItem(
+                            value: 'pause',
+                            child: Row(
+                              children: [
+                                Icon(Icons.pause_circle_outline, color: Colors.orange, size: 16),
+                                SizedBox(width: 8),
+                                Text('Pause / Set Pending'),
+                              ],
+                            ),
+                          ),
+                        const PopupMenuItem(value: 'delete', child: Text('Cancel/Remove')),
                       ],
                     ),
                   ],
@@ -655,6 +718,22 @@ class _BannerSlotCard extends StatelessWidget {
                       _Tag(text: '${slot.daysRemaining} days left'),
                   ],
                 ),
+                if (slot.isPending) ...[
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: onApprove,
+                    icon: const Icon(Icons.rocket_launch_outlined, size: 16, color: Colors.green),
+                    label: const Text(
+                      'Make Banner Live (Approve)',
+                      style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.green),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

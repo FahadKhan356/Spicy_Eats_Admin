@@ -103,6 +103,27 @@ class BannerPromotionsRepo {
     });
   }
 
+  Future<void> updateStatus({
+    required String slotId,
+    required String status,
+  }) async {
+    await supabaseClient
+        .from('banner_slots')
+        .update({'status': status})
+        .eq('id', slotId);
+
+    try {
+      await supabaseClient
+          .from('banner_requests')
+          .update({
+            'approval_status': status,
+            'payment_status': status == 'approved' ? 'paid' : 'pending',
+            if (status == 'approved') 'approved_at': DateTime.now().toIso8601String(),
+          })
+          .eq('slot_id', slotId);
+    } catch (_) {}
+  }
+
   Future<void> deleteBanner(String slotId) async {
     try {
       await supabaseClient
@@ -215,6 +236,14 @@ class BannerPromotionsController extends Notifier<BannerPromotionsState> {
           endDate: endDate,
           price: price,
           imageBytes: imageBytes,
+        );
+    await load(restUid);
+  }
+
+  Future<void> setStatus(String slotId, String newStatus, String restUid) async {
+    await ref.read(bannerPromotionsRepoProvider).updateStatus(
+          slotId: slotId,
+          status: newStatus,
         );
     await load(restUid);
   }
