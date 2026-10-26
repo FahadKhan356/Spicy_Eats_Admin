@@ -62,26 +62,31 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen> {
           ? const Center(child: CircularProgressIndicator(color: Colors.black))
           : RefreshIndicator(
               onRefresh: _loadAll,
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-                children: [
-                  _Header(
-                    restaurantName: restaurant?.restaurantName ?? '',
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1360),
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                    children: [
+                      _Header(
+                        restaurantName: restaurant?.restaurantName ?? '',
+                      ),
+                      const SizedBox(height: 18),
+                      _TabSelector(
+                        selectedIndex: _activeTabIndex,
+                        onSelected: (index) => setState(() => _activeTabIndex = index),
+                      ),
+                      const SizedBox(height: 22),
+                      if (_activeTabIndex == 0)
+                        _DiscountsTabView(
+                          error: _discountsError,
+                          onRefresh: _loadAll,
+                        )
+                      else
+                        const _BannersTabView(),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  _TabSelector(
-                    selectedIndex: _activeTabIndex,
-                    onSelected: (index) => setState(() => _activeTabIndex = index),
-                  ),
-                  const SizedBox(height: 20),
-                  if (_activeTabIndex == 0)
-                    _DiscountsTabView(
-                      error: _discountsError,
-                      onRefresh: _loadAll,
-                    )
-                  else
-                    const _BannersTabView(),
-                ],
+                ),
               ),
             ),
     );
@@ -130,31 +135,37 @@ class _TabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      padding: const EdgeInsets.all(4),
-      child: Row(
-        children: [
-          Expanded(
-            child: _TabButton(
-              title: '🏷️ Discounts & Coupons',
-              isSelected: selectedIndex == 0,
-              onTap: () => onSelected(0),
-            ),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade200),
           ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: _TabButton(
-              title: '🖼️ Banner Ads',
-              isSelected: selectedIndex == 1,
-              onTap: () => onSelected(1),
-            ),
+          padding: const EdgeInsets.all(4),
+          child: Row(
+            children: [
+              Expanded(
+                child: _TabButton(
+                  title: '🏷️ Discounts & Coupons',
+                  isSelected: selectedIndex == 0,
+                  onTap: () => onSelected(0),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: _TabButton(
+                  title: '🖼️ Banner Ads',
+                  isSelected: selectedIndex == 1,
+                  onTap: () => onSelected(1),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -246,14 +257,26 @@ class _DiscountsTabView extends ConsumerWidget {
         else if (state.visible.isEmpty)
           const _EmptyDiscountsView()
         else
-          ...state.visible.map((promotion) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _PromotionCard(
-                  promotion: promotion,
-                  onToggle: () => _toggle(context, ref, promotion),
-                  onDelete: () => _confirmDelete(context, ref, promotion),
-                ),
-              )),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 840;
+              final cardWidth = isWide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth;
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: state.visible
+                    .map((promotion) => SizedBox(
+                          width: cardWidth,
+                          child: _PromotionCard(
+                            promotion: promotion,
+                            onToggle: () => _toggle(context, ref, promotion),
+                            onDelete: () => _confirmDelete(context, ref, promotion),
+                          ),
+                        ))
+                    .toList(),
+              );
+            },
+          ),
         const SizedBox(height: 16),
         FilledButton.icon(
           onPressed: () => _openCreateSheet(context, ref),
@@ -334,6 +357,7 @@ class _DiscountsTabView extends ConsumerWidget {
     final result = await showModalBottomSheet<_PromotionDraft>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 640),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -419,15 +443,27 @@ class _BannersTabView extends ConsumerWidget {
         else if (state.visible.isEmpty)
           const _EmptyBannersView()
         else
-          ...state.visible.map((slot) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _BannerSlotCard(
-                  slot: slot,
-                  onApprove: () => _updateBannerStatus(context, ref, slot, 'approved'),
-                  onPause: () => _updateBannerStatus(context, ref, slot, 'pending'),
-                  onDelete: () => _confirmDeleteBanner(context, ref, slot),
-                ),
-              )),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 840;
+              final cardWidth = isWide ? (constraints.maxWidth - 16) / 2 : constraints.maxWidth;
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: state.visible
+                    .map((slot) => SizedBox(
+                          width: cardWidth,
+                          child: _BannerSlotCard(
+                            slot: slot,
+                            onApprove: () => _updateBannerStatus(context, ref, slot, 'approved'),
+                            onPause: () => _updateBannerStatus(context, ref, slot, 'pending'),
+                            onDelete: () => _confirmDeleteBanner(context, ref, slot),
+                          ),
+                        ))
+                    .toList(),
+              );
+            },
+          ),
         const SizedBox(height: 16),
         FilledButton.icon(
           onPressed: () => _openRequestBannerSheet(context, ref, state.positions),
@@ -529,6 +565,7 @@ class _BannersTabView extends ConsumerWidget {
     final result = await showModalBottomSheet<_BannerDraft>(
       context: context,
       isScrollControlled: true,
+      constraints: const BoxConstraints(maxWidth: 640),
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -600,8 +637,15 @@ class _BannerSlotCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -611,7 +655,7 @@ class _BannerSlotCard extends StatelessWidget {
             Stack(
               children: [
                 AspectRatio(
-                  aspectRatio: 16 / 6,
+                  aspectRatio: 16 / 8,
                   child: Image.network(
                     slot.bannerImageUrl,
                     fit: BoxFit.cover,
@@ -720,17 +764,20 @@ class _BannerSlotCard extends StatelessWidget {
                 ),
                 if (slot.isPending) ...[
                   const SizedBox(height: 12),
-                  OutlinedButton.icon(
-                    onPressed: onApprove,
-                    icon: const Icon(Icons.rocket_launch_outlined, size: 16, color: Colors.green),
-                    label: const Text(
-                      'Make Banner Live (Approve)',
-                      style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.green),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: onApprove,
+                      icon: const Icon(Icons.rocket_launch_rounded, size: 16, color: Colors.white),
+                      label: const Text(
+                        'Make Banner Live (Approve)',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.green.shade600,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      ),
                     ),
                   ),
                 ],
@@ -1060,8 +1107,15 @@ class _PromotionCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

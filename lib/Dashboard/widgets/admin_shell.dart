@@ -94,16 +94,20 @@ class _AdminShellState extends ConsumerState<AdminShell> {
               ],
             ),
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (isDesktop)
-            ColoredBox(
-              color: Colors.white,
-              child: SafeArea(
-                right: false,
-                child: SizedBox(
-                  width: SideDrawerMenu.width,
-                  child: ref.watch(sideDrawerProvider),
+            Container(
+              width: SideDrawerMenu.width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  right: BorderSide(color: Colors.grey.shade200, width: 1),
                 ),
+              ),
+              child: const SafeArea(
+                right: false,
+                child: SideDrawerMenu(),
               ),
             ),
           Expanded(child: widget.child),
