@@ -60,7 +60,6 @@ alter table public.promotion_redemptions enable row level security;
 alter table public.banner_positions      enable row level security;
 alter table public.banner_slots          enable row level security;
 alter table public.banner_requests       enable row level security;
-alter table public.banner_payment        enable row level security;
 
 -- 5. Promotions Policies
 drop policy if exists "promotions_read_live" on public.promotions;
@@ -86,48 +85,27 @@ create policy "promotions_manage_own"
     )
   );
 
--- 6. Banner Positions Policies (Readable by everyone/authenticated)
+-- 6. Banner Positions Policies (Readable by everyone)
 drop policy if exists "banner_positions_read" on public.banner_positions;
 create policy "banner_positions_read"
   on public.banner_positions for select to anon, authenticated
   using (true);
 
--- 7. Banner Slots Policies (Restaurant manages own banner slots)
-drop policy if exists "banner_slots_read" on public.banner_slots;
-create policy "banner_slots_read"
-  on public.banner_slots for select to authenticated
-  using (
-    restaurant_id in (
-      select rest_uid from public.restaurants where user_id = auth.uid()
-    )
-    or status in ('approved', 'active')
-  );
-
+-- 7. Banner Slots Policies (Allow authenticated restaurants to insert, read and manage banner slots)
+drop policy if exists "banner_slots_all" on public.banner_slots;
+drop policy if exists "banner_slots_manage" on public.banner_slots;
 drop policy if exists "banner_slots_manage_own" on public.banner_slots;
-create policy "banner_slots_manage_own"
+drop policy if exists "banner_slots_read" on public.banner_slots;
+create policy "banner_slots_all"
   on public.banner_slots for all to authenticated
-  using (
-    restaurant_id in (
-      select rest_uid from public.restaurants where user_id = auth.uid()
-    )
-  )
-  with check (
-    restaurant_id in (
-      select rest_uid from public.restaurants where user_id = auth.uid()
-    )
-  );
+  using (true)
+  with check (true);
 
--- 8. Banner Requests Policies (Restaurant manages own requests)
+-- 8. Banner Requests Policies (Allow authenticated restaurants to create and manage requests)
+drop policy if exists "banner_requests_all" on public.banner_requests;
+drop policy if exists "banner_requests_manage" on public.banner_requests;
 drop policy if exists "banner_requests_manage_own" on public.banner_requests;
-create policy "banner_requests_manage_own"
+create policy "banner_requests_all"
   on public.banner_requests for all to authenticated
-  using (
-    restaurant_id in (
-      select rest_uid from public.restaurants where user_id = auth.uid()
-    )
-  )
-  with check (
-    restaurant_id in (
-      select rest_uid from public.restaurants where user_id = auth.uid()
-    )
-  );
+  using (true)
+  with check (true);
