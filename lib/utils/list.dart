@@ -1,18 +1,22 @@
+import 'package:flutter/material.dart';
 import 'package:spicy_eats_admin/Dashboard/Dashboard.dart';
 import 'package:spicy_eats_admin/menu/screen/MenuScreen.dart';
 import 'package:spicy_eats_admin/orders/screen/OrdersScreen.dart';
 import 'package:spicy_eats_admin/promotions/screen/PromotionsScreen.dart';
+import 'package:spicy_eats_admin/reviews/screen/ReviewsScreen.dart';
 
 class NavItem {
   final String title;
   final String route;
-  final String icon;
+  final String? icon;
+  final IconData? iconData;
   final bool enabled;
 
   const NavItem({
     required this.title,
     required this.route,
-    required this.icon,
+    this.icon,
+    this.iconData,
     this.enabled = true,
   });
 }
@@ -37,5 +41,10 @@ const List<NavItem> navItems = [
     title: 'Promotions',
     route: PromotionsScreen.routename,
     icon: 'lib/assets/Promotion.png',
+  ),
+  NavItem(
+    title: 'Reviews',
+    route: ReviewsScreen.routename,
+    iconData: Icons.star_rate_rounded,
   ),
 ];

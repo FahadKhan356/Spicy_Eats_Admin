@@ -110,3 +110,15 @@ final dishReviewsProvider =
     FutureProvider.autoDispose.family<List<ReviewModel>, String>((ref, restUid) {
   return ref.read(reviewsRepoProvider).fetchDishReviews(restUid);
 });
+
+final allReviewsProvider = FutureProvider.autoDispose
+    .family<List<ReviewModel>, String>((ref, restUid) async {
+  final repo = ref.read(reviewsRepoProvider);
+  final results = await Future.wait([
+    repo.fetchRestaurantReviews(restUid),
+    repo.fetchDishReviews(restUid),
+  ]);
+  final combined = [...results[0], ...results[1]];
+  combined.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  return combined;
+});

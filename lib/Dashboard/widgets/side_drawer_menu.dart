@@ -246,12 +246,19 @@ class _NavTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10.5),
             child: Row(
               children: [
-                Image.asset(
-                  item.icon,
-                  width: 20,
-                  height: 20,
-                  color: isSelected ? Colors.white : iconColor,
-                ),
+                if (item.iconData != null)
+                  Icon(
+                    item.iconData,
+                    size: 20,
+                    color: isSelected ? Colors.white : iconColor,
+                  )
+                else
+                  Image.asset(
+                    item.icon!,
+                    width: 20,
+                    height: 20,
+                    color: isSelected ? Colors.white : iconColor,
+                  ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(

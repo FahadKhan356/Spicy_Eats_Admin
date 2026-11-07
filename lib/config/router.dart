@@ -18,6 +18,7 @@ import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:spicy_eats_admin/menu/screen/MenuScreen.dart';
 import 'package:spicy_eats_admin/orders/screen/OrdersScreen.dart';
 import 'package:spicy_eats_admin/promotions/screen/PromotionsScreen.dart';
+import 'package:spicy_eats_admin/reviews/screen/ReviewsScreen.dart';
 import 'package:spicy_eats_admin/splashscreen.dart/SplashScreen.dart';
 
 const publicRoutes = <String>{
@@ -179,6 +180,10 @@ GoRouter buildRouter() {
           GoRoute(
             path: PromotionsScreen.routename,
             builder: (context, state) => const PromotionsScreen(),
+          ),
+          GoRoute(
+            path: ReviewsScreen.routename,
+            builder: (context, state) => const ReviewsScreen(),
           ),
         ],
       ),

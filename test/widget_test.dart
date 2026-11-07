@@ -83,9 +83,10 @@ void main() {
       expect(routes.toSet().length, routes.length);
     });
 
-    test('all four primary destinations are declared', () {
-      expect(navItems.length, 4);
+    test('all primary destinations are declared including reviews', () {
+      expect(navItems.length, 5);
       expect(navItems.first.route, '/Dashboard');
+      expect(navItems.any((item) => item.route == '/Reviews'), isTrue);
     });
   });
 }
