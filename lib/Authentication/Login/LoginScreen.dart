@@ -208,12 +208,13 @@ class _DekstopLayoutState extends ConsumerState<DekstopLayout> {
                                                 overflow: TextOverflow.clip)),
                                       ],
                                     ),
-                                    MouseRegion(
-                                      cursor: SystemMouseCursors.click,
-                                      child: GestureDetector(
-                                        onTap: () => context
-                                            .go(ForgotPasswordScreen.routename),
-                                        child: const Text(
+                                    InkWell(
+                                      onTap: () => context
+                                          .go(ForgotPasswordScreen.routename),
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 4, horizontal: 2),
+                                        child: Text(
                                           "Forget Your Password?",
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
@@ -526,12 +527,13 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                       ),
                                     ],
                                   ),
-                                  MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      onTap: () => context
-                                          .go(ForgotPasswordScreen.routename),
-                                      child: const Text(
+                                  InkWell(
+                                    onTap: () => context
+                                        .go(ForgotPasswordScreen.routename),
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 4, horizontal: 2),
+                                      child: Text(
                                         "Forget Your Password?",
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -558,12 +560,13 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                     ),
                                   ],
                                 ),
-                                MouseRegion(
-                                  cursor: SystemMouseCursors.click,
-                                  child: GestureDetector(
-                                    onTap: () => context
-                                        .go(ForgotPasswordScreen.routename),
-                                    child: const Text(
+                                InkWell(
+                                  onTap: () => context
+                                      .go(ForgotPasswordScreen.routename),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 4, horizontal: 2),
+                                    child: Text(
                                       "Forget Your Password?",
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
