@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:spicy_eats_admin/Authentication/ForgotPassword/ForgotPasswordScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Signup/screen/SignupScreen.dart';
 import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/RegisterTextfield.dart';
@@ -207,11 +208,18 @@ class _DekstopLayoutState extends ConsumerState<DekstopLayout> {
                                                 overflow: TextOverflow.clip)),
                                       ],
                                     ),
-                                    const Text(
-                                      "Forget Your Password?",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          overflow: TextOverflow.clip),
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: GestureDetector(
+                                        onTap: () => context
+                                            .go(ForgotPasswordScreen.routename),
+                                        child: const Text(
+                                          "Forget Your Password?",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              overflow: TextOverflow.clip),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -518,13 +526,18 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                       ),
                                     ],
                                   ),
-                                  const Text(
-                                    "Forget Your Password?",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      overflow: TextOverflow.ellipsis,
-                                      // fontSize:
-                                      //     constraint.maxWidth < 767 ? 10 : 20
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: () => context
+                                          .go(ForgotPasswordScreen.routename),
+                                      child: const Text(
+                                        "Forget Your Password?",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -541,20 +554,22 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                                       "Remember Me",
                                       style: TextStyle(
                                         overflow: TextOverflow.ellipsis,
-                                        // fontSize: constraint.maxWidth < 767
-                                        //     ? 10
-                                        //     : 20
                                       ),
                                     ),
                                   ],
                                 ),
-                                const Text(
-                                  "Forget Your Password?",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    overflow: TextOverflow.ellipsis,
-                                    // fontSize:
-                                    //     constraint.maxWidth < 767 ? 10 : 20
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: GestureDetector(
+                                    onTap: () => context
+                                        .go(ForgotPasswordScreen.routename),
+                                    child: const Text(
+                                      "Forget Your Password?",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],

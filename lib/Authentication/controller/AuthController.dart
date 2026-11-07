@@ -95,4 +95,36 @@ class AuthController {
         pickUpCommission: pickUpCommission,
         userid: userid);
   }
+
+  Future<bool> sendPasswordResetEmail({
+    required String email,
+    required BuildContext context,
+  }) async {
+    return await authRepository.sendPasswordResetEmail(
+      email: email,
+      context: context,
+    );
+  }
+
+  Future<bool> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+    required BuildContext context,
+  }) async {
+    return await authRepository.verifyPasswordResetOtp(
+      email: email,
+      otp: otp,
+      context: context,
+    );
+  }
+
+  Future<bool> updatePassword({
+    required String newPassword,
+    required BuildContext context,
+  }) async {
+    return await authRepository.updatePassword(
+      newPassword: newPassword,
+      context: context,
+    );
+  }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:spicy_eats_admin/Authentication/ForgotPassword/ResetPasswordScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
@@ -33,6 +34,8 @@ class _AuthCallbackPageState extends ConsumerState<AuthCallbackPage> {
   Future<void> _restoreSession() async {
     try {
       final uri = Uri.base;
+      final isRecovery = uri.queryParameters['type'] == 'recovery' ||
+          uri.fragment.contains('type=recovery');
       final hasParams = uri.queryParameters.containsKey('code') ||
           uri.queryParameters.containsKey('access_token');
 
@@ -41,15 +44,27 @@ class _AuthCallbackPageState extends ConsumerState<AuthCallbackPage> {
       }
 
       _authListener = supabaseClient.auth.onAuthStateChange.listen((event) {
+        if (event.event == AuthChangeEvent.passwordRecovery && mounted) {
+          context.go(ResetPasswordScreen.routename);
+          return;
+        }
         if (event.event == AuthChangeEvent.signedIn &&
             event.session != null &&
             mounted) {
+          if (isRecovery) {
+            context.go(ResetPasswordScreen.routename);
+            return;
+          }
           _persistUser();
           context.go(SplashScreen.routename);
         }
       });
 
       if (isLoggedIn && mounted) {
+        if (isRecovery) {
+          context.go(ResetPasswordScreen.routename);
+          return;
+        }
         await _persistUser();
         if (mounted) context.go(SplashScreen.routename);
       }

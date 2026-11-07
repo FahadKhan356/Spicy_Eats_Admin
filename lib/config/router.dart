@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:spicy_eats_admin/Authentication/ForgotPassword/ForgotPasswordScreen.dart';
+import 'package:spicy_eats_admin/Authentication/ForgotPassword/ResetPasswordScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
@@ -23,6 +25,8 @@ const publicRoutes = <String>{
   LoginScreen.routename,
   SignUpScreen.routename,
   AuthCallbackPage.routename,
+  ForgotPasswordScreen.routename,
+  ResetPasswordScreen.routename,
 };
 
 final authRefresh = ValueNotifier<int>(0);
@@ -111,6 +115,10 @@ GoRouter buildRouter() {
       if (!isLoggedIn) {
         return isPublic ? null : LoginScreen.routename;
       }
+      if (location == ResetPasswordScreen.routename ||
+          location == AuthCallbackPage.routename) {
+        return null;
+      }
       if (isPublic && location != SplashScreen.routename) {
         return SplashScreen.routename;
       }
@@ -128,6 +136,14 @@ GoRouter buildRouter() {
       GoRoute(
         path: SignUpScreen.routename,
         builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
+        path: ForgotPasswordScreen.routename,
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: ResetPasswordScreen.routename,
+        builder: (context, state) => const ResetPasswordScreen(),
       ),
       GoRoute(
         path: AuthCallbackPage.routename,

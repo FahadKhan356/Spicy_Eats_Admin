@@ -303,4 +303,130 @@ class AuthRepository {
       rethrow;
     }
   }
+
+  // Send password reset email
+  Future<bool> sendPasswordResetEmail({
+    required String email,
+    required BuildContext context,
+  }) async {
+    try {
+      final redirectUrl = kIsWeb ? '${Uri.base.origin}/auth/callback' : null;
+      await supabaseClient.auth.resetPasswordForEmail(
+        email.trim(),
+        redirectTo: redirectUrl,
+      );
+      if (context.mounted) {
+        showCustomSnackbar(
+          context: context,
+          message: 'Password reset link sent to $email',
+          backgroundColor: Colors.black,
+        );
+      }
+      return true;
+    } on AuthException catch (e) {
+      if (context.mounted) {
+        showCustomSnackbar(
+          context: context,
+          message: e.message,
+          backgroundColor: Colors.red,
+        );
+      }
+      return false;
+    } catch (e) {
+      if (context.mounted) {
+        showCustomSnackbar(
+          context: context,
+          message: 'Failed to send reset link: $e',
+          backgroundColor: Colors.red,
+        );
+      }
+      return false;
+    }
+  }
+
+  // Verify OTP for password recovery
+  Future<bool> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+    required BuildContext context,
+  }) async {
+    try {
+      final response = await supabaseClient.auth.verifyOTP(
+        email: email.trim(),
+        token: otp.trim(),
+        type: OtpType.recovery,
+      );
+      if (response.session != null) {
+        return true;
+      }
+      if (context.mounted) {
+        showCustomSnackbar(
+          context: context,
+          message: 'Invalid or expired OTP code',
+          backgroundColor: Colors.red,
+        );
+      }
+      return false;
+    } on AuthException catch (e) {
+      if (context.mounted) {
+        showCustomSnackbar(
+          context: context,
+          message: e.message,
+          backgroundColor: Colors.red,
+        );
+      }
+      return false;
+    } catch (e) {
+      if (context.mounted) {
+        showCustomSnackbar(
+          context: context,
+          message: 'Verification failed: $e',
+          backgroundColor: Colors.red,
+        );
+      }
+      return false;
+    }
+  }
+
+  // Update password
+  Future<bool> updatePassword({
+    required String newPassword,
+    required BuildContext context,
+  }) async {
+    try {
+      final response = await supabaseClient.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+      if (response.user != null) {
+        if (context.mounted) {
+          showCustomSnackbar(
+            context: context,
+            message: 'Password updated successfully! Please login with your new password.',
+            backgroundColor: Colors.black,
+          );
+        }
+        await supabaseClient.auth.signOut();
+        return true;
+      }
+      return false;
+    } on AuthException catch (e) {
+      if (context.mounted) {
+        showCustomSnackbar(
+          context: context,
+          message: e.message,
+          backgroundColor: Colors.red,
+        );
+      }
+      return false;
+    } catch (e) {
+      if (context.mounted) {
+        showCustomSnackbar(
+          context: context,
+          message: 'Failed to update password: $e',
+          backgroundColor: Colors.red,
+        );
+      }
+      return false;
+    }
+  }
 }
