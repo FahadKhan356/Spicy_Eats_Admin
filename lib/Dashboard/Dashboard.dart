@@ -361,17 +361,50 @@ class _RecentOrders extends StatelessWidget {
   }
 }
 
-class _ReviewsPanel extends ConsumerWidget {
+class _ReviewsPanel extends ConsumerStatefulWidget {
   final String restUid;
 
   const _ReviewsPanel({required this.restUid});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final reviewsAsync = ref.watch(reviewsProvider(restUid));
+  ConsumerState<_ReviewsPanel> createState() => _ReviewsPanelState();
+}
+
+class _ReviewsPanelState extends ConsumerState<_ReviewsPanel> {
+  int _selectedTab = 0; // 0: Restaurant Reviews, 1: Dish Reviews
+
+  @override
+  Widget build(BuildContext context) {
+    final isDishTab = _selectedTab == 1;
+    final reviewsAsync = ref.watch(
+        isDishTab ? dishReviewsProvider(widget.restUid) : reviewsProvider(widget.restUid));
 
     return _Panel(
-      title: 'Recent reviews',
+      title: 'Customer reviews & ratings',
+      trailing: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.all(2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _TabButton(
+              label: 'Restaurant',
+              icon: Icons.storefront_outlined,
+              isSelected: _selectedTab == 0,
+              onTap: () => setState(() => _selectedTab = 0),
+            ),
+            _TabButton(
+              label: 'Dishes',
+              icon: Icons.fastfood_outlined,
+              isSelected: _selectedTab == 1,
+              onTap: () => setState(() => _selectedTab = 1),
+            ),
+          ],
+        ),
+      ),
       child: reviewsAsync.when(
         loading: () => const Padding(
           padding: EdgeInsets.symmetric(vertical: 20),
@@ -383,15 +416,23 @@ class _ReviewsPanel extends ConsumerWidget {
             ),
           ),
         ),
-        error: (_, __) => const _EmptyNote(
-          text: 'Reviews appear after the reviews migration is run.',
+        error: (err, _) => _EmptyNote(
+          text: 'Error loading reviews: $err',
         ),
         data: (reviews) => reviews.isEmpty
-            ? const _EmptyNote(text: 'No reviews yet.')
+            ? _EmptyNote(
+                text: isDishTab
+                    ? 'No dish ratings or reviews yet.'
+                    : 'No restaurant reviews yet.',
+              )
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final review in reviews) _ReviewRow(review: review),
+                  for (final review in reviews)
+                    _ReviewRow(
+                      review: review,
+                      restUid: widget.restUid,
+                    ),
                 ],
               ),
       ),
@@ -399,13 +440,118 @@ class _ReviewsPanel extends ConsumerWidget {
   }
 }
 
-class _ReviewRow extends StatelessWidget {
-  final ReviewModel review;
+class _TabButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
 
-  const _ReviewRow({required this.review});
+  const _TabButton({
+    required this.label,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  )
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 13,
+              color: isSelected ? Colors.black : Colors.black45,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? Colors.black : Colors.black54,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReviewRow extends ConsumerStatefulWidget {
+  final ReviewModel review;
+  final String restUid;
+
+  const _ReviewRow({required this.review, required this.restUid});
+
+  @override
+  ConsumerState<_ReviewRow> createState() => _ReviewRowState();
+}
+
+class _ReviewRowState extends ConsumerState<_ReviewRow> {
+  bool _isReplying = false;
+  bool _isSubmitting = false;
+  late final TextEditingController _replyController;
+
+  @override
+  void initState() {
+    super.initState();
+    _replyController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _replyController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitReply() async {
+    final text = _replyController.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() => _isSubmitting = true);
+    final success = await ref.read(reviewsRepoProvider).replyToReview(
+          reviewId: widget.review.id,
+          reply: text,
+          isDishReview: widget.review.isDishReview,
+        );
+
+    if (mounted) {
+      setState(() {
+        _isSubmitting = false;
+        if (success) {
+          _isReplying = false;
+        }
+      });
+      if (success) {
+        ref.invalidate(reviewsProvider(widget.restUid));
+        ref.invalidate(dishReviewsProvider(widget.restUid));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final review = widget.review;
     final tone = review.rating >= 4
         ? Colors.green
         : review.rating == 3
@@ -413,28 +559,69 @@ class _ReviewRow extends StatelessWidget {
             : Colors.red;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (review.dishName != null && review.dishName!.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: MyAppColor.primaryBg,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.black12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.fastfood_outlined,
+                    size: 11,
+                    color: MyAppColor.orangePrimary,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    review.dishName!,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Row(
             children: [
-              Text(review.reviewer, style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              )),
+              Text(
+                review.reviewer,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(width: 8),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: tone.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(
-                  '${review.rating}/5',
-                  style: TextStyle(
-                      fontSize: 10, color: tone, fontWeight: FontWeight.bold),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.star, size: 10, color: tone),
+                    const SizedBox(width: 2),
+                    Text(
+                      '${review.rating}/5',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: tone,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const Spacer(),
@@ -444,30 +631,142 @@ class _ReviewRow extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 5),
           if ((review.body ?? '').isNotEmpty)
             Text(
               review.body!,
               style: const TextStyle(fontSize: 12, color: Colors.black87, height: 1.4),
             ),
           if ((review.reply ?? '').isNotEmpty) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
+                color: const Color(0xFFF9F9FB),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.black12),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.reply, size: 12, color: Colors.black45),
+                  const Icon(Icons.reply, size: 13, color: Colors.black45),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(
-                      review.reply!,
-                      style: const TextStyle(fontSize: 11, color: Colors.black54),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Your response:',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          review.reply!,
+                          style: const TextStyle(fontSize: 11, color: Colors.black87),
+                        ),
+                      ],
                     ),
+                  ),
+                ],
+              ),
+            ),
+          ] else if (!_isReplying) ...[
+            const SizedBox(height: 4),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => setState(() => _isReplying = true),
+                icon: const Icon(Icons.reply, size: 12, color: Colors.black54),
+                label: const Text(
+                  'Reply',
+                  style: TextStyle(fontSize: 11, color: Colors.black87),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ),
+          ],
+          if (_isReplying) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F5F7),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.black12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  TextField(
+                    controller: _replyController,
+                    maxLines: 2,
+                    style: const TextStyle(fontSize: 12),
+                    decoration: const InputDecoration(
+                      hintText: 'Type your response to the customer...',
+                      hintStyle: TextStyle(fontSize: 11, color: Colors.black38),
+                      border: InputBorder.none,
+                      isDense: true,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: _isSubmitting
+                            ? null
+                            : () => setState(() => _isReplying = false),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(fontSize: 11, color: Colors.black54),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: _isSubmitting ? null : _submitReply,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                width: 12,
+                                height: 12,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Post reply',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -490,8 +789,9 @@ class _ReviewRow extends StatelessWidget {
 class _Panel extends StatelessWidget {
   final String title;
   final Widget child;
+  final Widget? trailing;
 
-  const _Panel({required this.title, required this.child});
+  const _Panel({required this.title, required this.child, this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -505,9 +805,15 @@ class _Panel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+              if (trailing != null) trailing!,
+            ],
           ),
           const SizedBox(height: 14),
           child,
