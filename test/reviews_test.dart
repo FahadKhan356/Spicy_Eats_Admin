@@ -48,6 +48,24 @@ void main() {
       expect(model.isDishReview, true);
     });
 
+    test('parses full name from profile when firstname and lastname exist', () {
+      final json = {
+        'id': 2,
+        'rating': 5,
+        'body': 'Great food!',
+        'created_at': '2026-11-05T13:25:48.926673+00:00',
+        'profiles': {
+          'firstname': 'Sajida',
+          'lastname': 'Awan',
+          'email': 'sajidaawan90@gmail.com',
+        },
+      };
+
+      final model = ReviewModel.fromJson(json);
+
+      expect(model.reviewer, 'Sajida Awan');
+    });
+
     test('handles missing profile and null body safely', () {
       final json = {
         'id': 99,

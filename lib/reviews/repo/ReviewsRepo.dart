@@ -27,13 +27,24 @@ class ReviewModel {
 
   factory ReviewModel.fromJson(Map<String, dynamic> json, {bool isDish = false}) {
     final profile = json['profiles'] as Map<String, dynamic>?;
+    String reviewerName = 'Customer';
+    if (profile != null) {
+      final fName = (profile['firstname'] as String?)?.trim() ?? '';
+      final lName = (profile['lastname'] as String?)?.trim() ?? '';
+      final fullName = '$fName $lName'.trim();
+      if (fullName.isNotEmpty) {
+        reviewerName = fullName;
+      } else if (profile['email'] != null && (profile['email'] as String).isNotEmpty) {
+        reviewerName = (profile['email'] as String).split('@').first;
+      }
+    }
+
     return ReviewModel(
       id: (json['id'] as num).toInt(),
       rating: (json['rating'] as num?)?.toInt() ?? 0,
       body: json['body']?.toString(),
       reply: json['reply']?.toString(),
-      reviewer:
-          (profile?['email'] as String?)?.split('@').first ?? 'Customer',
+      reviewer: reviewerName,
       createdAt:
           DateTime.tryParse((json['created_at'] ?? '').toString()) ?? DateTime.now(),
       dishName: json['dish_name']?.toString(),
@@ -87,12 +98,12 @@ class ReviewsRepo {
       return await supabaseClient
           .from(table)
           .select(embedProfile
-              ? '*, profiles:users!$fkName(email)'
+              ? '*, profiles:users!$fkName(firstname, lastname, email)'
               : '*')
           .eq('restaurant_id', restUid)
           .eq('is_hidden', false)
           .order('created_at', ascending: false)
-          .limit(10);
+          .limit(100);
     } catch (_) {
       return null;
     }
