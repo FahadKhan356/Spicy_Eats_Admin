@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:spicy_eats_admin/config/responsiveness.dart';
+import 'package:spicy_eats_admin/config/router.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:spicy_eats_admin/menu/Repo/MenuManagerRepo.dart';
 import 'package:spicy_eats_admin/utils/colors.dart';
@@ -338,14 +339,11 @@ class _SignOutTile extends ConsumerWidget {
   }
 
   Future<void> _signOut(BuildContext context, WidgetRef ref) async {
-    if (Responsive.isMobile(context)) Navigator.of(context).pop();
-    if (!context.mounted) return;
-
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Sign out?'),
-        content: const Text('You will need to sign in again to manage orders.'),
+        content: const Text('You will need to sign in again to access the portal.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -353,16 +351,30 @@ class _SignOutTile extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.black),
             child: const Text('Sign out'),
           ),
         ],
       ),
     );
 
-    if (confirmed != true || !context.mounted) return;
+    if (confirmed != true) return;
 
-    await supabaseClient.auth.signOut();
+    if (context.mounted && Responsive.isMobile(context)) {
+      Navigator.of(context).pop();
+    }
+
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (e) {
+      debugPrint('SignOut error: $e');
+    }
+
     ref.read(restaurantProvider.notifier).state = null;
-    if (context.mounted) context.go(LoginScreen.routename);
+    authRefresh.value++;
+
+    if (context.mounted) {
+      context.go(LoginScreen.routename);
+    }
   }
 }

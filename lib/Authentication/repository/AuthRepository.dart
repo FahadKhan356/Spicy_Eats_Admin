@@ -7,6 +7,7 @@ import 'package:spicy_eats_admin/Authentication/Register/screens/Approve.dart';
 import 'package:spicy_eats_admin/Authentication/Register/screens/chooseplanscreen.dart';
 import 'package:spicy_eats_admin/Authentication/Register/model/Restaurantmodel.dart';
 import 'package:spicy_eats_admin/common/snackbar.dart';
+import 'package:spicy_eats_admin/config/router.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:spicy_eats_admin/splashscreen.dart/SplashScreen.dart';
 import 'package:spicy_eats_admin/utils/UploadImageToSupabase.dart';
@@ -243,6 +244,7 @@ class AuthRepository {
   Future<void> signout(BuildContext context) async {
     try {
       await supabaseClient.auth.signOut();
+      authRefresh.value++;
       if (context.mounted) {
         context.go(LoginScreen.routename);
       }

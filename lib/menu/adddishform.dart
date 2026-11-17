@@ -394,27 +394,46 @@ class _AddDishFormState extends ConsumerState<AddDishForm> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: DropdownButtonFormField<CategoryModel>(
-                          isExpanded: true,
-                          initialValue: _category,
-                          decoration: const InputDecoration(
-                            labelText: 'Category',
-                            labelStyle: TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          items: widget.categories
-                              .map((c) => DropdownMenuItem(
-                                    value: c,
-                                    child: Text(
-                                      c.categoryName,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ))
-                              .toList(),
-                          onChanged: (v) => setState(() => _category = v),
-                          validator: (v) =>
-                              v == null ? 'Select a category' : null,
+                        child: Builder(
+                          builder: (context) {
+                            final Map<String, CategoryModel> categoryMap = {};
+                            for (final c in widget.categories) {
+                              if (c.categoryId.isNotEmpty) {
+                                categoryMap[c.categoryId] = c;
+                              }
+                            }
+                            final uniqueCategories = categoryMap.values.toList();
+                            final selectedId = (_category != null && categoryMap.containsKey(_category!.categoryId))
+                                ? _category!.categoryId
+                                : null;
+
+                            return DropdownButtonFormField<String>(
+                              isExpanded: true,
+                              value: selectedId,
+                              decoration: const InputDecoration(
+                                labelText: 'Category',
+                                labelStyle: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              items: uniqueCategories
+                                  .map((c) => DropdownMenuItem<String>(
+                                        value: c.categoryId,
+                                        child: Text(
+                                          c.categoryName,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ))
+                                  .toList(),
+                              onChanged: (v) {
+                                setState(() {
+                                  _category = v != null ? categoryMap[v] : null;
+                                });
+                              },
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? 'Select a category' : null,
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 16),

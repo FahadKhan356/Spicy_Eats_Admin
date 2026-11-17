@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/side_drawer_menu.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
+import 'package:spicy_eats_admin/config/router.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 import 'package:spicy_eats_admin/menu/Repo/MenuManagerRepo.dart';
 
@@ -69,8 +70,11 @@ class _AdminShellState extends ConsumerState<AdminShell> {
       backgroundColor: Colors.grey[50],
       drawer: isDesktop
           ? null
-          : Drawer(
-              child: SafeArea(child: ref.watch(sideDrawerProvider)),
+          : const Drawer(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              child: SafeArea(child: SideDrawerMenu()),
             ),
       appBar: isDesktop
           ? null
@@ -121,7 +125,7 @@ class _AdminShellState extends ConsumerState<AdminShell> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Sign out?'),
-        content: const Text('You will need to sign in again to manage orders.'),
+        content: const Text('You will need to sign in again to access the portal.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -129,17 +133,27 @@ class _AdminShellState extends ConsumerState<AdminShell> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.black),
             child: const Text('Sign out'),
           ),
         ],
       ),
     );
 
-    if (shouldSignOut != true || !mounted) return;
+    if (shouldSignOut != true) return;
 
-    await supabaseClient.auth.signOut();
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (e) {
+      debugPrint('SignOut error: $e');
+    }
+
     ref.read(restaurantProvider.notifier).state = null;
-    if (mounted) context.go(LoginScreen.routename);
+    authRefresh.value++;
+
+    if (mounted) {
+      context.go(LoginScreen.routename);
+    }
   }
 }
 

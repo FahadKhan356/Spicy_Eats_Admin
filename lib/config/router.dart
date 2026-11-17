@@ -87,9 +87,59 @@ Future<Map<String, dynamic>?> ensureUserProfile() async {
 }
 
 Future<int?> readAuthStep() async {
+  final user = supabaseClient.auth.currentUser;
+  if (user == null) return null;
+
   final profile = await ensureUserProfile();
-  final step = profile?['Auth_steps'];
-  return step is int ? step : null;
+  final rawStep = profile?['Auth_steps'];
+  int? step;
+  if (rawStep is int) {
+    step = rawStep;
+  } else if (rawStep != null) {
+    step = int.tryParse(rawStep.toString());
+  }
+
+  // 1. If Auth_steps is explicitly step 3 (pending approval), respect it
+  if (step == 3) {
+    return 3;
+  }
+
+  // 2. Check if the user already has a restaurant registered in public.restaurants
+  try {
+    final rest = await supabaseClient
+        .from('restaurants')
+        .select('rest_uid')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+    if (rest != null) {
+      // User owns a restaurant! Make sure Auth_steps is updated to 2
+      if (step != 2) {
+        await supabaseClient
+            .from('users')
+            .update({'Auth_steps': 2, 'Role': 'restaurant-admin'})
+            .eq('id', user.id);
+      }
+      return 2;
+    }
+  } catch (e) {
+    debugPrint('readAuthStep restaurant check failed: $e');
+  }
+
+  // 3. If no restaurant found and step is null, 0, or 1 -> default to 1 (RestaurantRegister)
+  if (step == null || step < 1) {
+    try {
+      await supabaseClient
+          .from('users')
+          .update({'Auth_steps': 1, 'Role': 'restaurant-admin', 'status': 'pending'})
+          .eq('id', user.id);
+    } catch (e) {
+      debugPrint('readAuthStep update Auth_steps failed: $e');
+    }
+    return 1;
+  }
+
+  return step;
 }
 
 String landingForStep(int? step) {

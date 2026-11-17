@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
 import 'package:spicy_eats_admin/config/router.dart';
+import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   static const String routename = '/SplashScreen';
@@ -95,7 +96,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextButton(
-                    onPressed: () => context.go(LoginScreen.routename),
+                    onPressed: () async {
+                      try {
+                        await supabaseClient.auth.signOut();
+                      } catch (_) {}
+                      authRefresh.value++;
+                      if (context.mounted) {
+                        context.go(LoginScreen.routename);
+                      }
+                    },
                     child: const Text('Sign in as someone else'),
                   ),
                 ],

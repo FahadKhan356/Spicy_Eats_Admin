@@ -195,17 +195,30 @@ class _DekstopLayoutState extends ConsumerState<DekstopLayout> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                Wrap(
+                                  alignment: WrapAlignment.spaceBetween,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 8,
+                                  runSpacing: 4,
                                   children: [
                                     Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Checkbox(
-                                            value: true, onChanged: (value) {}),
-                                        const Text("Remember Me",
-                                            style: TextStyle(
-                                                overflow: TextOverflow.clip)),
+                                        SizedBox(
+                                          width: 22,
+                                          height: 22,
+                                          child: Checkbox(
+                                            value: true,
+                                            materialTapTargetSize:
+                                                MaterialTapTargetSize.shrinkWrap,
+                                            onChanged: (value) {},
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        const Text(
+                                          "Remember Me",
+                                          style: TextStyle(fontSize: 13),
+                                        ),
                                       ],
                                     ),
                                     InkWell(
@@ -215,32 +228,46 @@ class _DekstopLayoutState extends ConsumerState<DekstopLayout> {
                                         padding: EdgeInsets.symmetric(
                                             vertical: 4, horizontal: 2),
                                         child: Text(
-                                          "Forget Your Password?",
+                                          "Forgot Password?",
                                           style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              overflow: TextOverflow.clip),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                InkWell(
-                                  onTap: () => context.go(SignUpScreen.routename),
-                                  child: const Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      'Don\'t Have An Account?',
-                                      style:
-                                          TextStyle(color: MyAppColor.iconGray),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      "Don't have an account? ",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: MyAppColor.iconGray,
+                                      ),
                                     ),
-                                  ),
+                                    InkWell(
+                                      onTap: () => context.go(SignUpScreen.routename),
+                                      child: const Text(
+                                        'Sign up / Register',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(
-                                  height: 10,
+                                  height: 14,
                                 ),
                                 SizedBox(
-                                  height:
-                                      Responsive.isDesktop(context) ? 40 : 30,
+                                  height: 44,
                                   width: double.maxFinite,
                                   child: ElevatedButton(
                                     onPressed: () async {
@@ -506,95 +533,82 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                       const SizedBox(
                         height: 10,
                       ),
-                      widget.constraint.maxWidth < 400
-                          ? SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Checkbox(
-                                          value: true, onChanged: (value) {}),
-                                      const Text(
-                                        "Remember Me",
-                                        style: TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          // fontSize: constraint.maxWidth < 767
-                                          //     ? 10
-                                          //     : 20
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  InkWell(
-                                    onTap: () => context
-                                        .go(ForgotPasswordScreen.routename),
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 2),
-                                      child: Text(
-                                        "Forget Your Password?",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: Checkbox(
+                                  value: true,
+                                  onChanged: (value) {},
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
                               ),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                        value: true, onChanged: (value) {}),
-                                    const Text(
-                                      "Remember Me",
-                                      style: TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
+                              const SizedBox(width: 6),
+                              const Text(
+                                "Remember Me",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black87,
                                 ),
-                                InkWell(
-                                  onTap: () => context
-                                      .go(ForgotPasswordScreen.routename),
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 4, horizontal: 2),
-                                    child: Text(
-                                      "Forget Your Password?",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      InkWell(
-                        onTap: () => context.go(SignUpScreen.routename),
-                        child: const Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            'Don\'t Have An Account?',
-                            style: TextStyle(color: MyAppColor.iconGray),
+                              ),
+                            ],
                           ),
-                        ),
+                          InkWell(
+                            onTap: () =>
+                                context.go(ForgotPasswordScreen.routename),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 4, horizontal: 2),
+                              child: Text(
+                                "Forgot Password?",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Don't have an account? ",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: MyAppColor.iconGray,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => context.go(SignUpScreen.routename),
+                            child: const Text(
+                              'Sign up / Register',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(
-                        height: 10,
+                        height: 14,
                       ),
                       SizedBox(
-                        height: Responsive.isDesktop(context) ? 40 : 30,
+                        height: 46,
                         width: double.maxFinite,
                         child: ElevatedButton(
                           onPressed: () async {
@@ -621,17 +635,14 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                'Log In ',
+                              const Text(
+                                'Log In',
                                 style: TextStyle(
-                                    fontSize: widget.constraint.maxWidth > 400
-                                        ? widget.constraint.maxWidth / 45
-                                        : 12,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     overflow: TextOverflow.ellipsis,
                                     color: Colors.white),
                               ),
-                              // isloader?
                               const SizedBox(
                                 width: 10,
                               ),
@@ -658,7 +669,7 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                         height: 20,
                       ),
                       SizedBox(
-                        height: Responsive.isDesktop(context) ? 40 : 30,
+                        height: 46,
                         width: double.maxFinite,
                         child: ElevatedButton(
                           onPressed: () async {
@@ -683,22 +694,20 @@ class _MobileLayoutState extends ConsumerState<MobileLayout> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Flexible(
-                                  child: Image.asset('lib/assets/google.png')),
-                              widget.constraint.maxWidth > 300
-                                  ? Text(
-                                      'Sign in with Google',
-                                      style: TextStyle(
-                                        fontSize: widget.constraint.maxWidth >
-                                                400
-                                            ? widget.constraint.maxWidth / 45
-                                            : 12,
-                                        fontWeight: FontWeight.bold,
-                                        overflow: TextOverflow.ellipsis,
-                                        color: Colors.black,
-                                      ),
-                                    )
-                                  : const SizedBox(),
+                              Image.asset(
+                                'lib/assets/google.png',
+                                height: 22,
+                                width: 22,
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'Sign in with Google',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ],
                           ),
                         ),
