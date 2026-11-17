@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:spicy_eats_admin/Authentication/Login/LoginScreen.dart';
+import 'package:spicy_eats_admin/Authentication/Register/screens/RestaurantRegister.dart';
 import 'package:spicy_eats_admin/Dashboard/widgets/side_drawer_menu.dart';
 import 'package:spicy_eats_admin/config/responsiveness.dart';
 import 'package:spicy_eats_admin/config/router.dart';
@@ -192,6 +193,11 @@ class _OwnerError extends StatelessWidget {
               onPressed: onRetry,
               style: FilledButton.styleFrom(backgroundColor: Colors.black),
               child: const Text('Try again'),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () => context.go(RestaurantRegister.routename),
+              child: const Text('Go to Restaurant Registration'),
             ),
           ],
         ),

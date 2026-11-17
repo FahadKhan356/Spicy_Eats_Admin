@@ -165,17 +165,17 @@ class AuthRepository {
             .select('Auth_steps')
             .eq('id', userid)
             .maybeSingle();
-        if (response != null || response!['Auth_steps'] != null) {
-          ref.read(authStepsProvider.notifier).state = response['Auth_steps'];
-        } else {
-          throw Exception('Auth_steps not found');
+        final rawStep = response?['Auth_steps'];
+        int step = 1;
+        if (rawStep is int) {
+          step = rawStep;
+        } else if (rawStep != null) {
+          step = int.tryParse(rawStep.toString()) ?? 1;
         }
+        ref.read(authStepsProvider.notifier).state = step;
       }
     } catch (e) {
-      showCustomSnackbar(
-          context: context,
-          message: e.toString(),
-          backgroundColor: Colors.black);
+      debugPrint('checkAuthSteps error: $e');
     }
   }
 

@@ -3,12 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/MyTimeLine.dart';
 
-class Approve extends ConsumerWidget {
+class Approve extends ConsumerStatefulWidget {
   static const String routename = '/Approve';
   const Approve({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<Approve> createState() => _ApproveState();
+}
+
+class _ApproveState extends ConsumerState<Approve> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(authRepoProvider).checkAuthSteps(context, ref);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final authrepo = ref.watch(authRepoProvider);
     final authStep = ref.watch(authStepsProvider);

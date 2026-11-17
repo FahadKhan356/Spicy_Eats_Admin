@@ -92,65 +92,58 @@ Future<int?> readAuthStep() async {
 
   final profile = await ensureUserProfile();
   final rawStep = profile?['Auth_steps'];
-  int? step;
+  final status = (profile?['status'] ?? '').toString().toLowerCase();
+  int step = 1;
   if (rawStep is int) {
     step = rawStep;
   } else if (rawStep != null) {
-    step = int.tryParse(rawStep.toString());
+    step = int.tryParse(rawStep.toString()) ?? 1;
   }
 
-  // 1. If Auth_steps is explicitly step 3 (pending approval), respect it
-  if (step == 3) {
-    return 3;
-  }
-
-  // 2. Check if the user already has a restaurant registered in public.restaurants
+  // 1. Check if the user already has a restaurant registered in public.restaurants
+  Map<String, dynamic>? rest;
   try {
-    final rest = await supabaseClient
+    rest = await supabaseClient
         .from('restaurants')
-        .select('rest_uid')
+        .select('rest_uid, delivery_commission')
         .eq('user_id', user.id)
         .maybeSingle();
-
-    if (rest != null) {
-      // User owns a restaurant! Make sure Auth_steps is updated to 2
-      if (step != 2) {
-        await supabaseClient
-            .from('users')
-            .update({'Auth_steps': 2, 'Role': 'restaurant-admin'})
-            .eq('id', user.id);
-      }
-      return 2;
-    }
   } catch (e) {
     debugPrint('readAuthStep restaurant check failed: $e');
   }
 
-  // 3. If no restaurant found and step is null, 0, or 1 -> default to 1 (RestaurantRegister)
-  if (step == null || step < 1) {
-    try {
-      await supabaseClient
-          .from('users')
-          .update({'Auth_steps': 1, 'Role': 'restaurant-admin', 'status': 'pending'})
-          .eq('id', user.id);
-    } catch (e) {
-      debugPrint('readAuthStep update Auth_steps failed: $e');
-    }
+  // If user has NO restaurant registered yet:
+  // They MUST complete Restaurant Registration (/Register).
+  if (rest == null) {
     return 1;
   }
 
-  return step;
+  // User HAS a restaurant registered in public.restaurants:
+  // Check if they need to choose a delivery/commission plan.
+  if (rest['delivery_commission'] == null && step <= 2 && status != 'approved') {
+    return 2;
+  }
+
+  // If status is pending or step == 3 (awaiting approval -> /Approve).
+  if (step == 3 && status == 'pending') {
+    return 3;
+  }
+
+  // If status is approved OR step >= 4 OR existing active restaurant -> Dashboard.
+  return 4;
 }
 
 String landingForStep(int? step) {
   switch (step) {
     case 1:
-      return RestaurantRegister.routename;
-    case 3:
-      return Approve.routename;
+      return RestaurantRegister.routename; // /Register
     case 2:
+      return ChoosePlanScreen.routename;   // /Chooseplan
+    case 3:
+      return Approve.routename;            // /Approve
+    case 4:
     default:
-      return Dashboard.routename;
+      return Dashboard.routename;          // /Dashboard
   }
 }
 

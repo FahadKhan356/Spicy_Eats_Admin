@@ -48,6 +48,15 @@ File? image;
 
 class _RestaurantRegisterState extends ConsumerState<RestaurantRegister> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(authRepoProvider).checkAuthSteps(context, ref);
+      ref.read(isloadingprovider.notifier).state = false;
+    });
+  }
+
+  @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
