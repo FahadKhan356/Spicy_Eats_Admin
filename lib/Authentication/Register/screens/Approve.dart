@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/MyTimeLine.dart';
+import 'package:spicy_eats_admin/config/router.dart';
 
 class Approve extends ConsumerStatefulWidget {
   static const String routename = '/Approve';
@@ -24,7 +25,7 @@ class _ApproveState extends ConsumerState<Approve> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final authrepo = ref.watch(authRepoProvider);
-    final authStep = ref.watch(authStepsProvider);
+    final authStep = ref.watch(authStepsProvider) ?? currentAuthStep.value ?? 3;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),

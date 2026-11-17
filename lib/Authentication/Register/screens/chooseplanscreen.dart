@@ -6,6 +6,7 @@ import 'package:spicy_eats_admin/Authentication/controller/AuthController.dart';
 
 import 'package:spicy_eats_admin/Authentication/repository/AuthRepository.dart';
 import 'package:spicy_eats_admin/Authentication/widgets/MyTimeLine.dart';
+import 'package:spicy_eats_admin/config/router.dart';
 import 'package:spicy_eats_admin/config/supabaseconfig.dart';
 
 class ChoosePlanScreen extends ConsumerStatefulWidget {
@@ -38,7 +39,7 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authStep = ref.watch(authStepsProvider);
+    final authStep = ref.watch(authStepsProvider) ?? currentAuthStep.value ?? 2;
     final size = MediaQuery.of(context).size;
     final authrepo = ref.watch(authRepoProvider);
     final authController = ref.watch(authControllerProvider);
@@ -372,8 +373,12 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                   width: 100,
                   height: 50,
                   child: ElevatedButton(
-                      onPressed: () => context.go(Approve.routename),
-                      child: Text('Approve')),
+                      onPressed: () {
+                        setAuthStep(3);
+                        ref.read(authStepsProvider.notifier).state = 3;
+                        context.go(Approve.routename);
+                      },
+                      child: const Text('Approve')),
                 ),
                 SizedBox(
                   width: double.maxFinite,

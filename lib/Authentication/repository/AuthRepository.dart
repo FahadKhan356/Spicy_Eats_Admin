@@ -173,6 +173,7 @@ class AuthRepository {
           step = int.tryParse(rawStep.toString()) ?? 1;
         }
         ref.read(authStepsProvider.notifier).state = step;
+        setAuthStep(step);
       }
     } catch (e) {
       debugPrint('checkAuthSteps error: $e');
@@ -227,6 +228,8 @@ class AuthRepository {
       await supabaseClient
           .from('users')
           .update({'Auth_steps': 2}).eq('email', user.currentUser!.email!);
+      setAuthStep(2);
+      ref.read(authStepsProvider.notifier).state = 2;
 
       if (context.mounted) {
         context.go(ChoosePlanScreen.routename);
@@ -256,20 +259,23 @@ class AuthRepository {
 //fetch address for choose plan screen
   Future<void> fetchaddress(WidgetRef ref) async {
     try {
-      final String userid = supabaseClient.auth.currentUser!.id;
+      final String? userid = supabaseClient.auth.currentUser?.id;
+      if (userid == null) return;
       final response = await supabaseClient
           .from('restaurants')
           .select()
           .eq('user_id', userid)
-          .single();
-      if (response.isNotEmpty) {
+          .maybeSingle();
+      if (response != null && response.isNotEmpty) {
         ref.read(restaurantAddressProvider.notifier).state =
-            response['address'];
+            (response['address'] ?? '').toString();
         debugPrint(
             'restaurant address : ${ref.watch(restaurantAddressProvider)}');
+      } else {
+        ref.read(restaurantAddressProvider.notifier).state = '';
       }
     } catch (e) {
-      throw Exception(e);
+      ref.read(restaurantAddressProvider.notifier).state = '';
     }
   }
 
@@ -293,6 +299,7 @@ class AuthRepository {
 
       await supabaseClient.from('users').update({'Auth_steps': 3}).eq(
           'email', supabaseClient.auth.currentUser!.email!);
+      setAuthStep(3);
 
       if (context.mounted) {
         context.go(Approve.routename);
