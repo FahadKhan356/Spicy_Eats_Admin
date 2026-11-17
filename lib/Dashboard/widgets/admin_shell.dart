@@ -196,7 +196,21 @@ class _OwnerError extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             TextButton(
-              onPressed: () => context.go(RestaurantRegister.routename),
+              onPressed: () async {
+                final uid = supabaseClient.auth.currentUser?.id;
+                if (uid != null) {
+                  try {
+                    await supabaseClient
+                        .from('users')
+                        .update({'Auth_steps': 1})
+                        .eq('id', uid);
+                  } catch (_) {}
+                }
+                setAuthStep(1);
+                if (context.mounted) {
+                  context.go(RestaurantRegister.routename);
+                }
+              },
               child: const Text('Go to Restaurant Registration'),
             ),
           ],

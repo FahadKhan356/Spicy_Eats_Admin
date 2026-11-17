@@ -33,11 +33,32 @@ class MenuManagerRepo {
     ref.read(restaurantLoadingProvider.notifier).state = true;
 
     try {
-      final response = await supabaseClient
+      Map<String, dynamic>? response = await supabaseClient
           .from('restaurants')
           .select()
           .eq('user_id', user.id)
+          .limit(1)
           .maybeSingle();
+
+      // If the user reached Dashboard (e.g. Auth_steps set to 4 in DB) without
+      // a restaurant row yet, auto-create a starter restaurant record for them.
+      if (response == null) {
+        final emailPrefix = (user.email ?? 'My Restaurant').split('@').first;
+        final defaultName = emailPrefix.isNotEmpty
+            ? '${emailPrefix[0].toUpperCase()}${emailPrefix.substring(1)}'
+            : 'My Restaurant';
+        response = await supabaseClient
+            .from('restaurants')
+            .insert({
+              'user_id': user.id,
+              'restaurantName': defaultName,
+              'businessEmail': user.email,
+              'is_open': true,
+            })
+            .select()
+            .limit(1)
+            .maybeSingle();
+      }
 
       if (response == null) {
         ref.read(restaurantErrorProvider.notifier).state =

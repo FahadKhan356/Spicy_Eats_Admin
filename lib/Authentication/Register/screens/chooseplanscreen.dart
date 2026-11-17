@@ -79,7 +79,9 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
                   ),
                 ],
               ),
-              if (size.width > 500 && address != null && address.trim().isNotEmpty)
+              if (size.width > 500 &&
+                  address != null &&
+                  address.trim().isNotEmpty)
                 Flexible(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
