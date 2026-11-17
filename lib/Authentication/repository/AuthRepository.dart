@@ -297,8 +297,9 @@ class AuthRepository {
         'pickup_commission': offersPickup ? pickUpCommission : null,
       }).eq('user_id', userid);
 
-      await supabaseClient.from('users').update({'Auth_steps': 3}).eq(
-          'email', supabaseClient.auth.currentUser!.email!);
+      await supabaseClient
+          .from('users')
+          .update({'Auth_steps': 3}).eq('id', userid);
       setAuthStep(3);
 
       if (context.mounted) {
